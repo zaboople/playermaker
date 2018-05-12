@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+
+<project name="playermaker" basedir="." default="help">
+
+  <!--**********-->
+  <!--PROPERTIES-->
+  <!--**********-->
+
+  <property name="src.dir" value="java"/>
+
+  <!--Property files:-->
+  <property file="build.properties"/>
+
+  <!--Properties: arbitrary environment prefix:-->
+  <property environment="env"/>
+
+  <!--Properties: directories:-->
+  <property name="src.dir" value="java"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="dist.prefix" value="${ant.project.name}"/>
+  <property name="build.dir" value="build"/>
+  <property name="javadoc.dir" value="javadoc"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="test.dir" value="test"/>
+
+
+  <!--**************-->
+  <!--TARGETS: HELP -->
+  <!--**************-->
+
+  <target name="help">
+    <echo>
+    </echo>
+  </target>
+
+
+  <!--**************-->
+  <!--TARGETS: CLEAN-->
+  <!--**************-->
+
+  <target name="clean" description="Clean output directories">
+    <delete dir="build"/>
+    <delete dir="javadoc"/>
+    <!--delete dir="${web.dir}/WEB-INF/classes/**"/-->
+  </target>
+
+  <!--***********************-->
+  <!--TARGETS: COMPILE & JAR -->
+  <!--***********************-->
+
+  <target name="compile" description="Compile">
+    <mkdir dir="${build.dir}"/>
+    <javac
+      destdir="${build.dir}"
+      debug="true"
+      deprecation="false"
+      failonerror="true"
+      >
+      <src path="${src.dir}"/>
+      <!--classpath><fileset dir="${lib.dir}" includes="*.jar"/></classpath-->
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${dist.dir}/bin"/>
+    <jar destfile="${dist.dir}/bin/${ant.project.name}-${VERSION}.jar">
+      <fileset dir="${build.dir}"/>
+    </jar>
+  </target>
+
+
+  <!--*************************************-->
+  <!--TARGETS: DISTRIBUTION/DOCUMENTATION: -->
+  <!--*************************************-->
+  <target name="javadoc" description="JavaDoc" depends="compile">
+    <mkdir dir="${javadoc.dir}"/>
+    <javadoc sourcepath="${src.dir}"
+             destdir="${javadoc.dir}"
+             packagenames="org.**,com.**"
+             Public="true"
+             >
+      <classpath>
+         <pathelement path="${build.dir}"/>
+         <fileset dir="${lib.dir}" includes="*.jar"/>
+      </classpath>
+      <fileset dir="${src.dir}">
+        <include name="**/*.java"/>
+      </fileset>
+    </javadoc>
+  </target>
+
+  <target name="dist.src" depends="clean">
+    <mkdir dir="${dist.dir}"/>
+    <zip destfile="${dist.dir}/${dist.prefix}.src.zip">
+      <zipfileset dir="." prefix="${dist.prefix}.src"/>
+    </zip>
+    <echo>
+      Source distribution zipped as ${dist.prefix}.src.zip.
+    </echo>
+  </target>
+
+
+</project>

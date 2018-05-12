@@ -1,0 +1,40 @@
+- High
+    - Triplets
+    - Dotted notes
+    - Rest should have a "finish" so you can just play the rest of the duration.
+    - Ties
+        - as in, s2(...).t4(...).up().s4()
+            - to vibrato that, you've gotta trace back
+            - yet you might tie multiple things in sequence
+            - you need to tie notes too
+        - I think in order for bends to work correctly, because we convert() backwards... we need a List of ties
+    - Hammer-ons/pull-offs
+        - And a 16th that appears at the end of a half (right before another note)
+        - Or a 16th that starts a half
+    - Slurs/Slides or do we even - just do 128ths... but we could do them different
+    - Change speed - and put speed in player. My idea is that speed is typically 0, but
+        you can enhance it by speed(+/-X). This means anytime a Sound is added, the
+        speed needs to be added to it.
+    - Load instruments:
+        # Example of using an instrument from sound bank 1152 - splitting it into two 7-bit parts
+        n the MIDI protocol itself, bank numbers are split into two 7-bit parts and transmitted as the value
+        of two controllers, "Bank Select" and "Bank Select LSB":
+        ... = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 0,  1152 >> 7);   // = 9
+        ... = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 32, 1152 & 0x7f); // = 0
+        ... = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 0, 14, 0);
+
+- Medium
+    -Portamento, Legato, Reverb?
+        http://audioundone.com/tip-knowing-the-midi-messages-part-2
+    - off-tune mode
+        - create a map of notes to pitch bends, so that we can retrieve at runtime; this would go in the player itself.
+
+- Low
+    - For testing it would be nice to add multi-sequence play, i.e. play multiple MyMidi's in a row
+    Speed should be modulated as well - don't apply it directly to the note speed, but after the note is transposed.
+
+    -Bends need to throw exceptions when out of range
+
+
+
+

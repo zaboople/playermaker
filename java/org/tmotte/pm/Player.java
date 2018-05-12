@@ -1,0 +1,98 @@
+package org.tmotte.pm;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Player extends AbstractSound<Player> {
+    long startTime=0;
+    List<Sound> sounds=new ArrayList<>();
+    int bendSensitivity=2;
+    int reverb=0;
+
+    // This might be better on attrs:
+    int instrumentIndex=0, channelIndex=0, trackIndex=0;
+
+    public Player() {
+        super(new TonalAttributes());
+        volume(64);
+    }
+
+    public Player instrument(int instrumentIndex) {
+        this.instrumentIndex=instrumentIndex;
+        return this;
+    }
+    public Player instrumentChannel(int instrumentIndex, int channelIndex) {
+        this.instrumentIndex=instrumentIndex;
+        this.channelIndex=channelIndex;
+        return this;
+    }
+    public Player instrumentTrackChannel(int instrumentIndex, int trackIndex, int channelIndex) {
+        this.instrumentIndex=instrumentIndex;
+        this.channelIndex=channelIndex;
+        return this;
+    }
+
+
+    public Collection<Sound> sounds() {
+        return sounds;
+    }
+
+    public Player setStart(long time) {
+        this.startTime=time;
+        return this;
+    }
+    public Player setBendSensitivity(int sensitivity) {
+        this.bendSensitivity=sensitivity;
+        return this;
+    }
+    public Player bendSense(int sensitivity) {
+        this.bendSensitivity=sensitivity;
+        return this;
+    }
+    public int getBendSensitivity() {
+        return this.bendSensitivity;
+    }
+
+    public Player setReverb(int reverb) {
+        this.reverb=reverb;
+        return this;
+    }
+    public int getReverb() {
+        return reverb;
+    }
+
+    public Player r1() {return rest(Divisions.reg2);}
+    public Player r2() {return rest(Divisions.reg2);}
+    public Player r4() {return rest(Divisions.reg4);}
+    public Player r8() {return rest(Divisions.reg8);}
+    public Player r16() {return rest(Divisions.reg16);}
+    public Player r32() {return rest(Divisions.reg32);}
+    public Player r64() {return rest(Divisions.reg64);}
+
+    public Player r8_3() {return rest(Divisions.triplet8);}
+    public Player r16_3() {return rest(Divisions.triplet16);}
+    public Player r32_3() {return rest(Divisions.triplet32);}
+    public Player r64_3() {return rest(Divisions.triplet64);}
+
+    private Player rest(long division) {
+        int v=volume();
+        volume(0);
+        addSound(division, 0);
+        volume(v);
+        return this;
+    }
+
+
+    protected @Override Sound addSound(long duration, int... pitches) {
+        Sound sound=new Sound(this, duration, pitches);
+        sounds.add(sound);
+        return sound;
+    }
+    protected @Override Note addNote(long duration, int pitch) {
+        return addSound(duration, pitch).notes().get(0);
+    }
+    protected @Override Player self(){
+        return this;
+    }
+}
