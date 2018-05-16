@@ -10,21 +10,61 @@ package org.tmotte.pm;
         <li>sX() creates &amp; returns a Sound object representing a chord, allowing
             for further modification of itself.
         <li>nX() creates a Sound with one Note, and returns that Note directly. This
-            allows detailed modification (vibrato, bend) of only that Note.
-
+            allows detailed modification (vibrato, bend) of only that Note. You can
+            still go Note.up() back to the Sound and add more notes, etc.
    </ul>
    But in the case of Sound,
    <ul>
         <li>pX() adds notes to the existing chord, then returns Player. The Sound is
             committed and later Sounds/Notes will be played after it.
-        <li>sX() does likewise and returns the original Sound object for further modification
-        <li>
+        <li>sX() does the same as Player.sX(), but appends to the chord to the existing
+            notes in the Sound, rather than making them come _after_.
+        <li>nX() does the same as Player.sX()
+    <ul/>
  */
 public abstract class AbstractSound<T> extends AttributeHolder<T> {
 
     AbstractSound(TonalAttributes ta) {
         super(ta);
     }
+
+    public Player p(Duration d, int... notes) {
+        return c(d, notes).up();
+    }
+    public Sound c(Duration d, int... notes) {
+        return addSound(d.duration(), notes);
+    }
+    public Note n(Duration d, int note) {
+        return addNote(d.duration(), note);
+    }
+
+    public Player p(int duration, int... notes) {
+        return c(duration, notes).up();
+    }
+    public Sound c(int duration, int... notes) {
+        return addSound(Divisions.convert(duration), notes);
+    }
+    public Note n(int duration, int note) {
+        return addNote(Divisions.convert(duration), note);
+    }
+
+    public Player p(double duration, int... notes) {
+        return c(duration, notes).up();
+    }
+    public Sound c(double duration, int... notes) {
+        return addSound(Divisions.convert(duration), notes);
+    }
+    public Note n(double duration, int note) {
+        return addNote(Divisions.convert(duration), note);
+    }
+
+    protected abstract Note addNote(long duration, int note);
+    protected abstract Sound addSound(long duration, int... notes);
+
+    ////////////////////////////////////////////
+    // Old way of adding notes... not all bad //
+    // but kind of repetitive to maintain:    //
+    ////////////////////////////////////////////
 
     public Note n1(int note) {
         return addNote(Divisions.whole, note);
@@ -119,6 +159,17 @@ public abstract class AbstractSound<T> extends AttributeHolder<T> {
         return s64_3(notes).up();
     }
 
-    protected abstract Note addNote(long division, int note);
-    protected abstract Sound addSound(long division, int... notes);
+    public Player p83(int... notes) {
+        return s8_3(notes).up();
+    }
+    public Player p163(int... notes) {
+        return s16_3(notes).up();
+    }
+    public Player p323(int... notes) {
+        return s32_3(notes).up();
+    }
+    public Player p643(int... notes) {
+        return s64_3(notes).up();
+    }
+
 }

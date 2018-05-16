@@ -17,15 +17,22 @@ public class Divisions {
 
     /**
      * Convert a triplet e.g. expressed as 8.3 to an 8th of a triplet.
-     * as well as a dotted e.g. expressed as 8.2 to an 8th + 16th.
+     * as well as a dotted e.g. expressed as 8.0 to an 8th + 16th
+     * - note that 8.0 can be written as "8.", i.e. without the zero. Nice.
      */
     public static long convert(double d) {
         long main=(long)Math.floor(d);
         long fractional=Math.round((d-main) * 10);
+        double dd=8.;
         main=convert(main);
-        return fractional==2
-            ?(main * 2) / 3   //triplet
-            : main + (main / 2); //dotted
+        if (fractional==3)
+            //triplet
+            return (main * 2) / 3;
+        else
+        if (fractional==2 || fractional==1 || fractional==0)
+            return main + (main / 2); //dotted
+        else
+            throw new RuntimeException("Don't know what to do with "+d);
     }
 
     public static long convert(long d) { //FIXME what a mess but it works

@@ -182,7 +182,7 @@ public class MyMidi3  {
 	}
 
 	private void sendBends(long soundStart, List<Bend> bends) {
-		System.out.println("Bends "+bends.size());
+		//System.out.println("MyMidi3: Bends "+bends.size());
 		final int max=8192;
 	    long t=soundStart;
 	    int pitch=max;//fixme is that correct?
@@ -198,7 +198,7 @@ public class MyMidi3  {
 		long t;
 		public void init(long soundStart) {
 			this.t=soundStart;
-			this.pitch=8192;//FIXME FUCKING CONSTANT
+			this.pitch=8192;//FIXME MAKE CONSTANT
 		}
 		public void send(long delay, long duration, int denominator) {
 		    //System.out.println("Delay "+delay+" duration "+duration+" denominator "+denominator);
@@ -216,6 +216,7 @@ public class MyMidi3  {
 		    	}
 		    	pitch+=thisAmount;
 		    	if (pitch==16384) pitch=16383;
+			    //System.out.println("Sending bend at "+t);
 		        eventBend(pitch, t);
 			    t+=tickX;
 	        }

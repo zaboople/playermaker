@@ -13,34 +13,36 @@ public class Rest {
         this.restFor=restFor;
     }
 
-    public Player p4(int note) {
-        return s4(note).up();
+    public Player p(double duration, int... notes) {
+        return c(duration, notes).up();
     }
-    public Player p8(int note) {
-        return s8(note).up();
+    public Sound c(double duration, int... notes) {
+        return c(Divisions.convert(duration), notes);
     }
-    public Player p16(int note) {
-        return s16(note).up();
-    }
-
-    public Sound s4(int note) {
-        return n4(note).up();
-    }
-    public Sound s8(int note) {
-        return n8(note).up();
-    }
-    public Sound s16(int note) {
-        return n16(note).up();
+    public Note n(double duration, int note) {
+        return n(Divisions.convert(duration), note);
     }
 
-    public Note n4(int note) {
-        return add(Divisions.reg4, note);
+    public Player p(int duration, int... notes) {
+        return c(duration, notes).up();
     }
-    public Note n8(int note) {
-        return add(Divisions.reg8, note);
+    public Sound c(int duration, int... notes) {
+        return c(Divisions.convert(duration), notes);
     }
-    public Note n16(int note) {
-        return add(Divisions.reg16, note);
+    public Note n(int duration, int note) {
+        return n(Divisions.convert(duration), note);
+    }
+
+    public Player p(long duration, int... notes) {
+        return c(duration, notes).up();
+    }
+    public Sound c(long duration, int... notes) {
+        for (int n: notes)
+            add(duration, n);
+        return sound;
+    }
+    public Note n(long duration, int note) {
+        return add(duration, note);
     }
 
     private Note add(long duration, int pitch) {

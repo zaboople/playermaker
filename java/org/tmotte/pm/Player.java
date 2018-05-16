@@ -62,6 +62,9 @@ public class Player extends AbstractSound<Player> {
         return reverb;
     }
 
+    public Player r(int i) {return rest(Divisions.convert(i));}
+    public Player r(double d) {return rest(Divisions.convert(d));}
+
     public Player r1() {return rest(Divisions.reg2);}
     public Player r2() {return rest(Divisions.reg2);}
     public Player r4() {return rest(Divisions.reg4);}
