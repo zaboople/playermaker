@@ -98,9 +98,15 @@ public class MyMidi3  {
 
 			// Setup of instrument:
 	        setupChannelForPlayer(player, currTick);
+	        int instrument=player.instrumentIndex;
 
 			// And blast off the rocket:
 	        for (Sound sound: player.sounds()) {
+		        if (sound.instrument!=instrument) {
+			        instrument=sound.instrument;
+	                sendInstrument(instrument, currTick);
+                }
+
 		        int spareTrackIndex=-1;
 	            long soundStart=currTick;
 	            for (Note note: sound.notes()) {
@@ -117,9 +123,12 @@ public class MyMidi3  {
 
 					// Send any bends, and the note start:
 		            if (!noteBends.isEmpty()) {
+			            System.out.println("Using spare!"+currChannelIndex);
 			            reservedChannels.useSpare(player, currTick);
+			            System.out.println("Used spare!"+currChannelIndex);
 						sendBends(soundStart + restBefore, noteBends);
 					}
+					System.out.println("Pitch "+pitch+" at "+currTick);
 	                event(NOTEON, pitch, volume, currTick);
 
 
@@ -146,6 +155,7 @@ public class MyMidi3  {
 	private void setupChannelForPlayer(Player player, long tick) throws Exception {
 		// Reverb doesn't work for me. Bummer.
         //System.out.println("REVERB "+currChannelIndex+" "+currTrack+" "+player.getReverb());
+        System.out.println("setupChannel "+currChannelIndex+" tick "+tick+" bend sense "+player.getBendSensitivity()+" "+player.instrumentIndex);
         sendBendSensitivity(player.getBendSensitivity(), tick);
         sendReverb(player.getReverb(), tick);
         sendInstrument(player.instrumentIndex, tick);
@@ -166,6 +176,7 @@ public class MyMidi3  {
 			    currChannelIndex+=1;
 			    Set<Integer> already=playerSetupAlready.computeIfAbsent(player, p -> new HashSet<>());
 			    if (!already.contains(currChannelIndex)) {
+				    System.out.println("Setting up spare...");
 				    already.add(currChannelIndex);
 				    setupChannelForPlayer(player, tick);
 			    }
@@ -216,7 +227,7 @@ public class MyMidi3  {
 		    	}
 		    	pitch+=thisAmount;
 		    	if (pitch==16384) pitch=16383;
-			    //System.out.println("Sending bend at "+t);
+			    //System.out.println("Sending bend "+pitch+" at "+t);
 		        eventBend(pitch, t);
 			    t+=tickX;
 	        }
@@ -259,28 +270,28 @@ public class MyMidi3  {
         //RPN MSB (always 0)
         sendMessage(
 	        new ShortMessage(
-		        ShortMessage.CONTROL_CHANGE, 0, 101, 0
+		        ShortMessage.CONTROL_CHANGE, currChannelIndex, 101, 0
 	        ),
 	        tick
         );
         //RPN LSB (for pitch sensitivity, 0)
         sendMessage(
 	        new ShortMessage(
-		        ShortMessage.CONTROL_CHANGE, 0, 100, 0
+		        ShortMessage.CONTROL_CHANGE, currChannelIndex, 100, 0
 	        ),
 	        tick
         );
         //Data Entry MSB
         sendMessage(
 	        new ShortMessage(
-		        ShortMessage.CONTROL_CHANGE, 0, 6, amount
+		        ShortMessage.CONTROL_CHANGE, currChannelIndex, 6, amount
 	        ),
 	        tick
         );
         //Data Entry LSB:
         sendMessage(
 	        new ShortMessage(
-		        ShortMessage.CONTROL_CHANGE, 0, 38, 0
+		        ShortMessage.CONTROL_CHANGE, currChannelIndex, 38, 0
 	        ),
 	        tick
         );
@@ -291,7 +302,7 @@ public class MyMidi3  {
 	    System.out.println("Sent reverb "+amount);
         sendMessage(
 	        new ShortMessage(
-		        ShortMessage.CONTROL_CHANGE, 0, 92, amount
+		        ShortMessage.CONTROL_CHANGE, currChannelIndex, 92, amount
 	        ),
 	        tick
         );

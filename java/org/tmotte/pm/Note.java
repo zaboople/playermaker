@@ -44,20 +44,45 @@ public class Note {
     public List<Bend> bends() {
         return bends==null ?Collections.emptyList() :bends;
     }
-    public Note bend(long duration, int semitones) {
-        return bend(0, duration, semitones);
+    public Note bend(int denominator) {
+        return bend(0L, duration, denominator);
     }
-    public Note bend(double duration, int semitones) {
-        return bend(0D, duration, semitones);
+
+    public Note bend(long duration, int denominator) {
+        return bend(0L, duration, denominator);
     }
-    public Note bend(long delay, long duration, int semitones) {
-        bends=Bend.add(bends, delay, duration, semitones);
+    public Note bend(long delay, long duration, int denominator) {
+        bends=Bend.add(bends, delay, duration, denominator);
         return this;
     }
-    public Note bend(double delay, double duration, int semitones) {
-        bends=Bend.add(bends, delay, duration, semitones);
+
+    public Note bend(double duration, int denominator) {
+        return bend(0D, duration, denominator);
+    }
+    public Note bend(double delay, double duration, int denominator) {
+        bends=Bend.add(bends, delay, duration, denominator);
         return this;
     }
+
+    public Note bend(int duration, int denominator) {
+        return bend(0, duration, denominator);
+    }
+    public Note bend(int delay, int duration, int denominator) {
+        bends=Bend.add(bends, delay, duration, denominator);
+        return this;
+    }
+
+    public Note vibrato(int frequency, int denominator) {
+        return vibrato(0L, duration, Divisions.convert(frequency), denominator);
+    }
+    public Note vibrato(int duration, int frequency, int denominator) {
+        return vibrato(0, duration, frequency, denominator);
+    }
+    public Note vibrato(int delay, int duration, int frequency, int denominator) {
+        bends=Bend.vibrato(bends, 0, duration, frequency, denominator);
+        return this;
+    }
+
 
 
     public Note vibrato(long frequency, int denominator) {

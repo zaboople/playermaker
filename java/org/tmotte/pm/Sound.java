@@ -9,10 +9,12 @@ public class Sound extends AbstractSound<Sound> {
     private Player player;
     private List<Note> notes=new ArrayList<>();
     private List<Bend> bends=null;
+    int instrument;
 
     Sound(Player player, long duration, int... pitches) {
         super(new TonalAttributes(player.attrs()));
         this.player=player;
+        this.instrument=player.instrumentIndex;
         addSound(duration, pitches);
     }
 
@@ -54,6 +56,10 @@ public class Sound extends AbstractSound<Sound> {
 
     public List<Bend> bends() {
         return bends==null ?Collections.emptyList() :bends;
+    }
+
+    public Sound bend(int denominator) {
+        return bend(0L, totalDuration(), denominator);
     }
 
     public Sound bend(long duration, int denominator) {

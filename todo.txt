@@ -1,4 +1,7 @@
+
 - High
+    - Do a chuck berry bend - so the non-bent note is delayed .
+    - Instrument needs to be able to change out
     - Triplets
     - Dotted notes
     - Rest should have a "finish" so you can just play the rest of the duration.
