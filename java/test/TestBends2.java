@@ -14,9 +14,9 @@ public class TestBends2  {
 		    .setBendSensitivity(4);
 		int base=10;
 	    player
-		    .octave(6)
+		    .octave(5)
 		    .r4()
-			.s4(G, B, D).bend(32, 1).up()
+			.s4(G+2, B+2, D+2).bend(8, 2).up()
 			.p4(A, D_, E)
 			.p8(E, D_, F)
 			.s4(C, E, G)

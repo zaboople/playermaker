@@ -11,9 +11,10 @@ public class TestReverb  {
 		{
 		    Player player=new Player()
 			    .instrumentTrackChannel(16, 0, 0)
-			    .setReverb(127)
+			    .setReverb(0)
 			    .octave(5)
 			    .r4()
+
 				.p4(G, B, D)
 			    .r8()
 				.p4(E, G_, B)
@@ -31,7 +32,11 @@ public class TestReverb  {
 			    .r8()
 				.p4(A, D_, E)
 			    .r8()
-			    .r2()
+				.p16(G_)
+				.p8(E)
+				.p16(G_)
+
+			    .r4()
 				;
 			    new MyMidi3()
 				    .setBeatsPerMinute(60)

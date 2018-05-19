@@ -123,12 +123,11 @@ public class MyMidi3  {
 
 					// Send any bends, and the note start:
 		            if (!noteBends.isEmpty()) {
-			            System.out.println("Using spare!"+currChannelIndex);
 			            reservedChannels.useSpare(player, currTick);
-			            System.out.println("Used spare!"+currChannelIndex);
+			            System.out.println("Using spare: "+currChannelIndex);
 						sendBends(soundStart + restBefore, noteBends);
 					}
-					System.out.println("Pitch "+pitch+" at "+currTick);
+					//System.out.println("Pitch "+pitch+" at "+currTick);
 	                event(NOTEON, pitch, volume, currTick);
 
 
@@ -137,11 +136,13 @@ public class MyMidi3  {
 	                event(NOTEOFF, pitch, volume, currTick);
 		            if (!noteBends.isEmpty())
 						eventBendEnd(currTick);
+
+					// Get back on channel if we had to use a reserve:
+		            currChannelIndex=player.channelIndex;
 	            }
 
-				// Get back on channel as necessary; note bends above will
-				// send us off channel (inside ReservedChannels logic)
-	            currChannelIndex=player.channelIndex;
+				// Finish up with the chord bends (if any) and
+				// and advance the currTick counter:
 	            if (!sound.bends().isEmpty())
 		            sendBends(soundStart, sound.bends());
 	            currTick=soundStart+(sound.totalDuration() * tickX);
@@ -154,8 +155,11 @@ public class MyMidi3  {
 
 	private void setupChannelForPlayer(Player player, long tick) throws Exception {
 		// Reverb doesn't work for me. Bummer.
-        //System.out.println("REVERB "+currChannelIndex+" "+currTrack+" "+player.getReverb());
-        System.out.println("setupChannel "+currChannelIndex+" tick "+tick+" bend sense "+player.getBendSensitivity()+" "+player.instrumentIndex);
+		/*
+        System.out.println("REVERB "+currChannelIndex+" "+currTrack+" "+player.getReverb());
+        System.out.println("setupChannel "+currChannelIndex+" tick "+tick
+	        +" bend sense "+player.getBendSensitivity()+" "+player.instrumentIndex);
+        */
         sendBendSensitivity(player.getBendSensitivity(), tick);
         sendReverb(player.getReverb(), tick);
         sendInstrument(player.instrumentIndex, tick);

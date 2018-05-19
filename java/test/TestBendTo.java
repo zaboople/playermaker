@@ -8,46 +8,47 @@ import static org.tmotte.pm.Pitches.*;
 
 public class TestBendTo  {
     public static void main(String args[]) throws Exception {
-	    //Organ 1, with double bend-sensitivity:
-		System.out.println(48+G);
-		System.out.println(48+A);
-		System.out.println(48+C+12);
-		System.out.println(48+D_+12);
-		System.out.println(48+D+12);
 	    Player player=new Player()
 		    .instrumentChannel(41, 3)
 		    .setBendSensitivity(4)
 		    .r4()
 
 		    .octave(4)
-		    /*
-		    .p(4, G)
-		    .p(4, A)
-		    .p(4, C+12)
-		    .p(4, D_+12)
-		    .p(4, D+12)
-		    */
 
-			.c(8, G)
-				.bend(2)
-				.up()
-			.p(8, D+12)
+		    // 1
+		    .p(8., G)
+		    .p(16, A)
 
-			.c(4, G)
-				.bend(8, 2)
-				.up()
-			.p(8, D+12)
+		    // 2-3 This has the tricky bend:
+		    .p(16.3, C+12)
+		    .p(16.3, D_+12)
+		    .p(16.3, D+12)
+			.n(4., G).bend(8, 2).up()
+				.r(4).n(8, E+12).upup()
 
-			//.p(8, G+12)
+			// 4
+			.c(4, F+12).bend(8, 2).up()
 
-
-			/** FIXME THIS IS BENDING BOTH NOTES! **/
+			// 5 - And again the tricky bend:
 			.n(4, G).bend(8, 2).up()
-				.r(8).n(8, D+12).upup()
-			.p(8, A)
+				.r(8)
+				.n(8, D+12).upup()
+			// 6
+			.c(4, E+12+2, G+12+2)
+				.bend(8, -2).up()
+
+			// 7
+		    .p(8., G)
+		    .p(16, A)
+
+			// 8-9
+			.p(16.3, C, E)
+			.p(16.3, G, B)
+			.p(16.3, D, B_)
+			.p(4., A, A-12, A+12)
 		    .r4();
 	    new MyMidi3()
-		    .setBeatsPerMinute(50)
+		    .setBeatsPerMinute(60)
 		    .sequenceAndPlay(player, true);
 	    System.out.println("Done");
     }

@@ -11,8 +11,9 @@ public class TestVibratoTriplet  {
     public static void main(String args[]) throws Exception {
 	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
-		    .instrument(81)
+		    .instrument(41)
 		    .setBendSensitivity(4)
+		    .setReverb(127)
 		    .octave(5)
 		    .r4()
 

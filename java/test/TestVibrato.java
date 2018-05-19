@@ -14,7 +14,6 @@ public class TestVibrato  {
 		    .setBendSensitivity(4)
 		    .octave(5)
 		    .r4()
-			.p8(A-12)
 			.s4(A-12).vibrato(64, 12).up()
 			.p16(B-12)
 			.p16(C)
