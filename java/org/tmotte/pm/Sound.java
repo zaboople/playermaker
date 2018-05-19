@@ -93,14 +93,11 @@ public class Sound extends AbstractSound<Sound> {
         return vibrato(0, duration, frequency, denominator);
     }
     public Sound vibrato(int delay, int duration, int frequency, int denominator) {
+        //FIXME do divisions.convert() on these dummy
         bends=Bend.vibrato(bends, 0, duration, frequency, denominator);
         return this;
     }
 
-    public Sound vibrato(Duration frequency, int denominator) {
-        //FIXME delete
-        return vibrato(frequency.duration(), denominator);
-    }
 
     public Sound vibrato(long frequency, int denominator) {
         return vibrato(0, totalDuration(), frequency, denominator);

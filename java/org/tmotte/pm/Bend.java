@@ -44,6 +44,16 @@ public final class Bend {
         return bends;
     }
 
+    static List<Bend> vibrato(List<Bend> bends, double delay, double duration, double frequency, int denominator) {
+        return vibrato(
+            bends,
+            Divisions.convert(delay),
+            Divisions.convert(duration),
+            Divisions.convert(frequency),
+            denominator
+        );
+    }
+
     /**
      * The long version will usually get used - the int version (FIXME) probably can go.
      */

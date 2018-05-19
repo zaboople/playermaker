@@ -1,6 +1,7 @@
 
 - High
-    - Rest should have a "finish" so you can just play the rest of the duration.
+    - Vibrato doesn't have triplet version
+    - Sound.rest() should have a "finish" so you can just play the rest of the duration.
     - Ties
         - as in, s2(...).t4(...).up().s4()
             - to vibrato that, you've gotta trace back

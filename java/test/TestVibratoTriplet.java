@@ -5,7 +5,6 @@ import org.tmotte.pm.Sound;
 import org.tmotte.pm.Bend;
 import org.tmotte.pm.Divisions;
 import static org.tmotte.pm.Pitches.*;
-import static org.tmotte.pm.Duration.*;
 
 public class TestVibratoTriplet  {
     public static void main(String args[]) throws Exception {

@@ -5,7 +5,7 @@ import org.tmotte.pm.Sound;
 import org.tmotte.pm.Bend;
 import org.tmotte.pm.Divisions;
 import static org.tmotte.pm.Pitches.*;
-import static org.tmotte.pm.Duration.*;
+
 
 /**
  * Demonstrates that to play different instruments, we do not need
@@ -30,16 +30,16 @@ public class TestChannelTrack  {
 			.r4()
 			.r4()
 			.octave(3)
-			.p(_83, D+12, D)
-			.p(_83, D_+12, F)
-			.c(_8dot, C+12, C).vibrato(64,8).up()
+			.p(8.3, D+12, D)
+			.p(8.3, D_+12, F)
+			.c(8., C+12, C).vibrato(64,8).up()
 			.octave(4)
-			.c(_16, C, C+12, C+24).up()
-			.c(_16, G, G+12, G+24).up()
+			.c(16, C, C+12, C+24).up()
+			.c(16, G, G+12, G+24).up()
 			.octave(5)
-			.c(_16, E, E+12, E+24).vibrato(64,8).up()
+			.c(16, E, E+12, E+24).vibrato(64,8).up()
 			.r32()
-			.c(_4, E, E+12, E+24).vibrato(64,8).up()
+			.c(4, E, E+12, E+24).vibrato(64,8).up()
 		    .r4();
 	    //Chiffer Lead:
 	    Player player2=new Player()

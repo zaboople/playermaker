@@ -72,6 +72,7 @@ public class Note {
         return this;
     }
 
+
     public Note vibrato(int frequency, int denominator) {
         return vibrato(0L, duration, Divisions.convert(frequency), denominator);
     }
@@ -83,34 +84,25 @@ public class Note {
         return this;
     }
 
-
-
     public Note vibrato(long frequency, int denominator) {
-        //FIXME this may need a durationShortForm() treatment
-        return vibrato(0, duration, frequency, denominator);
-    }
-    public Note vibrato(double frequency, int denominator) {
         return vibrato(0, duration, frequency, denominator);
     }
     public Note vibrato(long duration, long frequency, int denominator) {
         return vibrato(0, duration, frequency, denominator);
     }
-    public Note vibrato(double duration, double frequency, int denominator) {
-        return vibrato(0, duration, frequency, denominator);
-    }
     public Note vibrato(long delay, long duration, long frequency, int denominator) {
-        long count=frequency/duration;
-        System.out.println(count);
-        int flipper=1;
-        for (long i=0; i<count; i++) {
-            bend((i==0 && delay>0 ?delay :0), frequency, denominator * flipper);
-            flipper*=-1;
-        }
+        bends=Bend.vibrato(bends, delay, duration, frequency, denominator);
         return this;
     }
+
+    public Note vibrato(double frequency, int denominator) {
+        return vibrato(0L, duration, Divisions.convert(frequency), denominator);
+    }
+    public Note vibrato(double duration, double frequency, int denominator) {
+        return vibrato(0D, duration, frequency, denominator);
+    }
     public Note vibrato(double delay, double duration, double frequency, int denominator) {
-        //FIXME
-        //vibratos=Vibrato.add(vibratos, delay, duration, frequency, denominator);
+        bends=Bend.vibrato(bends, delay, duration, frequency, denominator);
         return this;
     }
 

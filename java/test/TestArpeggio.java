@@ -3,9 +3,8 @@ import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import org.tmotte.pm.Sound;
 import org.tmotte.pm.Bend;
-import org.tmotte.pm.Divisions;
 import static org.tmotte.pm.Pitches.*;
-import static org.tmotte.pm.Duration.*;
+
 
 public class TestArpeggio  {
     public static void main(String args[]) throws Exception {
