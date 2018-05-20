@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Note {
+public class Note implements BendContainer {
 
     final long restBefore;
     final long duration;
@@ -44,6 +44,13 @@ public class Note {
     public List<Bend> bends() {
         return bends==null ?Collections.emptyList() :bends;
     }
+    public @Override void setBends(List<Bend> bends) {
+        this.bends=bends;
+    }
+    public @Override List<Bend> getBends() {
+        return bends;
+    }
+
     public Note bend(int denominator) {
         return bend(0L, duration, denominator);
     }
@@ -52,24 +59,22 @@ public class Note {
         return bend(0L, duration, denominator);
     }
     public Note bend(long delay, long duration, int denominator) {
-        bends=Bend.add(bends, delay, duration, denominator);
-        return this;
+        return Bend.add(this, delay, duration, denominator);
     }
 
     public Note bend(double duration, int denominator) {
         return bend(0D, duration, denominator);
     }
     public Note bend(double delay, double duration, int denominator) {
-        bends=Bend.add(bends, delay, duration, denominator);
-        return this;
+        return Bend.add(this, delay, duration, denominator);
     }
 
     public Note bend(int duration, int denominator) {
         return bend(0, duration, denominator);
     }
     public Note bend(int delay, int duration, int denominator) {
-        bends=Bend.add(bends, delay, duration, denominator);
-        return this;
+        System.out.println("Note.bend() 3 int");
+        return Bend.add(this, delay, duration, denominator);
     }
 
 
@@ -80,8 +85,7 @@ public class Note {
         return vibrato(0, duration, frequency, denominator);
     }
     public Note vibrato(int delay, int duration, int frequency, int denominator) {
-        bends=Bend.vibrato(bends, 0, duration, frequency, denominator);
-        return this;
+        return Bend.vibrato(this, 0, duration, frequency, denominator);
     }
 
     public Note vibrato(long frequency, int denominator) {
@@ -91,8 +95,7 @@ public class Note {
         return vibrato(0, duration, frequency, denominator);
     }
     public Note vibrato(long delay, long duration, long frequency, int denominator) {
-        bends=Bend.vibrato(bends, delay, duration, frequency, denominator);
-        return this;
+        return Bend.vibrato(this, delay, duration, frequency, denominator);
     }
 
     public Note vibrato(double frequency, int denominator) {
@@ -102,8 +105,7 @@ public class Note {
         return vibrato(0D, duration, frequency, denominator);
     }
     public Note vibrato(double delay, double duration, double frequency, int denominator) {
-        bends=Bend.vibrato(bends, delay, duration, frequency, denominator);
-        return this;
+        return Bend.vibrato(this, delay, duration, frequency, denominator);
     }
 
 }

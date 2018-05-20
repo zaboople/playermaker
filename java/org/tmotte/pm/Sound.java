@@ -5,7 +5,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Sound extends AbstractSound<Sound> {
+/**
+ * @param delay A period to wait before the bend; this can be expressed as
+ *        2/4/8/16/32/64 etc to indicate a period corresponding to half/quarter/eighth/etc
+ *        notes (for triplet and dotted note delays, use Bend(double, double, int)).
+ * @param denominator Can be negative or positive. Indicates the 1/denominator of our bend range to go
+ * up or down. So, if our bend sensitivity is set to the default of one whole step:
+   <ul>
+     <li>1 is a whole step, e.g. C to D
+     <li>2 is a half step, e.g. C to C#
+     <li>4 is a quarter step (obviously off key but it's jazzy that way)
+   </ul>
+ * And so forth.
+ */
+public class Sound extends AbstractSound<Sound> implements BendContainer {
     private Player player;
     private List<Note> notes=new ArrayList<>();
     private List<Bend> bends=null;
@@ -54,8 +67,16 @@ public class Sound extends AbstractSound<Sound> {
     // BEND & VIBRATO: //
     /////////////////////
 
+    // BEND: //
+
     public List<Bend> bends() {
         return bends==null ?Collections.emptyList() :bends;
+    }
+    public @Override void setBends(List<Bend> bends) {
+        this.bends=bends;
+    }
+    public @Override List<Bend> getBends() {
+        return bends;
     }
 
     public Sound bend(int denominator) {
@@ -66,25 +87,24 @@ public class Sound extends AbstractSound<Sound> {
         return bend(0L, duration, denominator);
     }
     public Sound bend(long delay, long duration, int denominator) {
-        bends=Bend.add(bends, delay, duration, denominator);
-        return this;
+        return Bend.add(this, delay, duration, denominator);
     }
 
     public Sound bend(double duration, int denominator) {
         return bend(0D, duration, denominator);
     }
     public Sound bend(double delay, double duration, int denominator) {
-        bends=Bend.add(bends, delay, duration, denominator);
-        return this;
+        return Bend.add(this, delay, duration, denominator);
     }
 
     public Sound bend(int duration, int denominator) {
         return bend(0, duration, denominator);
     }
     public Sound bend(int delay, int duration, int denominator) {
-        bends=Bend.add(bends, delay, duration, denominator);
-        return this;
+       return Bend.add(this, delay, duration, denominator);
     }
+
+    // VIBRATO: //
 
     public Sound vibrato(int frequency, int denominator) {
         return vibrato(0L, totalDuration(), Divisions.convert(frequency), denominator);
@@ -93,11 +113,8 @@ public class Sound extends AbstractSound<Sound> {
         return vibrato(0, duration, frequency, denominator);
     }
     public Sound vibrato(int delay, int duration, int frequency, int denominator) {
-        //FIXME do divisions.convert() on these dummy
-        bends=Bend.vibrato(bends, 0, duration, frequency, denominator);
-        return this;
+        return Bend.vibrato(this, delay, duration, frequency, denominator);
     }
-
 
     public Sound vibrato(long frequency, int denominator) {
         return vibrato(0, totalDuration(), frequency, denominator);
@@ -106,8 +123,17 @@ public class Sound extends AbstractSound<Sound> {
         return vibrato(0, duration, frequency, denominator);
     }
     public Sound vibrato(long delay, long duration, long frequency, int denominator) {
-        bends=Bend.vibrato(bends, delay, duration, frequency, denominator);
-        return this;
+        return Bend.vibrato(this, delay, duration, frequency, denominator);
+    }
+
+    public Sound vibrato(double frequency, int denominator) {
+        return vibrato(0L, totalDuration(), Divisions.convert(frequency), denominator);
+    }
+    public Sound vibrato(double duration, double frequency, int denominator) {
+        return vibrato(0D, duration, frequency, denominator);
+    }
+    public Sound vibrato(double delay, double duration, double frequency, int denominator) {
+        return Bend.vibrato(this, delay, duration, frequency, denominator);
     }
 
     ////////////////
@@ -135,6 +161,5 @@ public class Sound extends AbstractSound<Sound> {
     private Rest rest(long duration) {
         return new Rest(this, duration);
     }
-
 
 }
