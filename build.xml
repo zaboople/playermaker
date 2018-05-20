@@ -53,9 +53,10 @@
     <javac
       destdir="${build.dir}"
       debug="true"
-      deprecation="false"
+      deprecation="true"
       failonerror="true"
       >
+      <compilerarg value="-Xlint:unchecked"/>
       <src path="${src.dir}"/>
       <!--classpath><fileset dir="${lib.dir}" includes="*.jar"/></classpath-->
     </javac>
