@@ -3,10 +3,10 @@ import java.util.List;
 
 /** This is an interface because I want default methods i.e. multiple inheritance. */
 public interface BendContainer<T> {
-    public List<Bend> getBends();
-    public void setBends(List<Bend> bends);
-    public T self();
-    public long totalDuration();
+    List<Bend> getBends();
+    void setBends(List<Bend> bends);
+    long totalDuration();
+    T self();
 
     public default T bend(int denominator) {
         return bend(0L, totalDuration(), denominator);

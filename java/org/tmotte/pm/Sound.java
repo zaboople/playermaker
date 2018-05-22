@@ -6,6 +6,14 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
+ * Represents a chord, be it one note or many. While a chord will often sound all of its
+ * notes at once and finish them all at once, overlapping/arpeggiating possibilities are
+ * allowed via the r() method, which creates a Rest, and then delayed notes can be added.
+ * FIXME test much overlapping waxing/waning etc.
+ *
+ * FIXME change name to Chord.
+ *
+ * FIXME what isn't this for ZBend
  * @param delay A period to wait before the bend; this can be expressed as
  *        2/4/8/16/32/64 etc to indicate a period corresponding to half/quarter/eighth/etc
  *        notes (for triplet and dotted note delays, use Bend(double, double, int)).
@@ -18,7 +26,7 @@ import java.util.stream.Stream;
    </ul>
  * And so forth.
  */
-public class Sound extends AbstractSound<Sound> implements BendContainer<Sound> {
+public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound>, Notable {
     private Player player;
     private List<Note> notes=new ArrayList<>();
     private List<Bend> bends=null;
@@ -82,15 +90,19 @@ public class Sound extends AbstractSound<Sound> implements BendContainer<Sound> 
     // INTERNALS: //
     ////////////////
 
-    protected @Override Sound addSound(long duration, int... pitches) {
+    /** For internal use, required by Notable */
+    public @Override Sound addSound(long duration, int... pitches) {
         for (int p: pitches)
             addNote(duration, p);
         return this;
     }
-    protected @Override Note addNote(long duration, int pitch) {
+
+    /** For internal use, required by Notable */
+    public @Override Note addNote(long duration, int pitch) {
         return addNote(duration, 0, pitch);
     }
-    /** This is a double-override - both AbstractSound & BendContainer! */
+
+    /** For internal use, required by BendContainer &amp; AttributeHolder */
     public @Override Sound self() {
         return this;
     }

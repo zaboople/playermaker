@@ -32,6 +32,5 @@ public abstract class AttributeHolder<T> {
         return attrs;
     }
 
-
     protected abstract T self();
 }

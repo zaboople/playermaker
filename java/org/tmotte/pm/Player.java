@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Player extends AbstractSound<Player> {
+public class Player extends AttributeHolder<Player> implements Notable {
     long startTime=0;
     List<Sound> sounds=new ArrayList<>();
     int bendSensitivity=2;
@@ -87,14 +87,19 @@ public class Player extends AbstractSound<Player> {
     }
 
 
-    protected @Override Sound addSound(long duration, int... pitches) {
+    /** For internal use, required by Notable */
+    public @Override Sound addSound(long duration, int... pitches) {
         Sound sound=new Sound(this, duration, pitches);
         sounds.add(sound);
         return sound;
     }
-    protected @Override Note addNote(long duration, int pitch) {
+
+    /** For internal use, required by Notable */
+    public @Override Note addNote(long duration, int pitch) {
         return addSound(duration, pitch).notes().get(0);
     }
+
+    /** For internal use, required by AttributeHolder &amp; BendContainer*/
     protected @Override Player self(){
         return this;
     }
