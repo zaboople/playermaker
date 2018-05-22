@@ -50,7 +50,7 @@ public class TestVibratoTriplet  {
 			//7-8
 			.c(2, F-12, C, G)
 				.bend(4, 2)
-				.vibrato(4, 4, 64, 8).up()
+				.vibrato(4, 64, 8).up()
 
 		    .r8()
 			;

@@ -32,19 +32,17 @@ public final class Bend {
     /////////////////////
 
 
-    static <T extends BendContainer> T add(T container, int delay, int duration, int denominator) {
-        fix(container).add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
-        return container;
+    static void add2(BendContainer<?> container, long delay, long duration, int denominator) {
+        fix2(container).add(new Bend(delay, duration, denominator));
     }
-    static <T extends BendContainer> T add(T container, long delay, long duration, int denominator) {
-        fix(container).add(new Bend(delay, duration, denominator));
-        return container;
+    static void add2(BendContainer<?> container, int delay, int duration, int denominator) {
+        fix2(container).add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
     }
-    static <T extends BendContainer> T add(T container, double delay, double duration, int denominator) {
-        fix(container).add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
-        return container;
+    static void add2(BendContainer<?> container, double delay, double duration, int denominator) {
+        fix2(container).add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
     }
-    private static List<Bend> fix(BendContainer container) {
+
+    private static List<Bend> fix2(BendContainer<?> container) {
         List<Bend> bends=container.getBends();
         if (bends==null) {
             bends=new ArrayList<>();
@@ -53,39 +51,8 @@ public final class Bend {
         return bends;
     }
 
-
-    static <T extends BendContainer> T vibrato(T container, int delay, int duration, int frequency, int denominator) {
-        return vibrato(
-            container,
-            Divisions.convert(delay),
-            Divisions.convert(duration),
-            Divisions.convert(frequency),
-            denominator
-        );
-    }
-    static <T extends BendContainer> T vibrato(T container, double delay, double duration, double frequency, int denominator) {
-        return vibrato(
-            container,
-            Divisions.convert(delay),
-            Divisions.convert(duration),
-            Divisions.convert(frequency),
-            denominator
-        );
-    }
-    //FIXME this and other variations....
-    static <T extends BendContainer> T vibrato(T container, int delay, double duration, double frequency, int denominator) {
-        return vibrato(
-            container,
-            Divisions.convert(delay),
-            Divisions.convert(duration),
-            Divisions.convert(frequency),
-            denominator
-        );
-    }
-    static <T extends BendContainer> T vibrato(
-            T container, long delay, long duration, long frequency, int denominator
-        ) {
-        List<Bend> bends=fix(container);
+    static void vibrato2(BendContainer<?> container, long delay, long duration, long frequency, int denominator) {
+        List<Bend> bends=fix2(container);
         if (denominator % 2 != 0)
             throw new RuntimeException("Denominator should be divisible by 2; value was "+denominator);
         long count=duration/frequency;
@@ -98,7 +65,6 @@ public final class Bend {
                 denominator/=2;
             }
         }
-        return container;
     }
 
 

@@ -18,7 +18,7 @@ import java.util.stream.Stream;
    </ul>
  * And so forth.
  */
-public class Sound extends AbstractSound<Sound> implements BendContainer {
+public class Sound extends AbstractSound<Sound> implements BendContainer<Sound> {
     private Player player;
     private List<Note> notes=new ArrayList<>();
     private List<Bend> bends=null;
@@ -36,15 +36,6 @@ public class Sound extends AbstractSound<Sound> implements BendContainer {
     }
     public Player up() {
         return player;
-    }
-    long totalDuration() {
-        return
-            notes.stream().map(n ->
-                n.restBefore + n.duration
-            ).reduce(
-                0L,
-                (x,y)-> y>x ?y :x
-            );
     }
 
     public Rest r(int i) {return rest(Divisions.convert(i));}
@@ -67,8 +58,6 @@ public class Sound extends AbstractSound<Sound> implements BendContainer {
     // BEND & VIBRATO: //
     /////////////////////
 
-    // BEND: //
-
     public List<Bend> bends() {
         return bends==null ?Collections.emptyList() :bends;
     }
@@ -78,63 +67,16 @@ public class Sound extends AbstractSound<Sound> implements BendContainer {
     public @Override List<Bend> getBends() {
         return bends;
     }
-
-    public Sound bend(int denominator) {
-        return bend(0L, totalDuration(), denominator);
+    public @Override long totalDuration() {
+        return
+            notes.stream().map(n ->
+                n.restBefore + n.duration
+            ).reduce(
+                0L,
+                (x,y)-> y>x ?y :x
+            );
     }
 
-    public Sound bend(long duration, int denominator) {
-        return bend(0L, duration, denominator);
-    }
-    public Sound bend(long delay, long duration, int denominator) {
-        return Bend.add(this, delay, duration, denominator);
-    }
-
-    public Sound bend(double duration, int denominator) {
-        return bend(0D, duration, denominator);
-    }
-    public Sound bend(double delay, double duration, int denominator) {
-        return Bend.add(this, delay, duration, denominator);
-    }
-
-    public Sound bend(int duration, int denominator) {
-        return bend(0, duration, denominator);
-    }
-    public Sound bend(int delay, int duration, int denominator) {
-       return Bend.add(this, delay, duration, denominator);
-    }
-
-    // VIBRATO: //
-
-    public Sound vibrato(int frequency, int denominator) {
-        return vibrato(0L, totalDuration(), Divisions.convert(frequency), denominator);
-    }
-    public Sound vibrato(int duration, int frequency, int denominator) {
-        return vibrato(0, duration, frequency, denominator);
-    }
-    public Sound vibrato(int delay, int duration, int frequency, int denominator) {
-        return Bend.vibrato(this, delay, duration, frequency, denominator);
-    }
-
-    public Sound vibrato(long frequency, int denominator) {
-        return vibrato(0, totalDuration(), frequency, denominator);
-    }
-    public Sound vibrato(long duration, long frequency, int denominator) {
-        return vibrato(0, duration, frequency, denominator);
-    }
-    public Sound vibrato(long delay, long duration, long frequency, int denominator) {
-        return Bend.vibrato(this, delay, duration, frequency, denominator);
-    }
-
-    public Sound vibrato(double frequency, int denominator) {
-        return vibrato(0L, totalDuration(), Divisions.convert(frequency), denominator);
-    }
-    public Sound vibrato(double duration, double frequency, int denominator) {
-        return vibrato(0D, duration, frequency, denominator);
-    }
-    public Sound vibrato(double delay, double duration, double frequency, int denominator) {
-        return Bend.vibrato(this, delay, duration, frequency, denominator);
-    }
 
     ////////////////
     // INTERNALS: //
@@ -148,7 +90,8 @@ public class Sound extends AbstractSound<Sound> implements BendContainer {
     protected @Override Note addNote(long duration, int pitch) {
         return addNote(duration, 0, pitch);
     }
-    protected @Override Sound self() {
+    /** This is a double-override - both AbstractSound & BendContainer! */
+    public @Override Sound self() {
         return this;
     }
 

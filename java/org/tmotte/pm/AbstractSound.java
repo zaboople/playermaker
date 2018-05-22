@@ -21,6 +21,7 @@ package org.tmotte.pm;
             notes in the Sound, rather than making them come _after_.
         <li>nX() does the same as Player.sX()
     <ul/>
+    FIXME make an interface with default methods.
  */
 public abstract class AbstractSound<T> extends AttributeHolder<T> {
 
