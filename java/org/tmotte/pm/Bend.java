@@ -14,18 +14,10 @@ import java.util.List;
 
 /**
  * FIXME WHY OH WHY DID YOU DO "DENOMINATOR"? Why couldn't you just send... well
- * <p>
- * Background: By default, a bend can go a "whole step", which is to say, two notes up or down.
- * 0 is all the way down, and 16384-1 is all the way up. So, 8192 is no bend at all.
- * Bends apply to the whole channel, regardless of what track they appear on. Finally,
- * the bend stays applied until it is unapplied.
- * <p>
- * However, you can change the "Bend sensitivity" (refer to the Player API) to increase
- * the range from a whole step to many more steps. The 16383/8192/0 limits remain the same.
  *
  * @see Player#setBendSensitivity(int)
  */
-public final class Bend {
+final class Bend {
 
     /////////////////////
     // STATIC METHODS: //
@@ -80,14 +72,14 @@ public final class Bend {
     // PUBLIC INSTANCE METHODS: //
     //////////////////////////////
 
-    public long delay() {
+    long delay() {
         return delay;
     }
     /** This is not the duration as input, but converted to tick groups. FIXME rename durationTicks */
-    public long duration() {
+    long duration() {
         return duration;
     }
-    public int denominator() {
+    int denominator() {
         return denominator;
     }
 

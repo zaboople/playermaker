@@ -13,18 +13,6 @@ import java.util.stream.Stream;
  *
  * FIXME change name to Chord.
  *
- * FIXME what isn't this for ZBend
- * @param delay A period to wait before the bend; this can be expressed as
- *        2/4/8/16/32/64 etc to indicate a period corresponding to half/quarter/eighth/etc
- *        notes (for triplet and dotted note delays, use Bend(double, double, int)).
- * @param denominator Can be negative or positive. Indicates the 1/denominator of our bend range to go
- * up or down. So, if our bend sensitivity is set to the default of one whole step:
-   <ul>
-     <li>1 is a whole step, e.g. C to D
-     <li>2 is a half step, e.g. C to C#
-     <li>4 is a quarter step (obviously off key but it's jazzy that way)
-   </ul>
- * And so forth.
  */
 public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound>, Notable {
     private Player player;
@@ -32,7 +20,7 @@ public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound
     private List<Bend> bends=null;
     int instrument;
 
-    Sound(Player player, long duration, int... pitches) {
+    protected Sound(Player player, long duration, int... pitches) {
         super(new TonalAttributes(player.attrs()));
         this.player=player;
         this.instrument=player.instrumentIndex;
@@ -75,6 +63,7 @@ public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound
     public @Override List<Bend> getBends() {
         return bends;
     }
+    /** Used by BendContainer (from which we override) and MyMidi3 */
     public @Override long totalDuration() {
         return
             notes.stream().map(n ->
@@ -107,7 +96,8 @@ public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound
         return this;
     }
 
-    protected Note addNote(long duration, long restBefore, int pitch) {
+    /** Exposed for use by Rest, which will supply a non-zero restBefore */
+    Note addNote(long duration, long restBefore, int pitch) {
         Note n=new Note(this, duration, restBefore, pitch);
         notes.add(n);
         return n;

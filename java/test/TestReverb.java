@@ -1,9 +1,6 @@
 package test;
 import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
-import org.tmotte.pm.Sound;
-import org.tmotte.pm.Bend;
-import org.tmotte.pm.Divisions;
 import static org.tmotte.pm.Pitches.*;
 
 /* This is actually in 3/8 time. No, the reverb is still broken :{ */

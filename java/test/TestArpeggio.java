@@ -1,8 +1,6 @@
 package test;
 import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
-import org.tmotte.pm.Sound;
-import org.tmotte.pm.Bend;
 import static org.tmotte.pm.Pitches.*;
 
 
