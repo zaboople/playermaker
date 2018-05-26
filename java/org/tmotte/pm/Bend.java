@@ -24,17 +24,17 @@ final class Bend {
     /////////////////////
 
 
-    static void add2(BendContainer<?> container, long delay, long duration, int denominator) {
-        fix2(container).add(new Bend(delay, duration, denominator));
+    static void add(BendContainer<?> container, long delay, long duration, int denominator) {
+        fix(container).add(new Bend(delay, duration, denominator));
     }
-    static void add2(BendContainer<?> container, int delay, int duration, int denominator) {
-        fix2(container).add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
+    static void add(BendContainer<?> container, int delay, int duration, int denominator) {
+        fix(container).add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
     }
-    static void add2(BendContainer<?> container, double delay, double duration, int denominator) {
-        fix2(container).add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
+    static void add(BendContainer<?> container, double delay, double duration, int denominator) {
+        fix(container).add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
     }
 
-    private static List<Bend> fix2(BendContainer<?> container) {
+    private static List<Bend> fix(BendContainer<?> container) {
         List<Bend> bends=container.getBends();
         if (bends==null) {
             bends=new ArrayList<>();
@@ -43,8 +43,8 @@ final class Bend {
         return bends;
     }
 
-    static void vibrato2(BendContainer<?> container, long delay, long duration, long frequency, int denominator) {
-        List<Bend> bends=fix2(container);
+    static void vibrato(BendContainer<?> container, long delay, long duration, long frequency, int denominator) {
+        List<Bend> bends=fix(container);
         if (denominator % 2 != 0)
             throw new RuntimeException("Denominator should be divisible by 2; value was "+denominator);
         long count=duration/frequency;

@@ -23,7 +23,7 @@ package org.tmotte.pm;
     <ul/>
     FIXME make an interface with default methods.
  */
-interface Notable {
+public interface Notable {
 
     Note addNote(long duration, int note);
     Sound addSound(long duration, int... notes);

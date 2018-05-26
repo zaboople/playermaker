@@ -41,9 +41,21 @@ public class Divisions {
         //if (d>128) throw new RuntimeException("The value "+d+" is greater than the limit of 128");
         return 128  * reg128 / d;
     }
-    public static long unconvert(long d) {
-        System.out.println("unconvert "+d+" * 128 / "+reg128);
-        return (d*128)/reg128;
+
+    public static long convert(Number number) {
+        if (number instanceof Long)
+            return (Long) number;
+        else
+        if (number instanceof Double)
+            return convert((Double) number);
+        else
+        if (number instanceof Integer)
+            return convert((Integer) number);
+        else
+        if (number instanceof Float)
+            return convert(((Float)number).doubleValue());
+        else
+            throw new RuntimeException("Can't handle number: "+number);
     }
 
 }
