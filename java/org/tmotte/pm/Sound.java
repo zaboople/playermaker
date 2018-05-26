@@ -27,9 +27,6 @@ public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound
         addSound(duration, pitches);
     }
 
-    public List<Note> notes() {
-        return notes;
-    }
     public Player up() {
         return player;
     }
@@ -50,20 +47,18 @@ public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound
     public Rest r32_3() {return rest(Divisions.triplet32);}
     public Rest r64_3() {return rest(Divisions.triplet64);}
 
-    /////////////////////
-    // BEND & VIBRATO: //
-    /////////////////////
-
-    public List<Bend> bends() {
+    List<Note> notes() {
+        return notes;
+    }
+    List<Bend> bends() {
         return bends==null ?Collections.emptyList() :bends;
     }
-    public @Override void setBends(List<Bend> bends) {
-        this.bends=bends;
-    }
-    public @Override List<Bend> getBends() {
-        return bends;
-    }
-    /** Used by BendContainer (from which we override) and MyMidi3 */
+
+    ////////////////
+    // INTERNALS: //
+    ////////////////
+
+    /** For internal use by BendContainer (from which we override) and MyMidi3 */
     public @Override long totalDuration() {
         return
             notes.stream().map(n ->
@@ -73,11 +68,6 @@ public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound
                 (x,y)-> y>x ?y :x
             );
     }
-
-
-    ////////////////
-    // INTERNALS: //
-    ////////////////
 
     /** For internal use, required by Notable */
     public @Override Sound addSound(long duration, int... pitches) {
@@ -94,6 +84,13 @@ public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound
     /** For internal use, required by BendContainer &amp; AttributeHolder */
     public @Override Sound self() {
         return this;
+    }
+
+    /** For internal use, required by BendContainer */
+    public @Override List<Bend> makeBends() {
+        if (bends==null)
+            bends=new ArrayList<>();
+        return bends;
     }
 
     /** Exposed for use by Rest, which will supply a non-zero restBefore */

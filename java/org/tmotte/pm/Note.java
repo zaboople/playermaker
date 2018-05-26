@@ -1,8 +1,7 @@
 package org.tmotte.pm;
-import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Collections;
 
 public class Note implements BendContainer<Note> {
 
@@ -29,7 +28,7 @@ public class Note implements BendContainer<Note> {
         return this.sound.up();
     }
 
-    public NoteAttributes attrs() {
+    NoteAttributes attrs() {
         return this.attrs;
     }
     class NoteAttributes extends TonalAttributes {
@@ -41,18 +40,21 @@ public class Note implements BendContainer<Note> {
         }
     }
 
-    public List<Bend> bends() {
+    List<Bend> bends() {
         return bends==null ?Collections.emptyList() :bends;
     }
-    public @Override void setBends(List<Bend> bends) {
-        this.bends=bends;
-    }
-    public @Override List<Bend> getBends() {
+
+    /** For internal use */
+    public @Override List<Bend> makeBends() {
+        if (bends==null)
+            bends=new ArrayList<>();
         return bends;
     }
+    /** For internal use */
     public @Override Note self(){
         return this;
     }
+    /** For internal use */
     public @Override long totalDuration(){
         return duration;
     }

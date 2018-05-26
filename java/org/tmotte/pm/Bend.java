@@ -2,16 +2,6 @@ package org.tmotte.pm;
 import java.util.ArrayList;
 import java.util.List;
 
-    /**
-     * Same as Bend(int, int, int) but the doubles are for expressing
-     * <ul>
-     *   <li>Triplets - e.g. 8.3 means a single eighth-note from a triplet
-     *   <li>Dotted notes - e.g. 8.2 means a dotted eighth-note. FIXME
-     *      how to delay/duration 8.3 but twice???? 16.6??? 8.6???
-     * <li>
-     * FIXME
-     */
-
 /**
  * FIXME WHY OH WHY DID YOU DO "DENOMINATOR"? Why couldn't you just send... well
  *
@@ -24,27 +14,17 @@ final class Bend {
     /////////////////////
 
 
-    static void add(BendContainer<?> container, long delay, long duration, int denominator) {
-        fix(container).add(new Bend(delay, duration, denominator));
+    static void add(List<Bend> bends, long delay, long duration, int denominator) {
+        bends.add(new Bend(delay, duration, denominator));
     }
-    static void add(BendContainer<?> container, int delay, int duration, int denominator) {
-        fix(container).add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
+    static void add(List<Bend> bends, int delay, int duration, int denominator) {
+        bends.add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
     }
-    static void add(BendContainer<?> container, double delay, double duration, int denominator) {
-        fix(container).add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
-    }
-
-    private static List<Bend> fix(BendContainer<?> container) {
-        List<Bend> bends=container.getBends();
-        if (bends==null) {
-            bends=new ArrayList<>();
-            container.setBends(bends);
-        }
-        return bends;
+    static void add(List<Bend> bends, double delay, double duration, int denominator) {
+        bends.add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
     }
 
-    static void vibrato(BendContainer<?> container, long delay, long duration, long frequency, int denominator) {
-        List<Bend> bends=fix(container);
+    static void vibrato(List<Bend> bends, long delay, long duration, long frequency, int denominator) {
         if (denominator % 2 != 0)
             throw new RuntimeException("Denominator should be divisible by 2; value was "+denominator);
         long count=duration/frequency;
@@ -93,7 +73,5 @@ final class Bend {
         this.duration=duration;
         this.denominator=denominator;
     }
-
-
 
 }

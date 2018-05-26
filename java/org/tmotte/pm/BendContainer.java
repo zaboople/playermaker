@@ -2,7 +2,18 @@ package org.tmotte.pm;
 import java.util.List;
 
 /**
- * This is an interface because I want default methods i.e. multiple inheritance.
+ * Same as Bend(int, int, int) but the doubles are for expressing
+ * <ul>
+ *   <li>Triplets - e.g. 8.3 means a single eighth-note from a triplet
+ *   <li>Dotted notes - e.g. 8.2 means a dotted eighth-note. FIXME
+ *      how to delay/duration 8.3 but twice???? 16.6??? 8.6???
+ * <li>
+ * FIXME
+ */
+
+/**
+ * (This is an interface because I want default methods i.e. multiple inheritance. However, some
+ * things that shouldn't be public are, because interfaces are that way. And I am a bad person.)
  * <p>
  * Background: By default, a bend can go a "whole step", which is to say, two notes up or down.
  * 0 is all the way down, and 16384-1 is all the way up. So, 8192 is no bend at all.
@@ -15,9 +26,15 @@ import java.util.List;
  * @see Player#setBendSensitivity(int)
  */
 public interface BendContainer<T> {
-    List<Bend> getBends();
-    void setBends(List<Bend> bends);
+
+    /**
+     * Internal Use. (We can't have an internal variable unless it's final, which is dumb. Being obsessed with
+     * memory, then, implementors maintain a List<Bend> and initialize when they need to.)
+     */
+    List<Bend> makeBends();
+    /* Internal use */
     long totalDuration();
+    /* Internal use */
     T self();
 
     ///////////
@@ -41,7 +58,7 @@ public interface BendContainer<T> {
      * The denominator must be divisible by 2, but it's okay for it to be larger than our bend sensitivity.
      */
     public default T bend(long delay, long duration, int denominator) {
-        Bend.add(this, delay, duration, denominator);
+        Bend.add(makeBends(), delay, duration, denominator);
         return self();
     }
     public default T bend(long duration, int denominator) {
@@ -56,12 +73,11 @@ public interface BendContainer<T> {
         return bend(0, duration, denominator);
     }
     public default T bend(int delay, int duration, int denominator) {
-       Bend.add(this, delay, duration, denominator);
+       Bend.add(makeBends(), delay, duration, denominator);
        return self();
     }
     public default T bend(Number delay, Number duration, int denominator) {
-       Bend.add(this, Divisions.convert(delay), Divisions.convert(duration), denominator);
-       return self();
+       return bend(Divisions.convert(delay), Divisions.convert(duration), denominator);
     }
 
 
@@ -69,7 +85,7 @@ public interface BendContainer<T> {
         return bend(0D, duration, denominator);
     }
     public default T bend(double delay, double duration, int denominator) {
-        Bend.add(this, delay, duration, denominator);
+        Bend.add(makeBends(), delay, duration, denominator);
         return self();
     }
 
@@ -78,7 +94,7 @@ public interface BendContainer<T> {
     //////////////
 
     public default T vibrato(long delay, long duration, long frequency, int denominator) {
-        Bend.vibrato(this, delay, duration, frequency, denominator);
+        Bend.vibrato(makeBends(), delay, duration, frequency, denominator);
         return self();
     }
 
