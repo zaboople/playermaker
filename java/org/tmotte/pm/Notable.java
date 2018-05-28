@@ -3,22 +3,22 @@ package org.tmotte.pm;
 /**
  * In the case of Player,
  * <ul>
-        <li>pX() creates a Sound, and returns the Player. Calling p/s/nX() again
-           will create a new Sound that <em>follows</em> the first. Thus the Sound
-           is committed: It cannot be further modified, and additional Sound/Note
+        <li>pX() creates a Chord, and returns the Player. Calling p/s/nX() again
+           will create a new Chord that <em>follows</em> the first. Thus the Chord
+           is committed: It cannot be further modified, and additional Chord/Note
            objects will play after it.
-        <li>sX() creates &amp; returns a Sound object representing a chord, allowing
+        <li>sX() creates &amp; returns a Chord object representing a chord, allowing
             for further modification of itself.
-        <li>nX() creates a Sound with one Note, and returns that Note directly. This
+        <li>nX() creates a Chord with one Note, and returns that Note directly. This
             allows detailed modification (vibrato, bend) of only that Note. You can
-            still go Note.up() back to the Sound and add more notes, etc.
+            still go Note.up() back to the Chord and add more notes, etc.
    </ul>
-   But in the case of Sound,
+   But in the case of Chord,
    <ul>
-        <li>pX() adds notes to the existing chord, then returns Player. The Sound is
-            committed and later Sounds/Notes will be played after it.
+        <li>pX() adds notes to the existing chord, then returns Player. The Chord is
+            committed and later Chords/Notes will be played after it.
         <li>sX() does the same as Player.sX(), but appends to the chord to the existing
-            notes in the Sound, rather than making them come _after_.
+            notes in the Chord, rather than making them come _after_.
         <li>nX() does the same as Player.sX()
     <ul/>
     FIXME make an interface with default methods.
@@ -26,14 +26,14 @@ package org.tmotte.pm;
 public interface Notable {
 
     Note addNote(long duration, int note);
-    Sound addSound(long duration, int... notes);
+    Chord addChord(long duration, int... notes);
 
 
     public default Player p(int duration, int... notes) {
         return c(duration, notes).up();
     }
-    public default Sound c(int duration, int... notes) {
-        return addSound(Divisions.convert(duration), notes);
+    public default Chord c(int duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes);
     }
     public default Note n(int duration, int note) {
         return addNote(Divisions.convert(duration), note);
@@ -42,8 +42,8 @@ public interface Notable {
     public default Player p(double duration, int... notes) {
         return c(duration, notes).up();
     }
-    public default Sound c(double duration, int... notes) {
-        return addSound(Divisions.convert(duration), notes);
+    public default Chord c(double duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes);
     }
     public default Note n(double duration, int note) {
         return addNote(Divisions.convert(duration), note);
@@ -78,39 +78,39 @@ public interface Notable {
     }
 
 
-    public default Sound s1(int... notes) {
-        return addSound(Divisions.whole, notes);
+    public default Chord s1(int... notes) {
+        return addChord(Divisions.whole, notes);
     }
-    public default Sound s2(int... notes) {
-        return addSound(Divisions.reg2, notes);
+    public default Chord s2(int... notes) {
+        return addChord(Divisions.reg2, notes);
     }
-    public default Sound s4(int... notes) {
-        return addSound(Divisions.reg4, notes);
+    public default Chord s4(int... notes) {
+        return addChord(Divisions.reg4, notes);
     }
-    public default Sound s8(int... notes) {
-        return addSound(Divisions.reg8, notes);
+    public default Chord s8(int... notes) {
+        return addChord(Divisions.reg8, notes);
     }
-    public default Sound s16(int... notes) {
-        return addSound(Divisions.reg16, notes);
+    public default Chord s16(int... notes) {
+        return addChord(Divisions.reg16, notes);
     }
-    public default Sound s32(int... notes) {
-        return addSound(Divisions.reg32, notes);
+    public default Chord s32(int... notes) {
+        return addChord(Divisions.reg32, notes);
     }
-    public default Sound s64(int... notes) {
-        return addSound(Divisions.reg64, notes);
+    public default Chord s64(int... notes) {
+        return addChord(Divisions.reg64, notes);
     }
 
-    public default Sound s8_3(int... notes) {
-        return addSound(Divisions.triplet8, notes);
+    public default Chord s8_3(int... notes) {
+        return addChord(Divisions.triplet8, notes);
     }
-    public default Sound s16_3(int... notes) {
-        return addSound(Divisions.triplet16, notes);
+    public default Chord s16_3(int... notes) {
+        return addChord(Divisions.triplet16, notes);
     }
-    public default Sound s32_3(int... notes) {
-        return addSound(Divisions.triplet32, notes);
+    public default Chord s32_3(int... notes) {
+        return addChord(Divisions.triplet32, notes);
     }
-    public default Sound s64_3(int... notes) {
-        return addSound(Divisions.triplet64, notes);
+    public default Chord s64_3(int... notes) {
+        return addChord(Divisions.triplet64, notes);
     }
 
     public default Player p1(int... notes) {

@@ -11,35 +11,33 @@ import java.util.stream.Stream;
  * allowed via the r() method, which creates a Rest, and then delayed notes can be added.
  * FIXME test much overlapping waxing/waning etc.
  *
- * FIXME change name to Chord.
- *
  */
-public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound>, Notable {
+public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord>, Notable {
     private Player player;
     private List<Note> notes=new ArrayList<>();
     private List<Bend> bends=null;
     int instrument;
 
-    protected Sound(Player player, long duration, int... pitches) {
+    protected Chord(Player player, long duration, int... pitches) {
         super(new TonalAttributes(player.attrs()));
         this.player=player;
         this.instrument=player.instrumentIndex;
-        addSound(duration, pitches);
+        addChord(duration, pitches);
     }
 
     public Player up() {
         return player;
     }
 
-    public Sound t(long duration) {
+    public Chord t(long duration) {
         for (Note n: notes)
             n.t(duration);
         return this;
     }
-    public Sound t(int duration) {
+    public Chord t(int duration) {
         return t(Divisions.convert(duration));
     }
-    public Sound t(double duration) {
+    public Chord t(double duration) {
         return t(Divisions.convert(duration));
     }
 
@@ -82,7 +80,7 @@ public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound
     }
 
     /** For internal use, required by Notable */
-    public @Override Sound addSound(long duration, int... pitches) {
+    public @Override Chord addChord(long duration, int... pitches) {
         for (int p: pitches)
             addNote(duration, p);
         return this;
@@ -94,7 +92,7 @@ public class Sound extends AttributeHolder<Sound> implements BendContainer<Sound
     }
 
     /** For internal use, required by BendContainer &amp; AttributeHolder */
-    public @Override Sound self() {
+    public @Override Chord self() {
         return this;
     }
 

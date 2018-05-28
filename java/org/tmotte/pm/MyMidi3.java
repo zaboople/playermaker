@@ -101,7 +101,7 @@ public class MyMidi3  {
 	        int instrument=player.instrumentIndex;
 
 			// And blast off the rocket:
-	        for (Sound sound: player.sounds()) {
+	        for (Chord sound: player.sounds()) {
 		        if (sound.instrument!=instrument) {
 			        instrument=sound.instrument;
 	                sendInstrument(instrument, currTick);
@@ -191,7 +191,7 @@ public class MyMidi3  {
 				   +"Make sure to give enough space between the channels of different players, "
 				   +"or put players on the same channel when you know they can't interfere with "
 				   +"each other. Spare channels are needed when individual Notes are bent - as "
-				   +"opposed to bending entire Sounds, aka chords."
+				   +"opposed to bending entire Chords"
 			    );
 	    }
 	}

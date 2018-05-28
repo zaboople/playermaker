@@ -9,10 +9,10 @@ public class Note implements BendContainer<Note> {
 
     final long restBefore;
     final int pitch;
-    final Sound sound;
+    final Chord sound;
     final NoteAttributes attrs;
 
-    public Note(Sound sound, long duration, long restBefore, int pitch) {
+    public Note(Chord sound, long duration, long restBefore, int pitch) {
         this.sound=sound;
         this.attrs=new NoteAttributes(sound.attrs());
         this.duration=duration;
@@ -31,7 +31,7 @@ public class Note implements BendContainer<Note> {
         return t(Divisions.convert(duration));
     }
 
-    public Sound up() {
+    public Chord up() {
         return this.sound;
     }
     public Player upup() {

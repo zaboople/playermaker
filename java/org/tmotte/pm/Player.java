@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public class Player extends AttributeHolder<Player> implements Notable {
     long startTime=0;
-    List<Sound> sounds=new ArrayList<>();
+    List<Chord> sounds=new ArrayList<>();
     int bendSensitivity=2;
     int reverb=0;
 
@@ -34,7 +34,7 @@ public class Player extends AttributeHolder<Player> implements Notable {
     }
 
 
-    public Collection<Sound> sounds() {
+    public Collection<Chord> sounds() {
         return sounds;
     }
 
@@ -81,22 +81,22 @@ public class Player extends AttributeHolder<Player> implements Notable {
     private Player rest(long division) {
         int v=volume();
         volume(0);
-        addSound(division, 0);
+        addChord(division, 0);
         volume(v);
         return this;
     }
 
 
     /** For internal use, required by Notable */
-    public @Override Sound addSound(long duration, int... pitches) {
-        Sound sound=new Sound(this, duration, pitches);
+    public @Override Chord addChord(long duration, int... pitches) {
+        Chord sound=new Chord(this, duration, pitches);
         sounds.add(sound);
         return sound;
     }
 
     /** For internal use, required by Notable */
     public @Override Note addNote(long duration, int pitch) {
-        return addSound(duration, pitch).notes().get(0);
+        return addChord(duration, pitch).notes().get(0);
     }
 
     /** For internal use, required by AttributeHolder &amp; BendContainer*/
