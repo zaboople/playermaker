@@ -28,15 +28,6 @@ public interface Notable {
     Note addNote(long duration, int note);
     Sound addSound(long duration, int... notes);
 
-    public default Player p(Duration d, int... notes) {
-        return c(d, notes).up();
-    }
-    public default Sound c(Duration d, int... notes) {
-        return addSound(d.duration(), notes);
-    }
-    public default Note n(Duration d, int note) {
-        return addNote(d.duration(), note);
-    }
 
     public default Player p(int duration, int... notes) {
         return c(duration, notes).up();

@@ -20,12 +20,8 @@ public abstract class AttributeHolder<T> {
         attrs.octave(octave);
         return self();
     }
-    public T move(int octaves) {
-        attrs.move(octaves);
-        return self();
-    }
-    public T modulate(int notes) {
-        attrs.modulate(notes);
+    public T modulate(int semitones) {
+        attrs.modulate(semitones);
         return self();
     }
     TonalAttributes attrs() {

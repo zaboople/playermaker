@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class TonalAttributes {
     int volume=64;
     int transpose=0;
-    int speed=0;// wut fixme?
 
     TonalAttributes() {
     }
@@ -13,7 +12,6 @@ public class TonalAttributes {
     public TonalAttributes(TonalAttributes other) {
         this.volume=other.volume;
         this.transpose=other.transpose;
-        this.speed=other.speed;
     }
 
     public TonalAttributes addVolume(int change) {
@@ -34,8 +32,8 @@ public class TonalAttributes {
         transpose+=octaves*12;
         return this;
     }
-    public TonalAttributes modulate(int notes) {
-        transpose+=notes;
+    public TonalAttributes modulate(int semitones) {
+        transpose+=semitones;
         return this;
     }
 
