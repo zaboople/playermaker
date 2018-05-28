@@ -5,24 +5,45 @@ package org.tmotte.pm;
  * want to create a chord where notes are delayed for an arpeggiated effect.
  */
 public class Rest implements Notable {
-    final Chord sound;
-    final long restFor;
+    private final Chord chord;
+    private long restFor;
 
-    public Rest(Chord sound, long restFor) {
-        this.sound=sound;
+    public Rest(Chord chord, long restFor) {
+        this.chord=chord;
         this.restFor=restFor;
     }
 
+    /** Indicates that we should "finish", i.e. play the pitches for the remaining duration of the Chord. */
+    public Chord fin(int... pitches) {
+        return addChord(chord.totalDuration()-restFor, pitches);
+    }
+
+    public Rest t(long duration) {
+        restFor+=duration;
+        return this;
+    }
+    public Rest t(int duration) {
+        return t(Divisions.convert(duration));
+    }
+    public Rest t(double duration) {
+        return t(Divisions.convert(duration));
+    }
+
+
+    ////////////////
+    // INTERNALS: //
+    ////////////////
+
     /** For internal use, required by Notable */
     public @Override Note addNote(long duration, int pitch) {
-        return sound.addNote(duration, restFor, pitch);
+        return chord.addNote(duration, restFor, pitch);
     }
 
     /** For internal use, required by Notable */
     public @Override Chord addChord(long duration, int... pitches){
         for (int n: pitches)
             addNote(duration, n);
-        return sound;
+        return chord;
     }
 
 }
