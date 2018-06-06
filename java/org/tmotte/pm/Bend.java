@@ -25,6 +25,8 @@ final class Bend {
     }
 
     static void vibrato(List<Bend> bends, long delay, long duration, long frequency, int denominator) {
+        if (denominator==0)
+            throw new RuntimeException("Denominator was 0");
         if (denominator % 2 != 0)
             throw new RuntimeException("Denominator should be divisible by 2; value was "+denominator);
         long count=duration/frequency;

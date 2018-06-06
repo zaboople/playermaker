@@ -25,6 +25,7 @@ public class TestFinish  {
 			    .fin(G)
 			    .r(2).t(8)
 			    .fin(A+12)
+			    .t(4)
 			    .up()
 
 			.r4();
