@@ -42,7 +42,7 @@ public class TestArpeggio  {
 			;
 	    new MyMidi3()
 		    .setBeatsPerMinute(80)
-		    .sequenceAndPlay(player, true);
+		    .playAndStop(player);
 	    System.out.println("Done");
     }
 

@@ -25,7 +25,7 @@ public class TestBendsPartial  {
 		    .r4();
 	    new MyMidi3()
 		    .setBeatsPerMinute(90)
-		    .sequenceAndPlay(player);
+		    .playAndStop(player);
 	    System.out.println("Done");
     }
 

@@ -1,4 +1,4 @@
-package test;
+ package test;
 import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
@@ -57,8 +57,7 @@ public class TestChannelTrack  {
 		    .r4();
 	    new MyMidi3()
 		    .setBeatsPerMinute(60)
-		    .sequence(player1, player2)
-		    .play(true);
+		    .playAndStop(player1, player2);
     }
 
 }

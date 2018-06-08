@@ -46,7 +46,7 @@ public class TestBendTo  {
 		    .r4();
 	    new MyMidi3()
 		    .setBeatsPerMinute(60)
-		    .sequenceAndPlay(player, true);
+		    .playAndStop(player);
 	    System.out.println("Done");
     }
 

@@ -45,15 +45,15 @@ public class TestVibratoTriplet  {
 			.r(8)
 
 			//7-8
-			.c(2, F-12, C, G)
+			.c(1, F-12, C, G)
 				.bend(4, 2)
-				.vibrato(4, 64, 8).up()
+				.vibrato(2., 64, 8).up()
 
 		    .r8()
 			;
 	    new MyMidi3()
 		    .setBeatsPerMinute(60)
-		    .sequenceAndPlay(player, true);
+		    .playAndStop(player);
 	    System.out.println("Done");
     }
 

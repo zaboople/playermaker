@@ -22,7 +22,7 @@ public class TestChords  {
 		    .instrument(1)
 		    .p(1, checks-5, checks-3, checks)
 		    .r4();
-	    midi.sequenceAndPlay(player, true);
+	    midi.playAndStop(player);
     }
 
 }

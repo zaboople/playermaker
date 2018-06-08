@@ -44,7 +44,7 @@ public class TestBends  {
 		    .r4();
 	    new MyMidi3()
 		    .setBeatsPerMinute(90)
-		    .sequenceAndPlay(player, true);
+		    .playAndStop(player);
 	    System.out.println("Done");
     }
 

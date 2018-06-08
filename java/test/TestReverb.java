@@ -8,7 +8,7 @@ public class TestReverb  {
     public static void main(String args[]) throws Exception {
 	    new MyMidi3()
 		    .setBeatsPerMinute(65)
-		    .sequenceAndPlay(make(), true);
+		    .playAndStop(make());
 	    System.out.println("Done");
     }
     private static Player make() {

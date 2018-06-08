@@ -53,8 +53,10 @@ public class TestPlayAfter  {
 	    player3.r4();
 	    new MyMidi3()
 		    .setBeatsPerMinute(60)
-		    .sequence(player1, player2, player3)
-		    .play(true);
+		    .play(player1, player2, player3)
+		    .reset()
+		    .playAndStop(player1, player2, player3)
+		    ;
 	    System.out.println("Done");
     }
 

@@ -24,7 +24,7 @@ public class Divisions {
         long main=(long)Math.floor(d);
         long fractional=Math.round((d-main) * 10);
         double dd=8.;
-        main=convert(main);
+        main=convert((int)main);
         if (fractional==3)
             //triplet
             return (main * 2) / 3;
@@ -35,11 +35,11 @@ public class Divisions {
             throw new RuntimeException("Don't know what to do with "+d);
     }
 
-    public static long convert(long d) { //FIXME what a mess but it works
+    public static long convert(int d) { //FIXME what a mess but it works
         //System.out.println("unconvert "+d+" / 128 * "+reg128);
         if (d==0) return 0;
         //if (d>128) throw new RuntimeException("The value "+d+" is greater than the limit of 128");
-        return 128  * reg128 / d;
+        return 128L  * reg128 / ((long)d);
     }
 
     public static long convert(Number number) {
@@ -47,10 +47,10 @@ public class Divisions {
             return (Long) number;
         else
         if (number instanceof Double)
-            return convert((Double) number);
+            return convert(number.doubleValue());
         else
         if (number instanceof Integer)
-            return convert((Integer) number);
+            return convert(number.intValue());
         else
         if (number instanceof Float)
             return convert(((Float)number).doubleValue());

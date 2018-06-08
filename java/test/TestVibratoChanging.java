@@ -44,7 +44,7 @@ public class TestVibratoChanging  {
 			.r4();
 	    new MyMidi3()
 		    .setBeatsPerMinute(48)
-		    .sequenceAndPlay(player, true);
+		    .playAndStop(player);
 	    System.out.println("Done");
     }
 

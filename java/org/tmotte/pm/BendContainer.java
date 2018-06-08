@@ -124,20 +124,14 @@ public interface BendContainer<T> {
     public default T vibrato(double frequency, int denominator) {
         return vibrato(0L, totalDuration(), Divisions.convert(frequency), denominator);
     }
-    public default T vibrato(double duration, double frequency, int denominator) {
-        return vibrato(0D, duration, frequency, denominator);
-    }
-    public default T vibrato(double delay, double duration, double frequency, int denominator) {
-        return vibrato(
-            Divisions.convert(delay),
-            Divisions.convert(duration),
-            Divisions.convert(frequency),
-            denominator
-        );
+    public default T vibrato(Number duration, Number frequency, int denominator) {
+        return vibrato(new Long(0), duration, frequency, denominator);
     }
 
 
     public default T vibrato(Number delay, Number duration, Number frequency, int denominator) {
+        System.out.println("BendContainer.vibrato(Number, Number, Number, int)");
+        System.out.println("BendContainer.vibrato("+delay+", "+duration+", "+frequency+", "+denominator+")");
         return vibrato(
             Divisions.convert(delay),
             Divisions.convert(duration),
