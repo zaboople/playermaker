@@ -5,7 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class Player extends AttributeHolder<Player> implements Notable {
+    static class TimeTracking {
+        long timeUpToIndex=0;
+        long timeAtIndex=0;
+        int indexForTimeCounted=0;
+    }
+    TimeTracking timeTracker=new TimeTracking();
+
     long startTime=0;
+
     List<Chord> sounds=new ArrayList<>();
     int bendSensitivity=2;
     int reverb=0;
@@ -33,6 +41,21 @@ public class Player extends AttributeHolder<Player> implements Notable {
         return this;
     }
 
+    public long getEndTime() {
+        return startTime + getTimeLength();
+    }
+
+    public long getTimeLength() {
+        int chordCount=sounds.size();
+        System.out.println("Count "+chordCount);
+        while (timeTracker.indexForTimeCounted < chordCount-1)
+            timeTracker.timeUpToIndex +=
+                sounds.get(timeTracker.indexForTimeCounted++).totalDuration();
+        System.out.println("UpTo: "+timeTracker.timeUpToIndex);
+        long last=chordCount==0 ?0 :sounds.get(timeTracker.indexForTimeCounted).totalDuration();
+        System.out.println("Rest: "+last);
+        return timeTracker.timeUpToIndex + last;
+    }
 
     public Collection<Chord> sounds() {
         return sounds;
@@ -62,6 +85,7 @@ public class Player extends AttributeHolder<Player> implements Notable {
         return reverb;
     }
 
+    public Player r(long i) {return rest(i);}
     public Player r(int i) {return rest(Divisions.convert(i));}
     public Player r(double d) {return rest(Divisions.convert(d));}
 
