@@ -3,40 +3,49 @@ import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
+/** This is running vibratos using dotted notes */
 public class TestVibratoSpeed  {
     public static void main(String args[]) throws Exception {
-	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
-		    .instrumentChannel(0, 0)
+		    .instrumentChannel(23, 0)
 		    .setBendSensitivity(4)
-		    .volume(127)
+		    .volume(100)
 		    .octave(5)
 		    .r4()
 
 			.c(1, F-12, C, G)
 				.bend(4, 2)
-				.vibrato(2., 64, 12).up()
+				.vibrato(2., 32, 16).up()
 
-			.c(2., F-12, C, G)
-				.vibrato(64, 12).up()
+			.c(4, F-12, C, G)
+				.r(8)
+				.c(16, G-12)
+				.r(8.)
+				.c(16, B-12)
+				.up()
+			.c(2., E-12, G-12, F)
+				.vibrato(32, 16).up()
 
-			.c(1, F-12, C, G)
+			.c(2, A-12, C, E)
 				.bend(4, 2)
-				.vibrato(64, 12).up()
+				.vibrato(32, 16).up()
+			.p(8, E)
+			.p(8, F)
+			.c(2, D_, E, G_)
+				.vibrato(32, 16).up()
+			.p(8, F)
+			.p(8, G_)
+			.c(2, E, G_-12, B_)
+				.vibrato(32, 16).up()
 
-		    /*
-		    .c(1, C)
-			    .bend(4, 2)
-			    .vibrato(64, 4)
-			    .up()
-		    .c(2, D)
-			    .bend(8, 2)
-			    .vibrato(64, 4)
-			    .up()
-		    */
+			.c(4, A)
+				.vibrato(32, 16).up()
+			.c(2., C+12, E, G)
+				.vibrato(32, 16).up()
+
 		    .r4();
 	    new MyMidi3()
-		    .setBeatsPerMinute(60)
+		    .setBeatsPerMinute(80)
 		    .playAndStop(player);
 	    System.out.println("Done");
     }

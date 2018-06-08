@@ -326,8 +326,8 @@ public class MyMidi3  {
 
     private static class MyNotifier extends ArrayBlockingQueue<Integer> {
         public MyNotifier() {super(1);}
-        public void give() {add(1);}
-        public void grab() {
+        void give() {add(1);}
+        void grab() {
             try {take();} catch (Exception e) {throw new RuntimeException(e);}
         }
     }
@@ -359,10 +359,8 @@ public class MyMidi3  {
             sequencer.addMetaEventListener(
                 event ->{
                     if (event.getType() == SEQUENCER_END_PLAY){
-                        if (andThenStop) {
-                            sequencer.close();
-                            sequencer=null;
-                        }
+                        if (andThenStop)
+                            close();
                         notifier.ifPresent(MyNotifier::give);
                     }
                 }
@@ -378,6 +376,10 @@ public class MyMidi3  {
 
     public void stopPlay() {
         sequencer.stop();
+    }
+    public void close() {
+        sequencer.close();
+        sequencer=null;
     }
 
 }
