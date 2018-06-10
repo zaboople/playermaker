@@ -2,10 +2,11 @@ package test;
 import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 
-public class TestChords  {
+public class TestChords implements XTest {
     public static void main(String args[]) throws Exception {
-	    MyMidi3 midi=new MyMidi3();
-	    midi.setBeatsPerMinute(90);
+	    new TestChords().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 midi, boolean stop)  {
 		int checks=15;
 	    Player player=new Player()
 		    .r4();
@@ -22,7 +23,6 @@ public class TestChords  {
 		    .instrument(1)
 		    .p(1, checks-5, checks-3, checks)
 		    .r4();
-	    midi.playAndStop(player);
+	    midi.setBeatsPerMinute(90).play(stop, player);
     }
-
 }

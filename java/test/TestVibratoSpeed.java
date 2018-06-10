@@ -4,12 +4,14 @@ import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
 /** This is running vibratos using dotted notes */
-public class TestVibratoSpeed  {
+public class TestVibratoSpeed implements XTest {
     public static void main(String args[]) throws Exception {
+	    new TestVibratoSpeed().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .instrumentChannel(23, 0)
 		    .setBendSensitivity(4)
-		    .volume(100)
 		    .octave(5)
 		    .r4()
 
@@ -44,10 +46,6 @@ public class TestVibratoSpeed  {
 				.vibrato(32, 16).up()
 
 		    .r4();
-	    new MyMidi3()
-		    .setBeatsPerMinute(80)
-		    .playAndStop(player);
-	    System.out.println("Done");
+	    midi.setBeatsPerMinute(80).play(stop, player);
     }
-
 }

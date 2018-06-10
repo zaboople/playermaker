@@ -3,8 +3,11 @@ import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
-public class TestBendsPartial  {
+public class TestBendsPartial implements XTest {
     public static void main(String args[]) throws Exception {
+	    new TestBendsPartial().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 midi, boolean stop)  {
 	    //Organ 1:
 	    Player player=new Player()
 		    .instrumentTrackChannel(16, 0, 0)
@@ -23,9 +26,9 @@ public class TestBendsPartial  {
 			.c(2, B)
 				.n(2, D -23).upup()
 		    .r4();
-	    new MyMidi3()
+	    midi
 		    .setBeatsPerMinute(90)
-		    .playAndStop(player);
+		    .play(stop, player);
 	    System.out.println("Done");
     }
 

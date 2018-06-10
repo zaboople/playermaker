@@ -69,6 +69,7 @@ public class MyMidi3  {
 
     public MyMidi3 reset() {
         try {
+            System.out.println("MyMidi3.reset(): Sequencer "+sequence);
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -84,8 +85,12 @@ public class MyMidi3  {
     }
 
 
-    /** FIXME players should go in constructor maybe. */
-    public MyMidi3 sequence(Player... players) throws Exception {
+    public MyMidi3 sequence(Player... players) {
+        try {return sequenceMessy(players);}
+        catch (Exception e)
+        {throw new RuntimeException(e);}
+    }
+    private MyMidi3 sequenceMessy(Player... players) throws Exception {
         for (Player player: players)
             reservedChannels.reserve(player);
 
@@ -337,16 +342,17 @@ public class MyMidi3  {
     public MyMidi3 playAndStop() {
         return play(true);
     }
-    public MyMidi3 play(Player... players) throws Exception {
+    public MyMidi3 play(boolean stop, Player... players) {
         sequence(players);
-        return play(false);
+        return play(stop);
     }
-    public void playAndStop(Player... players) throws Exception {
+    public void playAndStop(Player... players)  {
         sequence(players);
         play(true);
     }
     public MyMidi3 play(boolean andThenStop) {
         try {
+            System.out.println("MyMidi3.play() starting..."+sequencer+" "+andThenStop);
             if (!sequencer.isOpen())
                 sequencer.open();
             sequencer.setSequence(sequence);
@@ -359,6 +365,7 @@ public class MyMidi3  {
             sequencer.addMetaEventListener(
                 event ->{
                     if (event.getType() == SEQUENCER_END_PLAY){
+                        System.out.println("play() close event "+andThenStop);
                         if (andThenStop)
                             close();
                         notifier.ifPresent(MyNotifier::give);
@@ -368,7 +375,8 @@ public class MyMidi3  {
             sequencer.start();
             notifier.ifPresent(MyNotifier::grab);
         } catch (Exception e) {
-            sequencer.close();
+            if (sequencer!=null)
+                sequencer.close();
             throw new RuntimeException(e);
         }
         return this;
@@ -378,8 +386,9 @@ public class MyMidi3  {
         sequencer.stop();
     }
     public void close() {
+        System.out.println("MyMidi3.close()");
         sequencer.close();
-        sequencer=null;
+        //sequencer=null;
     }
 
 }

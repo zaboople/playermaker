@@ -9,8 +9,11 @@ import static org.tmotte.pm.Pitches.*;
  * different tracks; we need different channels. Also, our reverb
  * settings are getting us absolutely nothing.
  */
-public class TestChannelTrack  {
+public class TestChannelTrack implements XTest {
     public static void main(String args[]) throws Exception {
+	    new TestChannelTrack().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 midi, boolean stop)  {
 	    //Accordion:
 	    Player player1=new Player()
 		    .instrumentChannel(21, 1)
@@ -55,9 +58,9 @@ public class TestChannelTrack  {
 			.p4(E, G_, B)
 
 		    .r4();
-	    new MyMidi3()
+	    midi
 		    .setBeatsPerMinute(60)
-		    .playAndStop(player1, player2);
+		    .play(stop, player1, player2);
     }
 
 }

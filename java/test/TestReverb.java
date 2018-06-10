@@ -4,15 +4,12 @@ import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
 /* This is actually in 3/8 time. No, the reverb is still broken :{ */
-public class TestReverb  {
+public class TestReverb implements XTest {
     public static void main(String args[]) throws Exception {
-	    new MyMidi3()
-		    .setBeatsPerMinute(65)
-		    .playAndStop(make());
-	    System.out.println("Done");
+	    new TestReverb().test(new MyMidi3(), true);
     }
-    private static Player make() {
-		return new Player()
+    public void test(MyMidi3 midi, boolean stop)  {
+		Player player=new Player()
 		    .instrumentTrackChannel(16, 0, 0)
 		    .setReverb(0)
 		    .octave(5)
@@ -79,6 +76,8 @@ public class TestReverb  {
 
 		    .r4()
 			;
+		midi.setBeatsPerMinute(65).play(stop, player);
+
     }
 
 }

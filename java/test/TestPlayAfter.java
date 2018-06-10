@@ -6,8 +6,11 @@ import static org.tmotte.pm.Pitches.*;
 /**
  * 3 players all coming in/out right at each other's beats using Player.getEndTime().
  */
-public class TestPlayAfter  {
+public class TestPlayAfter implements XTest {
     public static void main(String args[]) throws Exception {
+	    new TestPlayAfter().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 midi, boolean stop)  {
 	    Player player1=new Player()
 		    .instrumentChannel(3, 0)
 		    .setBendSensitivity(4)
@@ -51,13 +54,10 @@ public class TestPlayAfter  {
 	    player1.r4();
 	    player2.r4();
 	    player3.r4();
-	    new MyMidi3()
+	    midi
 		    .setBeatsPerMinute(60)
-		    .play(player1, player2, player3)
-		    .reset()
-		    .playAndStop(player1, player2, player3)
+		    .play(stop, player1, player2, player3)
 		    ;
-	    System.out.println("Done");
     }
 
 }

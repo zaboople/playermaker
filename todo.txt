@@ -1,6 +1,7 @@
 
 - High
-    - I swear vibrato is wrong. Look at using vibrato(4, 64, 8) vs vibrato(2, 64, 8) vs vibrato(1, 64, 8)
+    - Running many after each other - the MyMidi3 watcher is watching things wrong - we end up with a bunch of event listeners instead of 1.
+    - Do a test where you tail off - a 1, 2., 2, 4, 8, 16
     - Load instruments:
         # Example of using an instrument from sound bank 1152 - splitting it into two 7-bit parts
         n the MIDI protocol itself, bank numbers are split into two 7-bit parts and transmitted as the value

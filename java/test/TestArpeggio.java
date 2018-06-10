@@ -4,8 +4,11 @@ import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
 
-public class TestArpeggio  {
+public class TestArpeggio implements XTest {
     public static void main(String args[]) throws Exception {
+	    new TestArpeggio().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 midi, boolean stop)  {
 	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
 		    .instrument(1)
@@ -40,10 +43,9 @@ public class TestArpeggio  {
 			//1
 			.r2()
 			;
-	    new MyMidi3()
+	    midi
 		    .setBeatsPerMinute(80)
-		    .playAndStop(player);
-	    System.out.println("Done");
+		    .play(stop, player);
     }
 
 }

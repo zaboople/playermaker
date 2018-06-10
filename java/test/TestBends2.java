@@ -3,8 +3,11 @@ import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
-public class TestBends2  {
+public class TestBends2 implements XTest {
     public static void main(String args[]) throws Exception {
+	    new TestBends2().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 sqr, boolean stop)  {
 	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
 		    .instrumentTrackChannel(16, 0, 0)
@@ -37,7 +40,7 @@ public class TestBends2  {
 				.bend(64, 8).bend(64, -8)
 				.up()
 		    .r4();
-	    new MyMidi3()
+	    sqr
 		    .setBeatsPerMinute(60)
 		    .playAndStop(player);
 	    System.out.println("Done");

@@ -3,8 +3,11 @@ import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
-public class TestBendTo  {
+public class TestBendTo implements XTest {
     public static void main(String args[]) throws Exception {
+	    new TestBendTo().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .instrumentChannel(41, 3)
 		    .setBendSensitivity(4)
@@ -44,10 +47,9 @@ public class TestBendTo  {
 			.p(16.3, D, B_)
 			.p(4., A, A-12, A+12)
 		    .r4();
-	    new MyMidi3()
+	    midi
 		    .setBeatsPerMinute(60)
-		    .playAndStop(player);
-	    System.out.println("Done");
+		    .play(stop, player);
     }
 
 }

@@ -3,8 +3,11 @@ import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
-public class TestVibratoChanging  {
+public class TestVibratoChanging implements XTest {
     public static void main(String args[]) throws Exception {
+	    new TestVibratoChanging().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .instrumentChannel(0,  0)
 		    .bendSense(8)
@@ -42,10 +45,9 @@ public class TestVibratoChanging  {
 				.vibrato(2, 16, 16)
 				.up()
 			.r4();
-	    new MyMidi3()
+	    midi
 		    .setBeatsPerMinute(48)
-		    .playAndStop(player);
-	    System.out.println("Done");
+		    .play(stop, player);
     }
 
 }

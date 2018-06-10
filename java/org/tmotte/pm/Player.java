@@ -47,13 +47,10 @@ public class Player extends AttributeHolder<Player> implements Notable {
 
     public long getTimeLength() {
         int chordCount=sounds.size();
-        System.out.println("Count "+chordCount);
         while (timeTracker.indexForTimeCounted < chordCount-1)
             timeTracker.timeUpToIndex +=
                 sounds.get(timeTracker.indexForTimeCounted++).totalDuration();
-        System.out.println("UpTo: "+timeTracker.timeUpToIndex);
         long last=chordCount==0 ?0 :sounds.get(timeTracker.indexForTimeCounted).totalDuration();
-        System.out.println("Rest: "+last);
         return timeTracker.timeUpToIndex + last;
     }
 

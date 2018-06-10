@@ -130,8 +130,8 @@ public interface BendContainer<T> {
 
 
     public default T vibrato(Number delay, Number duration, Number frequency, int denominator) {
-        System.out.println("BendContainer.vibrato(Number, Number, Number, int)");
-        System.out.println("BendContainer.vibrato("+delay+", "+duration+", "+frequency+", "+denominator+")");
+        //System.out.println("BendContainer.vibrato(Number, Number, Number, int)");
+        //System.out.println("BendContainer.vibrato("+delay+", "+duration+", "+frequency+", "+denominator+")");
         return vibrato(
             Divisions.convert(delay),
             Divisions.convert(duration),

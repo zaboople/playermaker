@@ -3,8 +3,11 @@ import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
-public class TestVibratoTriplet  {
+public class TestVibratoTriplet implements XTest {
     public static void main(String args[]) throws Exception {
+	    new TestVibratoTriplet().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 midi, boolean stop)  {
 	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
 		    .instrument(41)
@@ -45,16 +48,14 @@ public class TestVibratoTriplet  {
 			.r(8)
 
 			//7-8
-			.c(1, F-12, C, G)
+			.c(2, F-12, C, G)
 				.bend(4, 2)
 				.vibrato(2., 64, 8).up()
-
 		    .r8()
 			;
-	    new MyMidi3()
+	    midi
 		    .setBeatsPerMinute(60)
-		    .playAndStop(player);
-	    System.out.println("Done");
+		    .play(stop, player);
     }
 
 }

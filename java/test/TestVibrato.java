@@ -3,9 +3,11 @@ import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
-public class TestVibrato  {
+public class TestVibrato implements XTest {
     public static void main(String args[]) throws Exception {
-	    //Organ 1, with double bend-sensitivity:
+	    new TestVibrato().test(new MyMidi3(), true);
+    }
+    public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .instrumentTrackChannel(16, 0, 0)
 		    .setBendSensitivity(4)
@@ -22,10 +24,9 @@ public class TestVibrato  {
 			.p8(C, G_, A)
 			.s2(B, D_, F).vibrato(64, 12).up()
 		    .r4();
-	    new MyMidi3()
+	    midi
 		    .setBeatsPerMinute(60)
-		    .playAndStop(player);
-	    System.out.println("Done");
+		    .play(stop, player);
     }
 
 }

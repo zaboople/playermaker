@@ -1,4 +1,5 @@
 package org.tmotte.pm;
+
 public class Divisions {
     public final static int triplet128=2;
     public final static int triplet64=triplet128 * 2;
