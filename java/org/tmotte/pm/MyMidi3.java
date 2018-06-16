@@ -47,11 +47,13 @@ public class MyMidi3  {
     private int currChannelIndex=0;
     public long tickX=0;
 
+    /**
+     * This wrapper for Sequencer allows me to put in a shutdown hook
+     */
     static class MySequencer {
         private final ArrayBlockingQueue<Integer> eventHook=new ArrayBlockingQueue<>(1);
 
         boolean waitForEndPlay=true, closeOnEndPlay=false;
-        Optional<ArrayBlockingQueue<Integer>> eventHookOption=Optional.of(eventHook);
         Sequencer realSequencer;
 
         public MySequencer() {
@@ -59,16 +61,17 @@ public class MyMidi3  {
             realSequencer.addMetaEventListener(
                 event ->{
                     if (event.getType() == SEQUENCER_END_PLAY){
-                        System.out.println("play() close event ");
                         if (closeOnEndPlay)
                             realSequencer.close();
-                        eventHookOption.ifPresent(q->q.add(1));
+                        if (waitForEndPlay)
+                            eventHook.add(1);
                     }
                 }
             );
         }
-        public void waitForIf() {
-            eventHookOption.ifPresent(q -> ExceptionWrapper.run(()->q.take()));
+        void waitForIf() {
+            if (waitForEndPlay)
+                ExceptionWrapper.run(()->eventHook.take());
         }
     }
 
@@ -367,7 +370,7 @@ public class MyMidi3  {
         sequencer.closeOnEndPlay=andThenStop;
         Sequencer sqr=sequencer.realSequencer;
         try {
-            System.out.println("MyMidi3.play() starting..."+sequencer+" "+andThenStop);
+            //System.out.println("MyMidi3.play() starting..."+sequencer+" "+andThenStop);
             if (!sqr.isOpen())
                 sqr.open();
             sqr.setSequence(sequence);
