@@ -1,4 +1,5 @@
 package org.tmotte.pm;
+import org.tmotte.common.util.ExceptionWrapper;
 import javax.sound.midi.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public class MyMidi3  {
     final static int SEQUENCER_END_PLAY=47;
     final static int C=0, D=2, E=4, F=5, G=7, A=9, B=11;
 
-    private Sequencer sequencer;
+    private MySequencer sequencer;
     private boolean waitForSequencerToStopPlaying=true;
     private Sequence sequence;
     private ReserveChannels reservedChannels=new ReserveChannels();
@@ -46,14 +47,37 @@ public class MyMidi3  {
     private int currChannelIndex=0;
     public long tickX=0;
 
+    static class MySequencer {
+        private final ArrayBlockingQueue<Integer> eventHook=new ArrayBlockingQueue<>(1);
+
+        boolean waitForEndPlay=true, closeOnEndPlay=false;
+        Optional<ArrayBlockingQueue<Integer>> eventHookOption=Optional.of(eventHook);
+        Sequencer realSequencer;
+
+        public MySequencer() {
+            ExceptionWrapper.run(()-> realSequencer=MidiSystem.getSequencer());
+            realSequencer.addMetaEventListener(
+                event ->{
+                    if (event.getType() == SEQUENCER_END_PLAY){
+                        System.out.println("play() close event ");
+                        if (closeOnEndPlay)
+                            realSequencer.close();
+                        eventHookOption.ifPresent(q->q.add(1));
+                    }
+                }
+            );
+        }
+        public void waitForIf() {
+            eventHookOption.ifPresent(q -> ExceptionWrapper.run(()->q.take()));
+        }
+    }
+
     public MyMidi3() {
-        try {
-            sequencer = MidiSystem.getSequencer();
+        ExceptionWrapper.run(()-> {
+            sequencer = new MySequencer();
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
             setBeatsPerMinute(60);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 
     /** Currently the quarter note always gets 1 beat */
@@ -68,12 +92,9 @@ public class MyMidi3  {
     }
 
     public MyMidi3 reset() {
-        try {
-            System.out.println("MyMidi3.reset(): Sequencer "+sequence);
+        ExceptionWrapper.run(()-> {
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        });
         return this;
     }
 
@@ -204,7 +225,7 @@ public class MyMidi3  {
     }
 
     private void sendBends(long soundStart, List<Bend> bends) {
-        System.out.println("MyMidi3: Bends "+bends.size());
+        //System.out.println("MyMidi3: Bends "+bends.size());
         final int max=8192;
         long t=soundStart;
         int pitch=max;//fixme is that correct?
@@ -262,13 +283,11 @@ public class MyMidi3  {
     }
 
     private void event(int type, int firstNum, int secondNum, long tick) {
-        try {
+        ExceptionWrapper.run(()-> {
             ShortMessage message = new ShortMessage();
             message.setMessage(type + currChannelIndex, firstNum, secondNum);//FIXME can't we do this in one shot
-            sendMessage(message, tick);//FIXME can't we handle exceptions in one place
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+            sendMessage(message, tick);
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -329,13 +348,7 @@ public class MyMidi3  {
     // PLAY: //
     ///////////
 
-    private static class MyNotifier extends ArrayBlockingQueue<Integer> {
-        public MyNotifier() {super(1);}
-        void give() {add(1);}
-        void grab() {
-            try {take();} catch (Exception e) {throw new RuntimeException(e);}
-        }
-    }
+
     public MyMidi3 play() {
         return play(false);
     }
@@ -351,43 +364,31 @@ public class MyMidi3  {
         play(true);
     }
     public MyMidi3 play(boolean andThenStop) {
+        sequencer.closeOnEndPlay=andThenStop;
+        Sequencer sqr=sequencer.realSequencer;
         try {
             System.out.println("MyMidi3.play() starting..."+sequencer+" "+andThenStop);
-            if (!sequencer.isOpen())
-                sequencer.open();
-            sequencer.setSequence(sequence);
-            sequencer.setLoopCount(0);
-            sequencer.setLoopStartPoint(0);
-            sequencer.setTickPosition(0);
-            Optional<MyNotifier> notifier= waitForSequencerToStopPlaying
-                ?Optional.of(new MyNotifier())
-                :Optional.empty();
-            sequencer.addMetaEventListener(
-                event ->{
-                    if (event.getType() == SEQUENCER_END_PLAY){
-                        System.out.println("play() close event "+andThenStop);
-                        if (andThenStop)
-                            close();
-                        notifier.ifPresent(MyNotifier::give);
-                    }
-                }
-            );
-            sequencer.start();
-            notifier.ifPresent(MyNotifier::grab);
+            if (!sqr.isOpen())
+                sqr.open();
+            sqr.setSequence(sequence);
+            sqr.setLoopCount(0);
+            sqr.setLoopStartPoint(0);
+            sqr.setTickPosition(0);
+            sqr.start();
+            sequencer.waitForIf();
         } catch (Exception e) {
-            if (sequencer!=null)
-                sequencer.close();
+            sqr.close();
             throw new RuntimeException(e);
         }
         return this;
     }
 
     public void stopPlay() {
-        sequencer.stop();
+        sequencer.realSequencer.stop();
     }
     public void close() {
         System.out.println("MyMidi3.close()");
-        sequencer.close();
+        sequencer.realSequencer.close();
         //sequencer=null;
     }
 

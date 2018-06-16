@@ -11,20 +11,57 @@ public class TestBendsPartial implements XTest {
 	    //Organ 1:
 	    Player player=new Player()
 		    .instrumentTrackChannel(16, 0, 0)
-		    .octave(6)
+		    .octave(5)
+
 		    .r(4)
+
+
 			.p(8, B)
-			.r(8)
-			.p(8, D - 24)
-			.r(8)
+			.p(8, D - 12)
+			.r(32)
+
+			.p(4, B, D -12)
+			.r(32)
+
 			.c(2, B)
-				.n(2, D -24).upup()
-			.r(8)
+				.n(2, D -12).bend(4, 2).upup()
+			.r(32)
+
 			.c(2, B)
-				.n(2, D -24).bend(4, 2).upup()
-			.r(8)
+				.n(2, D -11).upup()
+			.r(32)
 			.c(2, B)
-				.n(2, D -23).upup()
+				.n(2, D -12).upup()
+
+
+			.octave(5)
+
+			// 1
+			.p(4, A, E)
+
+			// 2
+			.c(8., A)
+				.n(8., E)
+				.bend(1)
+				.upup()
+			.p(32, E)
+			.p(32, F)
+
+			// 3 + 4
+			.c(2, G_)
+				.r(8).n(4., A).upup()
+
+			// 5 & 1/2
+			.p(8, F)
+			.c(8., E).r(16).n(8, A).upup()
+			.p(16, E, G)
+
+			// 6
+			.p(8, D, G)
+
+			// 7 & 8
+			.p(2, F-12, A-12, C, G)
+
 		    .r4();
 	    midi
 		    .setBeatsPerMinute(90)

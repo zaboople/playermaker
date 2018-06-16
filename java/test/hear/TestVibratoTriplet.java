@@ -50,7 +50,7 @@ public class TestVibratoTriplet implements XTest {
 			//7-8
 			.c(2, F-12, C, G)
 				.bend(4, 2)
-				.vibrato(2., 64, 8).up()
+				.vibrato(2., 64, 8).up() //FIXME what is a 2. doing here?
 		    .r8()
 			;
 	    midi
