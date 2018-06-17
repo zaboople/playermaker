@@ -10,7 +10,7 @@ public class TestReverb implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
 		Player player=new Player()
-		    .instrumentTrackChannel(16, 0, 0)
+		    .instrument(16)
 		    .setReverb(0)
 		    .octave(5)
 		    .r4()

@@ -9,9 +9,9 @@ public class TestBends implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
 	    //Organ 1:
-	    Player player=new Player().instrumentTrackChannel(16, 0, 0);
 		int base=10;
-	    player
+	    Player player=new Player()
+		    .instrument(16)
 		    .octave(6)
 		    .r4()
 

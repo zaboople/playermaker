@@ -1,7 +1,5 @@
 
 - High
-    - Running many after each other - the MyMidi3 watcher is watching things wrong - we end up with a bunch of event listeners instead of 1.
-    - Do a test where you tail off - a 1, 2., 2, 4, 8, 16
     - Load instruments:
         # Example of using an instrument from sound bank 1152 - splitting it into two 7-bit parts
         n the MIDI protocol itself, bank numbers are split into two 7-bit parts and transmitted as the value
@@ -9,8 +7,7 @@
         ... = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 0,  1152 >> 7);   // = 9
         ... = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 32, 1152 & 0x7f); // = 0
         ... = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 0, 14, 0);
-    - I want to be able to tell player A to rest until player B's current position. This likely means ChordList appears - it tracks the length of everything.
-        Or I know, a chordsMeasured number that tells us how far we've measured lately.
+    - Do a test where you tail off - a 1, 2., 2, 4, 8, 16
     - Can't help but think you should just allow player to do bends/vibratos etc. on the last note played, and just
         have c() return player itself. But consider p(8,C).rest(16).n(16, D)
     - Hammer-ons/pull-offs

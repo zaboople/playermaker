@@ -5,40 +5,61 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class Player extends AttributeHolder<Player> implements Notable {
-    static class TimeTracking {
+    private static class TimeTracking {
         long timeUpToIndex=0;
         long timeAtIndex=0;
         int indexForTimeCounted=0;
     }
-    TimeTracking timeTracker=new TimeTracking();
+    private TimeTracking timeTracker=new TimeTracking();
 
     long startTime=0;
-
     List<Chord> sounds=new ArrayList<>();
     int bendSensitivity=2;
     int reverb=0;
+    int bpm=-1;
 
     // This might be better on attrs:
-    int instrumentIndex=0, channelIndex=0, trackIndex=0;
+    int instrumentIndex=0, channelIndex=0;
 
     public Player() {
         super(new TonalAttributes());
         volume(64);
     }
 
+    /** Achieves the equivalent of instrumentChannel(instrumentIndex, 0) */
     public Player instrument(int instrumentIndex) {
         this.instrumentIndex=instrumentIndex;
         return this;
     }
+    /**
+       Player can only store 1 track and 1 channel, so if this is invoked multiple times,
+       the last values are the only ones that count.
+
+       @param Channel: When there are multiple players, you are responsible for assigning each
+       its own channel. If possible, create "gaps" between the tracks for different
+       players; MyMidi will make use of these unused channels in cases where
+       one player needs extra channels, most common example being bent & not-bent
+       notes in the same Chord.
+     */
     public Player instrumentChannel(int instrumentIndex, int channelIndex) {
         this.instrumentIndex=instrumentIndex;
         this.channelIndex=channelIndex;
         return this;
     }
-    public Player instrumentTrackChannel(int instrumentIndex, int trackIndex, int channelIndex) {
-        this.instrumentIndex=instrumentIndex;
-        this.channelIndex=channelIndex;
+    /**
+     * BPM means "beats per minute". Different players can play at their own speeds (might be... trickY) or one player can act as
+     * "lead", setting the BPM for everyone - as long as they are the first player sequenced.
+     * <br>
+     * Under the hood we are just defaulting to -1, in which case we just use whatever was last set in the MyMidi player; otherwise
+     * MyMidi uses this setting until told otherwise. Player only has one value for BPM - in other words you can't change the BPM
+     * at a specific time; for that, use Chord.setBPM().
+     */
+    public Player setBeatsPerMinute(int bpm) {
+        this.bpm=bpm;
         return this;
+    }
+    public Player setBPM(int bpm) {
+        return setBeatsPerMinute(bpm);
     }
 
     public long getEndTime() {

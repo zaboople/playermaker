@@ -9,11 +9,11 @@ public class TestBends2 implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
 	    //Organ 1, with double bend-sensitivity:
-	    Player player=new Player()
-		    .instrumentTrackChannel(16, 0, 0)
-		    .setBendSensitivity(4);
 		int base=10;
-	    player
+	    Player player=new Player()
+		    .instrument(16)
+		    .setBendSensitivity(4)
+		    .setBeatsPerMinute(60)
 		    .octave(5)
 		    .r4()
 			.s4(G+2, B+2, D+2).bend(8, 2).up()
@@ -41,7 +41,6 @@ public class TestBends2 implements XTest {
 				.up()
 		    .r4();
 	    midi
-		    .setBeatsPerMinute(60)
 		    .play(stop, player);
 	    System.out.println("Done");
     }

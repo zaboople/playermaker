@@ -16,12 +16,12 @@ public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord
     private Player player;
     private List<Note> notes=new ArrayList<>();
     private List<Bend> bends=null;
-    int instrument;
+    int instrument=-1;
+    int bpm=-1;
 
     protected Chord(Player player, long duration, int... pitches) {
         super(new TonalAttributes(player.attrs()));
         this.player=player;
-        this.instrument=player.instrumentIndex;
         addChord(duration, pitches);
     }
 

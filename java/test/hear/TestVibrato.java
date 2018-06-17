@@ -9,7 +9,7 @@ public class TestVibrato implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
-		    .instrumentTrackChannel(16, 0, 0)
+		    .instrument(16)
 		    .setBendSensitivity(4)
 		    .octave(5)
 		    .r4()

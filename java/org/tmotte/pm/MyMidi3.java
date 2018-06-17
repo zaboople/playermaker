@@ -119,6 +119,9 @@ public class MyMidi3  {
             reservedChannels.reserve(player);
 
         for (Player player: players) {
+            // Player can change the BPM:
+            if (player.bpm!=-1)
+                setBeatsPerMinute(player.bpm);
 
             // Tracks & channel setup:
             currTrack=sequence.createTrack();;
@@ -133,12 +136,11 @@ public class MyMidi3  {
 
             // And blast off the rocket:
             for (Chord sound: player.sounds()) {
-                if (sound.instrument!=instrument) {
+                if (sound.instrument!=-1) {
                     instrument=sound.instrument;
                     sendInstrument(instrument, currTick);
                 }
 
-                int spareTrackIndex=-1;
                 long soundStart=currTick;
                 for (Note note: sound.notes()) {
 
