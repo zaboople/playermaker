@@ -41,6 +41,26 @@ public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord
         return t(Divisions.convert(duration));
     }
 
+    /**
+     * Changes the current instrument as of this chord;
+     * later chords from this player will use the same instrument
+     * until another chord changes it again. Overrides the
+     * instrument setting for the player.
+     */
+    public Chord instrument(int instrument) {
+        this.instrument=instrument;
+        return this;
+    }
+
+    /**
+     * Sets the BPM as of this chord, following the same general
+     * rule as setInstrument().
+     */
+    public Chord bpm(int bpm) {
+        this.bpm=bpm;
+        return this;
+    }
+
     public Rest r(int i) {return rest(Divisions.convert(i));}
     public Rest r(double d) {return rest(Divisions.convert(d));}
 

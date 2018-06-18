@@ -135,14 +135,16 @@ public class MyMidi3  {
             int instrument=player.instrumentIndex;
 
             // And blast off the rocket:
-            for (Chord sound: player.sounds()) {
-                if (sound.instrument!=-1) {
-                    instrument=sound.instrument;
+            for (Chord chord: player.sounds()) {
+                if (chord.instrument!=-1) {
+                    instrument=chord.instrument;
                     sendInstrument(instrument, currTick);
                 }
+                if (chord.bpm!=-1)
+                    setBeatsPerMinute(chord.bpm);
 
                 long soundStart=currTick;
-                for (Note note: sound.notes()) {
+                for (Note note: chord.notes()) {
 
                     // Local variables for note attributes:
                     TonalAttributes attrs=note.attrs;
@@ -176,10 +178,10 @@ public class MyMidi3  {
 
                 // Finish up with the chord bends (if any) and
                 // and advance the currTick counter:
-                if (!sound.bends().isEmpty())
-                    sendBends(soundStart, sound.bends());
-                currTick=soundStart+(sound.totalDuration() * tickX);
-                if (!sound.bends().isEmpty())
+                if (!chord.bends().isEmpty())
+                    sendBends(soundStart, chord.bends());
+                currTick=soundStart+(chord.totalDuration() * tickX);
+                if (!chord.bends().isEmpty())
                     eventBendEnd(currTick);
             }
         }

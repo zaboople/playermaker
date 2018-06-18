@@ -7,17 +7,19 @@
         ... = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 0,  1152 >> 7);   // = 9
         ... = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 32, 1152 & 0x7f); // = 0
         ... = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 0, 14, 0);
-    - Do a test where you tail off - a 1, 2., 2, 4, 8, 16
-    - Can't help but think you should just allow player to do bends/vibratos etc. on the last note played, and just
-        have c() return player itself. But consider p(8,C).rest(16).n(16, D)
+    - Tests
+        - Do a test where you tail off - a 1, 2., 2, 4, 8, 16
+        - Test Chord.bpm()
+            - Change speed - and put speed in player. My idea is that speed is typically 0, but
+                you can enhance it by speed(+/-X). This means anytime a Sound is added, the
+                speed needs to be added to it.
     - Hammer-ons/pull-offs
         - This makes no sense at all.
         - And a 16th that appears at the end of a half (right before another note)
         - Or a 16th that starts a half
     - Slurs/Slides or do we even - just do 128ths... but we could do them different
-    - Change speed - and put speed in player. My idea is that speed is typically 0, but
-        you can enhance it by speed(+/-X). This means anytime a Sound is added, the
-        speed needs to be added to it.
+    - Can't help but think you should just allow player to do bends/vibratos etc. on the last note played, and just
+        have c() return player itself. But consider p(8,C).rest(16).n(16, D)
 
 - Medium
     -Portamento, Legato, Reverb?
