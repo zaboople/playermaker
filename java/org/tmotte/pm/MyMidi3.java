@@ -1,5 +1,5 @@
 package org.tmotte.pm;
-import org.tmotte.common.util.ExceptionWrapper;
+import org.tmotte.function.Exceptional;
 import javax.sound.midi.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,12 +52,18 @@ public class MyMidi3  {
      */
     static class MySequencer {
         private final ArrayBlockingQueue<Integer> eventHook=new ArrayBlockingQueue<>(1);
+        private Synthesizer synth;
 
         boolean waitForEndPlay=true, closeOnEndPlay=false;
         Sequencer realSequencer;
 
         public MySequencer() {
-            ExceptionWrapper.run(()-> realSequencer=MidiSystem.getSequencer());
+            Exceptional.run(()-> {
+                realSequencer=MidiSystem.getSequencer();
+                synth=MidiSystem.getSynthesizer();
+                System.out.println("Synthesizer "+synth);
+                //realSequencer.getTransmitter().setReceiver(synth.getReceiver());
+            });
             realSequencer.addMetaEventListener(
                 event ->{
                     if (event.getType() == SEQUENCER_END_PLAY){
@@ -71,12 +77,12 @@ public class MyMidi3  {
         }
         void waitForIf() {
             if (waitForEndPlay)
-                ExceptionWrapper.run(()->eventHook.take());
+                Exceptional.run(()->eventHook.take());
         }
     }
 
     public MyMidi3() {
-        ExceptionWrapper.run(()-> {
+        Exceptional.run(()-> {
             sequencer = new MySequencer();
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
             setBeatsPerMinute(60);
@@ -95,7 +101,7 @@ public class MyMidi3  {
     }
 
     public MyMidi3 reset() {
-        ExceptionWrapper.run(()-> {
+        Exceptional.run(()-> {
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
         });
         return this;
@@ -110,9 +116,7 @@ public class MyMidi3  {
 
 
     public MyMidi3 sequence(Player... players) {
-        try {return sequenceMessy(players);}
-        catch (Exception e)
-        {throw new RuntimeException(e);}
+        return Exceptional.get(()-> sequenceMessy(players));
     }
     private MyMidi3 sequenceMessy(Player... players) throws Exception {
         for (Player player: players)
@@ -162,7 +166,8 @@ public class MyMidi3  {
                         System.out.println("Using spare: "+currChannelIndex);
                         sendBends(soundStart + restBefore, noteBends);
                     }
-                    //System.out.println("Pitch "+pitch+" at "+currTick);
+                    if (pitch<0)
+                        throw new RuntimeException("Invalid pitch "+pitch+" from player "+player);
                     event(NOTEON, pitch, volume, currTick);
 
 
@@ -290,7 +295,7 @@ public class MyMidi3  {
     }
 
     private void event(int type, int firstNum, int secondNum, long tick) {
-        ExceptionWrapper.run(()-> {
+        Exceptional.run(()-> {
             ShortMessage message = new ShortMessage();
             message.setMessage(type + currChannelIndex, firstNum, secondNum);//FIXME can't we do this in one shot
             sendMessage(message, tick);

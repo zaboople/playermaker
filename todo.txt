@@ -1,5 +1,16 @@
+- Player
+    Label keys C1 - G8 or whatever
 
-- High
+- High playermaker
+    - Capture reverb messages from MidiDemo and figure out how they are sent.
+    - Allow pressure in playermaker
+    - Add C1, C2, C3, D1, D2, D3 to constants; easier than -12 +12 I think.
+    - ARGH midi channel 10 is drums!!!!
+        This article contains infor about what notes are what - map to constants:
+        https://en.wikipedia.org/wiki/General_MIDI#Percussive
+        hey there's stuff in here about reverb and so forth so maybe...
+        https://en.wikipedia.org/wiki/General_MIDI_Level_2
+    - Pressure
     - Load instruments:
         # Example of using an instrument from sound bank 1152 - splitting it into two 7-bit parts
         n the MIDI protocol itself, bank numbers are split into two 7-bit parts and transmitted as the value
@@ -18,6 +29,7 @@
         - And a 16th that appears at the end of a half (right before another note)
         - Or a 16th that starts a half
     - Slurs/Slides or do we even - just do 128ths... but we could do them different
+        - How about series of 128ths or whatever, and then a sort of finish...didn't i already make a finish?
     - Can't help but think you should just allow player to do bends/vibratos etc. on the last note played, and just
         have c() return player itself. But consider p(8,C).rest(16).n(16, D)
 

@@ -96,13 +96,13 @@ public class MediaTypes2 {
             if (line instanceof DataLine) {
                 DataLine dataLine = (DataLine)line;
                 AudioFormat audioFormat = dataLine.getFormat();
-                child.add("Channels: " + new Integer(audioFormat.getChannels()));
+                child.add("Channels: " + audioFormat.getChannels());
                 child.add("Encoding: " + audioFormat.getEncoding());
-                child.add("Frame Rate: " +new Float(audioFormat.getFrameRate()));
-                child.add("Sample Rate: " +new Float(audioFormat.getSampleRate()));
-                child.add("Sample Size (bits): " +new Integer(audioFormat.getSampleSizeInBits()));
-                child.add("Big Endian: " +new Boolean(audioFormat.isBigEndian()));
-                child.add("Level: " +new Float(dataLine.getLevel()));
+                child.add("Frame Rate: " +audioFormat.getFrameRate());
+                child.add("Sample Rate: " +audioFormat.getSampleRate());
+                child.add("Sample Size (bits): " +audioFormat.getSampleSizeInBits());
+                child.add("Big Endian: " +audioFormat.isBigEndian());
+                child.add("Level: " +dataLine.getLevel());
             }
             if (line instanceof Port) {
                 Port port = (Port)line;

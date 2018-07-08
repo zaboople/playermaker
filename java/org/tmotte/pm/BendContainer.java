@@ -125,7 +125,8 @@ public interface BendContainer<T> {
         return vibrato(0L, totalDuration(), Divisions.convert(frequency), denominator);
     }
     public default T vibrato(Number duration, Number frequency, int denominator) {
-        return vibrato(new Long(0), duration, frequency, denominator);
+        Long long0=0l;//Avoids java 10 compiler warning
+        return vibrato(long0, duration, frequency, denominator);
     }
 
 
