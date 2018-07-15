@@ -3,6 +3,7 @@
 
 - High playermaker
     - Capture reverb messages from MidiDemo and figure out how they are sent.
+        Okay they are never sent.
     - Allow pressure in playermaker
     - Add C1, C2, C3, D1, D2, D3 to constants; easier than -12 +12 I think.
     - ARGH midi channel 10 is drums!!!!
