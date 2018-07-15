@@ -1,4 +1,4 @@
-package org.tmotte.function;
+package org.tmotte.common.function;
 
 public interface Exceptional {
     public static interface ExceptionalRunnable {
