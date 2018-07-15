@@ -1,5 +1,5 @@
 package org.tmotte.pm;
-import org.tmotte.function.Exceptional;
+import org.tmotte.common.function.Exceptional;
 import javax.sound.midi.*;
 import java.util.ArrayList;
 import java.util.HashMap;
