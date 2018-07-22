@@ -156,9 +156,8 @@ public class MyMidi3  {
                 for (Note note: chord.notes()) {
 
                     // Local variables for note attributes:
-                    TonalAttributes attrs=note.attrs;
-                    int pitch=note.pitch+attrs.transpose,
-                        volume=note.attrs.volume;
+                    int pitch=note.pitch+note.getTranspose(),
+                        volume=note.getVolume();
                     long restBefore=note.restBefore * tickX;
                     List<Bend> noteBends=note.bends();
 

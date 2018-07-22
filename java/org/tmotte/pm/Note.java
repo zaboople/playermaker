@@ -3,18 +3,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
-public class Note implements BendContainer<Note> {
+public class Note extends AttributeHolder<Note> implements BendContainer<Note> {
     long duration;
     private List<Bend> bends=null;
 
     final long restBefore;
     final int pitch;
     final Chord sound;
-    final NoteAttributes attrs;
 
     public Note(Chord sound, long duration, long restBefore, int pitch) {
+        super(sound);
         this.sound=sound;
-        this.attrs=new NoteAttributes(sound.attrs());
         this.duration=duration;
         this.restBefore=restBefore;
         this.pitch=pitch;
@@ -38,6 +37,10 @@ public class Note implements BendContainer<Note> {
         return this.sound.up();
     }
 
+    List<Bend> bends() {
+        return bends==null ?Collections.emptyList() :bends;
+    }
+
     /** For internal use */
     public @Override List<Bend> makeBends() {
         if (bends==null)
@@ -52,23 +55,6 @@ public class Note implements BendContainer<Note> {
     public @Override long totalDuration(){
         return duration;
     }
-
-    NoteAttributes attrs() {
-        return this.attrs;
-    }
-    class NoteAttributes extends TonalAttributes {
-        public NoteAttributes(TonalAttributes other) {
-            super(other);
-        }
-        public Note up() {
-            return Note.this;
-        }
-    }
-
-    List<Bend> bends() {
-        return bends==null ?Collections.emptyList() :bends;
-    }
-
 
 
 }

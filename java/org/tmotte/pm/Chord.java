@@ -20,7 +20,7 @@ public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord
     int bpm=-1;
 
     protected Chord(Player player, long duration, int... pitches) {
-        super(new TonalAttributes(player.attrs()));
+        super(player);
         this.player=player;
         addChord(duration, pitches);
     }

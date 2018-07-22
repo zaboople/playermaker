@@ -22,7 +22,7 @@ public class Player extends AttributeHolder<Player> implements Notable {
     int instrumentIndex=0, channelIndex=0;
 
     public Player() {
-        super(new TonalAttributes());
+        super();
         volume(64);
     }
 
