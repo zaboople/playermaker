@@ -61,8 +61,13 @@ public class MyMidi3  {
             Exceptional.run(()-> {
                 realSequencer=MidiSystem.getSequencer();
                 synth=MidiSystem.getSynthesizer();
-                System.out.println("Synthesizer "+synth);
-                //realSequencer.getTransmitter().setReceiver(synth.getReceiver());
+                synth.open();
+                for (Transmitter t: realSequencer.getTransmitters())
+                    Optional.ofNullable(t.getReceiver()).ifPresent(Receiver::close);
+                realSequencer.getTransmitters().stream()
+                    .findFirst()
+                    .orElse(realSequencer.getTransmitter())
+                    .setReceiver(synth.getReceiver());
             });
             realSequencer.addMetaEventListener(
                 event ->{

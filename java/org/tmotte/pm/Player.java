@@ -12,8 +12,8 @@ public class Player extends AttributeHolder<Player> implements Notable {
     }
     private TimeTracking timeTracker=new TimeTracking();
 
+    private List<Chord> sounds=new ArrayList<>();
     long startTime=0;
-    List<Chord> sounds=new ArrayList<>();
     int bendSensitivity=2;
     int reverb=0;
     int bpm=-1;

@@ -2,23 +2,24 @@
     Label keys C1 - G8 or whatever
 
 - High playermaker
-    - Capture reverb messages from MidiDemo and figure out how they are sent.
-        Okay they are never sent.
-    - Allow pressure in playermaker
-    - Add C1, C2, C3, D1, D2, D3 to constants; easier than -12 +12 I think.
-    - ARGH midi channel 10 is drums!!!!
-        This article contains infor about what notes are what - map to constants:
-        https://en.wikipedia.org/wiki/General_MIDI#Percussive
-        hey there's stuff in here about reverb and so forth so maybe...
-        https://en.wikipedia.org/wiki/General_MIDI_Level_2
-    - Pressure
-    - Load instruments:
+    - Load instruments into :
         # Example of using an instrument from sound bank 1152 - splitting it into two 7-bit parts
         n the MIDI protocol itself, bank numbers are split into two 7-bit parts and transmitted as the value
         of two controllers, "Bank Select" and "Bank Select LSB":
         ... = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 0,  1152 >> 7);   // = 9
         ... = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 32, 1152 & 0x7f); // = 0
         ... = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 0, 14, 0);
+    - Capture reverb messages from MidiDemo and figure out how they are sent.
+        Okay they are never sent.
+        Make it where we can send these straight to channel
+            -pressure
+            -reverb
+    - Add C1, C2, C3, D1, D2, D3 to constants; easier than -12 +12 I think.
+    - ARGH midi channel 10 is drums!!!!
+        This article contains infor about what notes are what - map to constants:
+        https://en.wikipedia.org/wiki/General_MIDI#Percussive
+        hey there's stuff in here about reverb and so forth so maybe...
+        https://en.wikipedia.org/wiki/General_MIDI_Level_2
     - Tests
         - Do a test where you tail off - a 1, 2., 2, 4, 8, 16
         - Test Chord.bpm()
