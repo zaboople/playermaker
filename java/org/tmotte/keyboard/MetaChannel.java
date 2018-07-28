@@ -11,6 +11,13 @@ public  class MetaChannel {
 
     MidiChannel channel;
     int channelIndex;
+    public static MetaChannel[] getChannels(Synthesizer synth) {
+	    MidiChannel midiChannels[] = synth.getChannels();
+	    MetaChannel[] mcs = new MetaChannel[midiChannels.length];
+	    for (int i = 0; i < mcs.length; i++)
+	        mcs[i] = new MetaChannel(midiChannels[i], i);
+        return mcs;
+    }
 
     public MetaChannel(MidiChannel channel, int index) {
         this.channel = channel;

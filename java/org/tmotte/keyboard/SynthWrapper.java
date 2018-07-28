@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import java.io.File;
 import java.io.IOException;
 
-import org.tmotte.common.function.Exceptional;
+import org.tmotte.common.function.Except;
 
 public class SynthWrapper implements MetaEventListener {
 
@@ -60,16 +60,16 @@ public class SynthWrapper implements MetaEventListener {
 
 		// Create default sequence:
         sequenceFile.ifPresentOrElse(
-	        file -> Exceptional.run( ()->openSequence(file) )
+	        file -> Except.run( ()->openSequence(file) )
 	        ,
-            ()-> Exceptional.run( ()->sequence=new Sequence(Sequence.PPQ, 10) )
+            ()-> Except.run( ()->sequence=new Sequence(Sequence.PPQ, 10) )
         );
 
 
 		// Meta-instruments:
 		final Instrument[] instruments=instrumentFile
 			.map(file ->
-				Exceptional.get(()->{
+				Except.get(()->{
 					synthesizer.unloadAllInstruments(synthesizer.getDefaultSoundbank());
 					Soundbank soundbank=MidiSystem.getSoundbank(file);
 					//synthesizer.loadAllInstruments(soundbank);
@@ -82,10 +82,7 @@ public class SynthWrapper implements MetaEventListener {
         synthesizer.loadInstrument(metaInstruments.get(0).instrument);
 
 		// Meta channels:
-	    MidiChannel midiChannels[] = synthesizer.getChannels();
-	    channels = new MetaChannel[midiChannels.length];
-	    for (int i = 0; i < channels.length; i++)
-	        channels[i] = new MetaChannel(midiChannels[i], i);
+	    channels = MetaChannel.getChannels(synthesizer);
 	    cc = channels[0];
 	    return this;
     }
@@ -141,7 +138,7 @@ public class SynthWrapper implements MetaEventListener {
         recording=false;
 	}
 	public void playBack() {
-        Exceptional.run(()-> {
+        Except.run(()-> {
             if (!sequencer.isOpen())
                 sequencer.open();
             sequencer.setSequence(sequence);
@@ -212,7 +209,7 @@ public class SynthWrapper implements MetaEventListener {
     }
 
     public void saveMidiFile(File file) {
-	    Exceptional.run(()->{
+	    Except.run(()->{
             int[] fileTypes = MidiSystem.getMidiFileTypes(sequence);
             if (fileTypes.length == 0)
                 throw new RuntimeException("MidiSystem doesn't support any file types!");
@@ -247,7 +244,7 @@ public class SynthWrapper implements MetaEventListener {
     }
 
 	private void createInstrumentEvent(MetaInstrument mi) {
-		Exceptional.run(()-> {
+		Except.run(()-> {
 			int bank = mi.getBank(),
 				program=mi.getProgram();
 			int msgType = ShortMessage.CONTROL_CHANGE;
@@ -272,7 +269,7 @@ public class SynthWrapper implements MetaEventListener {
      *   ticks = milliseconds * resolution / 500
      */
     private void createShortEvent(int type, int num) {
-        Exceptional.run(()->{
+        Except.run(()->{
 	        ShortMessage message = new ShortMessage();
             message.setMessage(type+cc.channelIndex, num, cc.getVolume());
             sendMessage(message);

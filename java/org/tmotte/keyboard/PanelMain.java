@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.tmotte.common.swang.GridBug;
-import org.tmotte.common.function.Exceptional;
+import org.tmotte.common.function.Except;
 
 /**
  * This was adapted from an utterly horrible piece of work distributed by the once-mighty
@@ -417,7 +417,7 @@ public class PanelMain {
         }
     }
     private void clickSave() {
-        Exceptional.run(()->{
+        Except.run(()->{
             JFileChooser fc = getFileChooser();
             if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
                 synthWrapper.saveMidiFile(fc.getSelectedFile());
@@ -435,7 +435,7 @@ public class PanelMain {
 		    });
     }
     private void clickOpen() {
-        Exceptional.run(()->{
+        Except.run(()->{
             JFileChooser fc = getFileChooser();
             if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 	            synthWrapper.openSequence(fc.getSelectedFile());
