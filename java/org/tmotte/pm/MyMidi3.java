@@ -1,5 +1,5 @@
 package org.tmotte.pm;
-import org.tmotte.common.function.Exceptional;
+import org.tmotte.common.function.Except;
 import javax.sound.midi.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.Optional;
+import org.tmotte.keyboard.MetaChannel;
 
 /**
  * FIXME name MyMidiSequencer
@@ -39,11 +40,15 @@ public class MyMidi3  {
     final static int C=0, D=2, E=4, F=5, G=7, A=9, B=11;
 
     private MySequencer sequencer;
-    private boolean waitForSequencerToStopPlaying=true;
     private Sequence sequence;
-    private ReserveChannels reservedChannels=new ReserveChannels();
-
+    private MetaChannel[] metaChannels;
+    private Instrument[] instruments;
     private Track currTrack;
+
+    private boolean waitForSequencerToStopPlaying=true;
+    private ReserveChannels reservedChannels=new ReserveChannels();
+    private Map<String, MetaInstrument> instrumentsByName;
+
     private int currChannelIndex=0;
     public long tickX=0;
 
@@ -52,16 +57,13 @@ public class MyMidi3  {
      */
     static class MySequencer {
         private final ArrayBlockingQueue<Integer> eventHook=new ArrayBlockingQueue<>(1);
-        private Synthesizer synth;
 
         boolean waitForEndPlay=true, closeOnEndPlay=false;
         Sequencer realSequencer;
 
-        public MySequencer() {
-            Exceptional.run(()-> {
+        public MySequencer(Synthesizer synth) {
+            Except.run(()-> {
                 realSequencer=MidiSystem.getSequencer();
-                synth=MidiSystem.getSynthesizer();
-                synth.open();
                 for (Transmitter t: realSequencer.getTransmitters())
                     Optional.ofNullable(t.getReceiver()).ifPresent(Receiver::close);
                 realSequencer.getTransmitters().stream()
@@ -82,15 +84,20 @@ public class MyMidi3  {
         }
         void waitForIf() {
             if (waitForEndPlay)
-                Exceptional.run(()->eventHook.take());
+                Except.run(()->eventHook.take());
         }
     }
 
     public MyMidi3() {
-        Exceptional.run(()-> {
-            sequencer = new MySequencer();
+        Except.run(()-> {
+            Synthesizer synth=MidiSystem.getSynthesizer();
+            synth.open();
+            this.instruments=synth.getDefaultSoundbank().getInstruments();
+            instrumentsByName=MetaInstrument.map(instruments);
+            sequencer = new MySequencer(synth);
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
             setBeatsPerMinute(60);
+            metaChannels=MetaChannel.getChannels(synth);
         });
     }
 
@@ -105,8 +112,19 @@ public class MyMidi3  {
         return this;
     }
 
+    public MyMidi3 setReverb(int reverb) {
+        for (MetaChannel mc: metaChannels)
+            mc.setReverb(reverb);
+        return this;
+    }
+
+    public MyMidi3 setReverb(int reverb, int channel) {
+        metaChannels[channel].setReverb(reverb);
+        return this;
+    }
+
     public MyMidi3 reset() {
-        Exceptional.run(()-> {
+        Except.run(()-> {
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
         });
         return this;
@@ -121,38 +139,39 @@ public class MyMidi3  {
 
 
     public MyMidi3 sequence(Player... players) {
-        return Exceptional.get(()-> sequenceMessy(players));
+        return Except.get(()-> sequenceMessy(players));
     }
     private MyMidi3 sequenceMessy(Player... players) throws Exception {
         for (Player player: players)
             reservedChannels.reserve(player);
+        for (Player player: players)
+            sequencePlayer(player);
+        return this;
+    }
 
-        for (Player player: players) {
-            // Player can change the BPM:
-            if (player.bpm!=-1)
-                setBeatsPerMinute(player.bpm);
+    private void sequencePlayer(Player player) throws Exception {
+        // Track & time & defaults:
+        currTrack=sequence.createTrack();;
+        long currTick=player.startTime * tickX;
+        int bendSense=8192;
 
-            // Tracks & channel setup:
-            currTrack=sequence.createTrack();;
-            currChannelIndex=player.channelIndex;
+        // And blast off the rocket:
+        for (Event event: player.events()){
+            {
+                Integer eBpm=event.getBeatsPerMinute(),
+                    eBendSense=event.getBendSensitivity(),
+                    eChannel=event.getChannel();
+                if (eBpm!=null)       setBeatsPerMinute(eBpm);
+                if (eChannel!=null)   currChannelIndex=eChannel;
+                if (eBendSense!=null) sendBendSense(bendSense=eBendSense, currTick);
+            }
 
-            // Do time:
-            long currTick=player.startTime * tickX;
+            getInstrument(event, currTick);
 
-            // Setup of instrument:
-            setupChannelForPlayer(player, currTick);
-            int instrument=player.instrumentIndex;
-
-            // And blast off the rocket:
-            for (Chord chord: player.sounds()) {
-                if (chord.instrument!=-1) {
-                    instrument=chord.instrument;
-                    sendInstrument(instrument, currTick);
-                }
-                if (chord.bpm!=-1)
-                    setBeatsPerMinute(chord.bpm);
-
+            Chord chord=event.getChord();
+            if (chord!=null) {
                 long soundStart=currTick;
+                int wasChannel=currChannelIndex;
                 for (Note note: chord.notes()) {
 
                     // Local variables for note attributes:
@@ -166,7 +185,7 @@ public class MyMidi3  {
 
                     // Send any bends, and the note start:
                     if (!noteBends.isEmpty()) {
-                        reservedChannels.useSpare(player, currTick);
+                        reservedChannels.useSpare(player, bendSense, currTick);
                         System.out.println("Using spare: "+currChannelIndex);
                         sendBends(soundStart + restBefore, noteBends);
                     }
@@ -182,7 +201,7 @@ public class MyMidi3  {
                         eventBendEnd(currTick);
 
                     // Get back on channel if we had to use a reserve:
-                    currChannelIndex=player.channelIndex;
+                    currChannelIndex=wasChannel;
                 }
 
                 // Finish up with the chord bends (if any) and
@@ -194,19 +213,22 @@ public class MyMidi3  {
                     eventBendEnd(currTick);
             }
         }
-        return this;
     }
 
-    private void setupChannelForPlayer(Player player, long tick) throws Exception {
-        // Reverb doesn't work for me. Bummer.
-        /*
-        System.out.println("REVERB "+currChannelIndex+" "+currTrack+" "+player.getReverb());
-        System.out.println("setupChannel "+currChannelIndex+" tick "+tick
-            +" bend sense "+player.getBendSensitivity()+" "+player.instrumentIndex);
-        */
-        sendBendSensitivity(player.getBendSensitivity(), tick);
-        sendReverb(player.getReverb(), tick);
-        sendInstrument(player.instrumentIndex, tick);
+    private void getInstrument(Event event, long tick) {
+        Instrument instrument=event.getInstrument();
+        String instrumentName=event.getInstrumentName();
+        if (instrumentName!=null) {
+            MetaInstrument mi=instrumentsByName.get(instrumentName);
+            if (mi==null) throw new IllegalStateException("No instrument named: \""+instrumentName+"\"");
+            instrument=mi.instrument;
+        }
+        Integer instrumentIndex=event.getInstrumentIndex();
+        if (instrumentIndex!=null)
+            instrument=instruments[instrumentIndex];
+        // Finally send it:
+        if (instrument!=null)
+            sendInstrument(currChannelIndex, instrument, tick);
     }
 
     /** One instance exists within the main class; ReserveChannels has hooks going back out to currChannelIndex
@@ -219,14 +241,14 @@ public class MyMidi3  {
         public void reserve(Player player) {
             reservedAll[player.channelIndex]=true;
         }
-        public void useSpare(Player player, long tick) throws Exception {
+        public void useSpare(Player player, int bendSense, long tick) throws Exception {
             if (!reservedAll[currChannelIndex+1]) {
                 currChannelIndex+=1;
                 Set<Integer> already=playerSetupAlready.computeIfAbsent(player, p -> new HashSet<>());
                 if (!already.contains(currChannelIndex)) {
                     System.out.println("Setting up spare...");
                     already.add(currChannelIndex);
-                    setupChannelForPlayer(player, tick);
+                    sendBendSense(bendSense, tick);
                 }
             }
             else
@@ -293,13 +315,25 @@ public class MyMidi3  {
         eventBend(8192, tick);
     }
 
+	private void sendInstrument(int channel, Instrument instr, long tick) {
+		Except.run(()-> {
+            Patch patch = instr.getPatch();
+			int bank = patch.getBank(),
+				program=patch.getProgram();
+			int msgType = ShortMessage.CONTROL_CHANGE;
+	        sendMessage(
+		        new ShortMessage(msgType, channel, 0,  bank >> 7), tick   // = 9
+	        );
+	        sendMessage(
+		        new ShortMessage(msgType, channel, 32, bank & 0x7f), tick // = 0
+	        );
+	        event(PROGRAM, program, 0, tick);
+        });
+	}
 
-    private void sendInstrument(int instrumentIndex, long tick) {
-        event(PROGRAM, instrumentIndex, 0, tick);
-    }
 
     private void event(int type, int firstNum, int secondNum, long tick) {
-        Exceptional.run(()-> {
+        Except.run(()-> {
             ShortMessage message = new ShortMessage();
             message.setMessage(type + currChannelIndex, firstNum, secondNum);//FIXME can't we do this in one shot
             sendMessage(message, tick);
@@ -311,7 +345,8 @@ public class MyMidi3  {
     // https://www.midi.org/specifications/item/table-3-control-change-messages-data-bytes-2  //
     ////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void sendBendSensitivity(int amount, long tick) throws Exception {
+    /** Short for Bend Sensitivity (hard word to type). */
+    private void sendBendSense(int amount, long tick) throws Exception {
         //This type of message is command, channel, data1, data2
         //RPN MSB (always 0)
         sendMessage(
@@ -338,17 +373,6 @@ public class MyMidi3  {
         sendMessage(
             new ShortMessage(
                 ShortMessage.CONTROL_CHANGE, currChannelIndex, 38, 0
-            ),
-            tick
-        );
-    }
-
-    /** I think the reverb limit is 127, oh and this appears broken */
-    private void sendReverb(int amount, long tick) throws Exception {
-        //System.out.println("Sent reverb "+amount);
-        sendMessage(
-            new ShortMessage(
-                ShortMessage.CONTROL_CHANGE, currChannelIndex, 92, amount
             ),
             tick
         );

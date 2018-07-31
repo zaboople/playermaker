@@ -3,6 +3,7 @@ import javax.sound.midi.*;
 import java.util.*;
 import java.util.function.Consumer;
 
+/** FIXME REUSE */
 public class MetaInstruments {
     private final static String categories[] = {
         "Piano", "Chromatic Perc.", "Organ", "Guitar",

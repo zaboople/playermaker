@@ -1,7 +1,9 @@
 package org.tmotte.keyboard;
 import javax.sound.midi.*;
+
 /**
  * Stores MidiChannel information.
+ * FIXME promote to common.
  */
 public  class MetaChannel {
     final int SUSTAIN = 64;

@@ -1,8 +1,10 @@
 package org.tmotte.pm;
 
+import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
+import javax.sound.midi.Instrument;
 
 public class Player extends AttributeHolder<Player> implements Notable {
     private static class TimeTracking {
@@ -13,10 +15,12 @@ public class Player extends AttributeHolder<Player> implements Notable {
     private TimeTracking timeTracker=new TimeTracking();
 
     private List<Chord> sounds=new ArrayList<>();
+    private List<Event> events=new ArrayList<>();
+    private Map<String, Instrument> allInstruments=null;
     long startTime=0;
     int bendSensitivity=2;
-    int reverb=0;
-    int bpm=-1;
+    int reverb=0;//FIXME remove
+    int bpm=-1;//FIXME remove
 
     // This might be better on attrs:
     int instrumentIndex=0, channelIndex=0;
@@ -31,6 +35,7 @@ public class Player extends AttributeHolder<Player> implements Notable {
         this.instrumentIndex=instrumentIndex;
         return this;
     }
+
     /**
        Player can only store 1 track and 1 channel, so if this is invoked multiple times,
        the last values are the only ones that count.
@@ -42,10 +47,37 @@ public class Player extends AttributeHolder<Player> implements Notable {
        notes in the same Chord.
      */
     public Player instrumentChannel(int instrumentIndex, int channelIndex) {
-        this.instrumentIndex=instrumentIndex;
-        this.channelIndex=channelIndex;
+        instrument(instrumentIndex);
+        channel(channelIndex);
         return this;
     }
+
+    public Player instrument(Instrument instrument) {
+        events.add(new Event(instrument));
+        return this;
+    }
+
+    public Player channel(int channel) {
+        events.add(new Event().setChannel(channel)); //FIXME should we default to zero somehow?
+        return this;
+    }
+
+    public Player instrumentChannel(Instrument instrument, int channel) {
+        instrument(instrument);
+        channel(channel);
+        return this;
+    }
+
+    /** Fixme should we do mymidi3.player() */
+    public Player instrument(String name) {
+        Instrument i=allInstruments.get(name);
+        if (i==null) throw new IllegalArgumentException(name);
+        instrument(i);
+        return this;
+    }
+
+
+
     /**
      * BPM means "beats per minute". Different players can play at their own speeds (might be... trickY) or one player can act as
      * "lead", setting the BPM for everyone - as long as they are the first player sequenced.
@@ -74,9 +106,16 @@ public class Player extends AttributeHolder<Player> implements Notable {
         long last=chordCount==0 ?0 :sounds.get(timeTracker.indexForTimeCounted).totalDuration();
         return timeTracker.timeUpToIndex + last;
     }
+    private long getDuration(int index) {
+        Chord chord=events.get(index).getChord();
+        return chord==null ?0L :chord.totalDuration();
+    }
 
     public Collection<Chord> sounds() {
         return sounds;
+    }
+    public Collection<Event> events() {
+        return events;
     }
 
     public Player setStart(long time) {
@@ -85,21 +124,21 @@ public class Player extends AttributeHolder<Player> implements Notable {
     }
     public Player setBendSensitivity(int sensitivity) {
         this.bendSensitivity=sensitivity;
+        events.add(new Event().setBendSensitivity(sensitivity));
         return this;
     }
     public Player bendSense(int sensitivity) {
-        this.bendSensitivity=sensitivity;
-        return this;
+        return setBendSensitivity(sensitivity);
     }
-    public int getBendSensitivity() {
+    public int getBendSensitivity() {//FIXME rm
         return this.bendSensitivity;
     }
 
-    public Player setReverb(int reverb) {
+    public Player setReverb(int reverb) {//REMOVE FIXME
         this.reverb=reverb;
         return this;
     }
-    public int getReverb() {
+    public int getReverb() {//FIXME rm
         return reverb;
     }
 
@@ -131,9 +170,10 @@ public class Player extends AttributeHolder<Player> implements Notable {
 
     /** For internal use, required by Notable */
     public @Override Chord addChord(long duration, int... pitches) {
-        Chord sound=new Chord(this, duration, pitches);
-        sounds.add(sound);
-        return sound;
+        Chord chord=new Chord(this, duration, pitches);
+        events.add(new Event(chord));
+        sounds.add(chord);//FIXME rm
+        return chord;
     }
 
     /** For internal use, required by Notable */

@@ -16,8 +16,6 @@ public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord
     private Player player;
     private List<Note> notes=new ArrayList<>();
     private List<Bend> bends=null;
-    int instrument=-1;
-    int bpm=-1;
 
     protected Chord(Player player, long duration, int... pitches) {
         super(player);
@@ -41,25 +39,6 @@ public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord
         return t(Divisions.convert(duration));
     }
 
-    /**
-     * Changes the current instrument as of this chord;
-     * later chords from this player will use the same instrument
-     * until another chord changes it again. Overrides the
-     * instrument setting for the player.
-     */
-    public Chord instrument(int instrument) {
-        this.instrument=instrument;
-        return this;
-    }
-
-    /**
-     * Sets the BPM as of this chord, following the same general
-     * rule as setInstrument().
-     */
-    public Chord bpm(int bpm) {
-        this.bpm=bpm;
-        return this;
-    }
 
     public Rest r(int i) {return rest(Divisions.convert(i));}
     public Rest r(double d) {return rest(Divisions.convert(d));}
@@ -88,7 +67,7 @@ public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord
     // INTERNALS: //
     ////////////////
 
-    /** For internal use by BendContainer (from which we override) and MyMidi3 */
+    /** For internal use by BendContainer (from which we override) and MyMidi3 and ok other things....*/
     public @Override long totalDuration() {
         return
             notes.stream().map(n ->
