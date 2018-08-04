@@ -12,7 +12,7 @@ public class TestVibratoTriplet implements XTest {
 	    Player player=new Player()
 		    .instrument(41)
 		    .setBendSensitivity(4)
-		    .setReverb(127)
+		    .setReverb(80)
 		    .octave(5)
 		    .r4()
 

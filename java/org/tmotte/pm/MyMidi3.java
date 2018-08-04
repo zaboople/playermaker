@@ -29,14 +29,10 @@ public class MyMidi3  {
     public final static int TICKS_PER_SECOND=SEQUENCE_RESOLUTION*2;
     public final static int TICKS_PER_MINUTE=TICKS_PER_SECOND*60;
 
-    final static int PROGRAM = 192; //FIXME these are already in SHORTMESSAGE
-    final static int NOTEON = 144;
-    final static int NOTEOFF = 128;
-    final static int SUSTAIN = 64;
-    final static int REVERB = 91;
-    final static int BEND = 224;
-    final static int SEQUENCER_END_PLAY=47;
     final static int NO_BEND = 8192;
+    final static int REVERB = 91;
+    final static int SEQUENCER_END_PLAY=47;
+    final static int DRUM_CHANNEL=9;
 
     private static class ChannelAttrs {
 	    int bendSense=2;
@@ -56,7 +52,7 @@ public class MyMidi3  {
     private MidiTracker midiTracker=new MidiTracker();
     private Sequence sequence;
     private ReserveChannels reservedChannels=new ReserveChannels();
-    private int currChannelIndex=0;
+    private int channelIndex=0;
     public long tickX=0;
 
     /**
@@ -152,7 +148,6 @@ public class MyMidi3  {
         long currTick=player.getStart() * tickX;
         ChannelAttrs channelAttrs=new ChannelAttrs();
         channelAttrs.reverb=player.getReverb();
-        channelAttrs.pressure=player.getPressure();
         channelAttrs.instrument=instruments[0];
 
         // And blast off the rocket:
@@ -164,7 +159,7 @@ public class MyMidi3  {
 			else {
 	            if (firstChord) {
 		            firstChord=false;
-		            setupChannelForPlayer(currChannelIndex, channelAttrs, currTick);
+		            setupChannelForPlayer(channelIndex, channelAttrs, currTick);
 	            }
 	            currTick=processChordEvent(chord, player, channelAttrs, currTick);
             }
@@ -182,26 +177,32 @@ public class MyMidi3  {
 	    // 1 Get the values:
         Integer eBpm=event.getBeatsPerMinute(),
             eBendSense=event.getBendSensitivity(),
-            eChannel=event.getChannel();
+            eChannel=event.getChannel(),
+            ePressure=event.getPressure();
         Instrument eInst=getInstrument(event);
 
 		//2 React to the values:
         if (eBpm!=null)
             setBeatsPerMinute(eBpm);
         if (eChannel!=null)   {
-            currChannelIndex=eChannel;
+            channelIndex=eChannel;
             if (!firstChord)
-	            setupChannelForPlayer(currChannelIndex, channelAttrs, currTick);
+	            setupChannelForPlayer(channelIndex, channelAttrs, currTick);
         }
         if (eBendSense!=null) {
             channelAttrs.bendSense=eBendSense;
             if (!firstChord)
-                midiTracker.sendBendSense(currChannelIndex, channelAttrs.bendSense,currTick);
+                midiTracker.sendBendSense(channelIndex, channelAttrs.bendSense,currTick);
+        }
+        if (ePressure!=null) {
+            channelAttrs.pressure=ePressure;
+            if (!firstChord)
+                midiTracker.sendPressure(channelIndex, channelAttrs.pressure, currTick);
         }
         if (eInst!=null)  {
             channelAttrs.instrument=eInst;
             if (!firstChord)
-                midiTracker.sendInstrument(currChannelIndex, channelAttrs.instrument, currTick);
+                midiTracker.sendInstrument(channelIndex, channelAttrs.instrument, currTick);
         }
     }
 
@@ -224,7 +225,7 @@ public class MyMidi3  {
 		    Chord chord, Player player, ChannelAttrs channelAttrs, long currTick
 	    ) throws Exception {
         long soundStart=currTick;
-        int wasChannel=currChannelIndex;
+        int wasChannel=channelIndex;
         for (Note note: chord.notes()) {
 
             // Local variables for note attributes:
@@ -238,37 +239,37 @@ public class MyMidi3  {
 
             // Send any bends, and the note start:
             if (!noteBends.isEmpty()) {
-                reservedChannels.useSpare(player, channelAttrs, currTick);
-                System.out.println("Using spare: "+currChannelIndex);
-                sendBends(currChannelIndex, soundStart + restBefore, noteBends);
+                channelIndex=reservedChannels.useSpare(channelIndex, player, channelAttrs, currTick);
+                System.out.println("Using spare: "+channelIndex);
+                sendBends(channelIndex, soundStart + restBefore, noteBends);
             }
             if (pitch<0)
                 throw new RuntimeException("Invalid pitch "+pitch+" from player "+player);
-            midiTracker.noteOn(currChannelIndex, pitch, volume, currTick);
+            midiTracker.noteOn(channelIndex, pitch, volume, currTick);
 
 
             // Finish the note:
             currTick += note.duration * tickX;
-            midiTracker.noteOff(currChannelIndex, pitch, currTick);
+            midiTracker.noteOff(channelIndex, pitch, currTick);
             if (!noteBends.isEmpty())
-                midiTracker.eventBendEnd(currChannelIndex, currTick);
+                midiTracker.eventBendEnd(channelIndex, currTick);
 
             // Get back on channel if we had to use a reserve:
-            currChannelIndex=wasChannel;
+            channelIndex=wasChannel;
         }
 
         // Finish up with the chord bends (if any) and
         // and advance the currTick counter:
         if (!chord.bends().isEmpty())
-            sendBends(currChannelIndex, soundStart, chord.bends());
+            sendBends(channelIndex, soundStart, chord.bends());
         currTick=soundStart+(chord.totalDuration() * tickX);
         if (!chord.bends().isEmpty())
-            midiTracker.eventBendEnd(currChannelIndex, currTick);
+            midiTracker.eventBendEnd(channelIndex, currTick);
 	    return currTick;
     }
 
 
-    /** One instance exists within the main class; ReserveChannels has hooks going back out to currChannelIndex; sort of ugly. */
+    /** One instance exists within the main class; ReserveChannels has hooks going back out to channelIndex; sort of ugly. */
     private class ReserveChannels {
         boolean[] reservedAll=new boolean[16];
         Map<Player, Set<Integer>> playerSetupAlready=new HashMap<>();
@@ -281,31 +282,33 @@ public class MyMidi3  {
 		            reservedAll[ch]=true;
             }
         }
-        public void useSpare(Player player, ChannelAttrs channelAttrs, long tick) throws Exception {
-            if (!reservedAll[currChannelIndex+1]) {
-                currChannelIndex+=1;
+        public int useSpare(int channel, Player player, ChannelAttrs channelAttrs, long tick) throws Exception {
+	        if (channel+1==DRUM_CHANNEL)
+		        channel++;
+            if (!reservedAll[channel+1]) {
+                channel+=1;
                 Set<Integer> already=playerSetupAlready.computeIfAbsent(player, p -> new HashSet<>());
-                if (!already.contains(currChannelIndex)) {
+                if (!already.contains(channel)) {
                     System.out.println("Setting up spare...");
-                    already.add(currChannelIndex);
-                    setupChannelForPlayer(currChannelIndex, channelAttrs, tick);
+                    already.add(channel);
+                    setupChannelForPlayer(channel, channelAttrs, tick);
                 }
+                return channel;
             }
-            else
-                throw new RuntimeException(
-                    "Ran out of spare channels after "+currChannelIndex+"; "
-                   +"Make sure to give enough space between the channels of different players, "
-                   +"or put players on the same channel when you know they can't interfere with "
-                   +"each other. Spare channels are needed when individual Notes are bent - as "
-                   +"opposed to bending entire Chords"
-                );
+            throw new RuntimeException(
+                "Ran out of spare channels after "+channel+"; "
+               +"Make sure to give enough space between the channels of different players, "
+               +"or put players on the same channel when you know they can't interfere with "
+               +"each other. Spare channels are needed when individual Notes are bent - as "
+               +"opposed to bending entire Chords"
+            );
         }
     }
 
 	private void setupChannelForPlayer(int channel, ChannelAttrs channelAttrs, long currTick) throws Exception {
         midiChannels[channel].controlChange(REVERB, channelAttrs.reverb);
-        midiChannels[channel].setChannelPressure(channelAttrs.pressure);
         midiTracker.sendBendSense(channel, channelAttrs.bendSense, currTick);
+        midiTracker.sendPressure(channel, channelAttrs.pressure, currTick);
         midiTracker.sendInstrument(channel, channelAttrs.instrument, currTick);
     }
 

@@ -16,6 +16,7 @@ public class Player extends AttributeHolder<Player> implements Notable {
     private List<Event> events=new ArrayList<>();
     private int reverb=0, pressure=0;
     private long startTime=0;
+    private boolean reverbSetOnce=false;
 
     public Player() {
         super();
@@ -103,32 +104,33 @@ public class Player extends AttributeHolder<Player> implements Notable {
     }
 
     public Player setBendSensitivity(int sensitivity) {
-        events.add(new Event().setBendSensitivity(sensitivity));
+        event(new Event().setBendSensitivity(sensitivity));
         return this;
     }
     public Player bendSense(int sensitivity) {
         return setBendSensitivity(sensitivity);
     }
 
-    public Player setReverb(int reverb) {
-        this.reverb=reverb;
-        return this;
-    }
-    public int getReverb() {
-        return reverb;
-    }
-
     public Player setPressure(int pressure) {
-        this.pressure=pressure;
+        event(new Event().setPressure(pressure));
         return this;
-    }
-    public int getPressure() {
-        return pressure;
     }
 
     private Player event(Event e) {
         events.add(e);
         return this;
+    }
+
+    /** Warning: Reverb can only be set once */
+    public Player setReverb(int reverb) {
+        if (reverbSetOnce)
+            throw new RuntimeException("There is no point in setting the reverb more than once.");
+        reverbSetOnce=true;
+        this.reverb=reverb;
+        return this;
+    }
+    public int getReverb() {
+        return reverb;
     }
 
     public Player r(long i) {return rest(i);}

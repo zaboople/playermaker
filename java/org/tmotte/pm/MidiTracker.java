@@ -69,7 +69,7 @@ public class MidiTracker  {
     ////////////////////////////////////////////////////////////////////////////////////////////
 
     /** Short for Bend Sensitivity (hard word to type). */
-    public void sendBendSense(int channel, int amount, long tick) throws Exception {
+    public void sendBendSense(int channel, int amount, long tick) {
         //This type of message is command, channel, data1, data2
         //RPN MSB (always 0)
         sendControlChange(channel, 101, 0, tick);
@@ -81,13 +81,19 @@ public class MidiTracker  {
         sendControlChange(channel, 38, 0, tick);
     }
 
+    public void sendPressure(int channel, int amount, long tick) {
+	    event(channel, ShortMessage.CHANNEL_PRESSURE, amount, 0, tick);
+    }
 
-    public void sendControlChange(int channel, int data1, int data2, long tick) throws Exception {
-        sendMessage(
-            new ShortMessage(
-                ShortMessage.CONTROL_CHANGE, channel, data1, data2
-            ),
-            tick
+
+    public void sendControlChange(int channel, int data1, int data2, long tick)  {
+	    Except.run(()->
+	        sendMessage(
+	            new ShortMessage(
+	                ShortMessage.CONTROL_CHANGE, channel, data1, data2
+	            ),
+	            tick
+	        )
         );
 	}
 

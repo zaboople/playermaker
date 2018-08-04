@@ -18,6 +18,7 @@ public class Event {
         private Integer channel=null;
         private Integer bendSense=null;
         private Integer bpm=null;
+        private Integer pressure=null;
     }
 
     private Chord chord=null;
@@ -47,6 +48,10 @@ public class Event {
         anything().bendSense=bendSense;
         return this;
     }
+    public Event setPressure(Integer pressure){
+        anything().pressure=pressure;
+        return this;
+    }
     public Event setBeatsPerMinute(Integer bpm){
         anything().bpm=bpm;
         return this;
@@ -73,6 +78,9 @@ public class Event {
     }
     public Integer getBendSensitivity() {
         return anything(a -> a.bendSense);
+    }
+    public Integer getPressure() {
+        return anything(a -> a.pressure);
     }
     public Integer getBeatsPerMinute() {
         return anything(a -> a.bpm);

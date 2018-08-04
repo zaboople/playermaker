@@ -3,7 +3,7 @@ import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
-/* This is actually in 3/8 time. No, the reverb is still broken :{ */
+/* This is actually in 3/8 time. Also tests channel pressure */
 public class TestReverb implements XTest {
     public static void main(String args[]) throws Exception {
 	    new TestReverb().test(new MyMidi3(), true);
@@ -12,6 +12,7 @@ public class TestReverb implements XTest {
 		Player player=new Player()
 		    .instrument(16)
 		    .setReverb(100)
+		    .setPressure(0)
 		    .octave(5)
 		    .r4()
 
@@ -24,6 +25,7 @@ public class TestReverb implements XTest {
 			.p4(E, G_, B)
 		    .r8()
 
+		    .setPressure(126)
 			.octave(4)
 			.p4(A, D_, E)
 		    .r8()
@@ -42,6 +44,7 @@ public class TestReverb implements XTest {
 			.p16(A)
 			.r8()
 
+		    .setPressure(0)
 		    .octave(5)
 			.p4(G, B, D)
 			.p(16.3, B_)
@@ -56,6 +59,7 @@ public class TestReverb implements XTest {
 			.p4(E, G_, B)
 		    .r8()
 
+		    .setPressure(126)
 			.octave(4)
 			.p4(A, D_, E)
 		    .r8()
