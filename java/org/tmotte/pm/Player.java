@@ -13,17 +13,9 @@ public class Player extends AttributeHolder<Player> implements Notable {
         int indexForTimeCounted=0;
     }
     private TimeTracking timeTracker=new TimeTracking();
-
-    private List<Chord> sounds=new ArrayList<>();
     private List<Event> events=new ArrayList<>();
-    private Map<String, Instrument> allInstruments=null;
-    long startTime=0;
-    int bendSensitivity=2;
-    int reverb=0;//FIXME remove
-    int bpm=-1;//FIXME remove
-
-    // This might be better on attrs:
-    int instrumentIndex=0, channelIndex=0;
+    private int reverb=0, pressure=0;
+    private long startTime=0;
 
     public Player() {
         super();
@@ -32,10 +24,19 @@ public class Player extends AttributeHolder<Player> implements Notable {
 
     /** Achieves the equivalent of instrumentChannel(instrumentIndex, 0) */
     public Player instrument(int instrumentIndex) {
-        this.instrumentIndex=instrumentIndex;
+        return event(new Event().setInstrument(instrumentIndex));
+    }
+    public Player instrument(Instrument instrument) {
+        return event(new Event(instrument));
+    }
+    public Player instrument(String name) {
+        return event(new Event().setInstrument(name));
+    }
+    public Player instrumentChannel(Instrument instrument, int channel) {
+        channel(channel);
+        instrument(instrument);
         return this;
     }
-
     /**
        Player can only store 1 track and 1 channel, so if this is invoked multiple times,
        the last values are the only ones that count.
@@ -47,63 +48,34 @@ public class Player extends AttributeHolder<Player> implements Notable {
        notes in the same Chord.
      */
     public Player instrumentChannel(int instrumentIndex, int channelIndex) {
-        instrument(instrumentIndex);
         channel(channelIndex);
+        instrument(instrumentIndex);
         return this;
     }
-
-    public Player instrument(Instrument instrument) {
-        events.add(new Event(instrument));
-        return this;
-    }
-
     public Player channel(int channel) {
-        events.add(new Event().setChannel(channel)); //FIXME should we default to zero somehow?
+        return event(new Event().setChannel(channel)); //FIXME should we default to zero somehow?
+    }
+
+
+
+
+    public Player setStart(long time) {
+        this.startTime=time;
         return this;
     }
-
-    public Player instrumentChannel(Instrument instrument, int channel) {
-        instrument(instrument);
-        channel(channel);
-        return this;
+    public long getStart() {
+        return startTime;
     }
-
-    /** Fixme should we do mymidi3.player() */
-    public Player instrument(String name) {
-        Instrument i=allInstruments.get(name);
-        if (i==null) throw new IllegalArgumentException(name);
-        instrument(i);
-        return this;
-    }
-
-
-
-    /**
-     * BPM means "beats per minute". Different players can play at their own speeds (might be... trickY) or one player can act as
-     * "lead", setting the BPM for everyone - as long as they are the first player sequenced.
-     * <br>
-     * Under the hood we are just defaulting to -1, in which case we just use whatever was last set in the MyMidi player; otherwise
-     * MyMidi uses this setting until told otherwise. Player only has one value for BPM - in other words you can't change the BPM
-     * at a specific time; for that, use Chord.setBPM().
-     */
-    public Player setBeatsPerMinute(int bpm) {
-        this.bpm=bpm;
-        return this;
-    }
-    public Player setBPM(int bpm) {
-        return setBeatsPerMinute(bpm);
-    }
-
     public long getEndTime() {
         return startTime + getTimeLength();
     }
-
     public long getTimeLength() {
-        int chordCount=sounds.size();
-        while (timeTracker.indexForTimeCounted < chordCount-1)
-            timeTracker.timeUpToIndex +=
-                sounds.get(timeTracker.indexForTimeCounted++).totalDuration();
-        long last=chordCount==0 ?0 :sounds.get(timeTracker.indexForTimeCounted).totalDuration();
+        int eventCount=events.size();
+        while (timeTracker.indexForTimeCounted < eventCount-1)
+            timeTracker.timeUpToIndex += getDuration(timeTracker.indexForTimeCounted++);
+        long last=eventCount>0
+            ?getDuration(timeTracker.indexForTimeCounted)
+            :0;
         return timeTracker.timeUpToIndex + last;
     }
     private long getDuration(int index) {
@@ -111,35 +83,52 @@ public class Player extends AttributeHolder<Player> implements Notable {
         return chord==null ?0L :chord.totalDuration();
     }
 
-    public Collection<Chord> sounds() {
-        return sounds;
+
+    /**
+     * BPM means "beats per minute". Different players can play at their own speeds (might be... trickY) or one player can act as
+     * "lead", setting the BPM for everyone - as long as they are the first player sequenced. This is event-based, so it can be set
+     * more than once, affecting all Chords added afterwards.
+     * <br>
+     * MyMidi uses this setting until told otherwise, so the next Player will inherit it (usually desirable) unless they set it explicitly.
+     */
+    public Player setBeatsPerMinute(int bpm) {
+        return event(new Event().setBeatsPerMinute(bpm));
     }
+    public Player setBPM(int bpm) {
+        return setBeatsPerMinute(bpm);
+    }
+
     public Collection<Event> events() {
         return events;
     }
 
-    public Player setStart(long time) {
-        this.startTime=time;
-        return this;
-    }
     public Player setBendSensitivity(int sensitivity) {
-        this.bendSensitivity=sensitivity;
         events.add(new Event().setBendSensitivity(sensitivity));
         return this;
     }
     public Player bendSense(int sensitivity) {
         return setBendSensitivity(sensitivity);
     }
-    public int getBendSensitivity() {//FIXME rm
-        return this.bendSensitivity;
-    }
 
-    public Player setReverb(int reverb) {//REMOVE FIXME
+    public Player setReverb(int reverb) {
         this.reverb=reverb;
         return this;
     }
-    public int getReverb() {//FIXME rm
+    public int getReverb() {
         return reverb;
+    }
+
+    public Player setPressure(int pressure) {
+        this.pressure=pressure;
+        return this;
+    }
+    public int getPressure() {
+        return pressure;
+    }
+
+    private Player event(Event e) {
+        events.add(e);
+        return this;
     }
 
     public Player r(long i) {return rest(i);}
@@ -172,7 +161,6 @@ public class Player extends AttributeHolder<Player> implements Notable {
     public @Override Chord addChord(long duration, int... pitches) {
         Chord chord=new Chord(this, duration, pitches);
         events.add(new Event(chord));
-        sounds.add(chord);//FIXME rm
         return chord;
     }
 

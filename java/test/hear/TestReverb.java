@@ -11,7 +11,7 @@ public class TestReverb implements XTest {
     public void test(MyMidi3 midi, boolean stop)  {
 		Player player=new Player()
 		    .instrument(16)
-		    .setReverb(0)
+		    .setReverb(100)
 		    .octave(5)
 		    .r4()
 
