@@ -243,12 +243,12 @@ public class MyMidi3  {
             }
             if (pitch<0)
                 throw new RuntimeException("Invalid pitch "+pitch+" from player "+player);
-            event(NOTEON, pitch, volume, currTick);
+            event(currChannelIndex, NOTEON, pitch, volume, currTick);
 
 
             // Finish the note:
             currTick += note.duration * tickX;
-            event(NOTEOFF, pitch, volume, currTick);
+            event(currChannelIndex, NOTEOFF, pitch, volume, currTick);
             if (!noteBends.isEmpty())
                 eventBendEnd(currTick);
 
@@ -311,9 +311,6 @@ public class MyMidi3  {
 
     private void sendBends(long soundStart, List<Bend> bends) {
         //System.out.println("MyMidi3: Bends "+bends.size());
-        final int max=8192;
-        long t=soundStart;
-        int pitch=max;//fixme is that correct?
         bender.init(soundStart);
         for (Bend bend: bends)
             bender.send(bend.delay, bend.duration, bend.denominator);
@@ -356,7 +353,7 @@ public class MyMidi3  {
         // even better, you are required to split it into a 7-bits-each pair.
         int lsb=amount & 127,
             msb=amount >>> 7;
-        event(BEND, lsb, msb, tick);
+        event(currChannelIndex, BEND, lsb, msb, tick);
     }
     private void eventBendEnd(long tick) {
         eventBend(8192, tick);
@@ -374,15 +371,15 @@ public class MyMidi3  {
 	        sendMessage(
 		        new ShortMessage(msgType, channel, 32, bank & 0x7f), tick // = 0
 	        );
-	        event(PROGRAM, program, 0, tick);
+	        event(channel, PROGRAM, program, 0, tick);
         });
 	}
 
 
-    private void event(int type, int firstNum, int secondNum, long tick) {
+    private void event(int channel, int type, int firstNum, int secondNum, long tick) {
         Except.run(()-> {
             ShortMessage message = new ShortMessage();
-            message.setMessage(type + currChannelIndex, firstNum, secondNum);//FIXME can't we do this in one shot
+            message.setMessage(type + channel, firstNum, secondNum);//FIXME can't we do this in one shot
             sendMessage(message, tick);
         });
     }
