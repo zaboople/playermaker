@@ -1,8 +1,9 @@
-package org.tmotte.pm;
+package org.tmotte.common.midi;
 import javax.sound.midi.Instrument;
 import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 /* FIXME promote back to keyboard? */
 public class MetaInstrument {
@@ -15,11 +16,14 @@ public class MetaInstrument {
 
     public final String originalName;
     public final String displayName;
+    public final String searchName;
     public final Instrument instrument;
+    public final boolean categorized;
 
     public MetaInstrument(Instrument instrument, Optional<String> category) {
         this.instrument=instrument;
         originalName=instrument.getName().trim();
+        categorized = category.isPresent();
         displayName = category
             .map(s->s+" - "+originalName)
             .orElse(
@@ -31,6 +35,7 @@ public class MetaInstrument {
                     .map(s -> s + originalName)
                     .orElse(originalName)
             );
+        searchName=displayName.toLowerCase();
     }
     public int getProgram() {
         return instrument.getPatch().getProgram();
@@ -54,18 +59,31 @@ public class MetaInstrument {
             Map<String, MetaInstrument> map,
             Instrument... instruments
         ) {
+        iterate(
+	        useDefaultCategories,
+	        mi -> map.put(mi.displayName, mi),
+	        instruments
+		);
+		return map;
+    }
+
+    public static void iterate(
+            boolean useDefaultCategories,
+            Consumer<MetaInstrument> consumer,
+            Instrument... instruments
+        ) {
 		int catIndex=-1;
 		for (int i=0; i<instruments.length; i++) {
-			int ci=catIndex+=i % 8==0 ?1 :0;
+			catIndex+=(i % 8 == 0) ?1 :0;
             MetaInstrument mi=new MetaInstrument(
 	            instruments[i],
                 Optional.ofNullable(
-                    useDefaultCategories && ci<8 ?categories[ci] :null
+                    useDefaultCategories && catIndex<8 ?categories[catIndex] :null
                 )
             );
-	        map.put(mi.displayName, mi);
+	        consumer.accept(mi);
 		}
-		return map;
     }
+
 
 }

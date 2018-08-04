@@ -4,8 +4,9 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.io.File;
 import java.io.IOException;
-
+import org.tmotte.common.midi.MetaInstrument;
 import org.tmotte.common.function.Except;
+import org.tmotte.common.midi.MidiTracker;
 
 public class SynthWrapper implements MetaEventListener {
 
@@ -14,6 +15,7 @@ public class SynthWrapper implements MetaEventListener {
     private final static int NOTEOFF = 128;
 
     private MetaInstruments metaInstruments=new MetaInstruments();
+    private MidiTracker midiTracker=new MidiTracker();
     private java.util.List<MetaTrack> tracks = new ArrayList<>();
     private Sequencer sequencer;
     private Sequence sequence;
@@ -119,7 +121,7 @@ public class SynthWrapper implements MetaEventListener {
 
 	public void startRecord(MetaInstrument instr) {
 		recording = true;
-        track = sequence.createTrack();
+        midiTracker.setTrack(track = sequence.createTrack());
         startTime = System.currentTimeMillis();
         createInstrumentEvent(instr);
 	}
@@ -235,29 +237,22 @@ public class SynthWrapper implements MetaEventListener {
 	public void sendNoteOn(int note) {
         cc.sendNoteOn(note);
         if (recording)
-            createShortEvent(NOTEON, note);
+	        midiTracker.noteOn(cc.channelIndex, note, cc.getVolume(), getTick());
 	}
 	public void sendNoteOff(int note) {
         cc.sendNoteOff(note);
         if (recording)
-            createShortEvent(NOTEOFF, note);
+	        midiTracker.noteOff(cc.channelIndex, note, getTick());
     }
-
 	private void createInstrumentEvent(MetaInstrument mi) {
-		Except.run(()-> {
-			int bank = mi.getBank(),
-				program=mi.getProgram();
-			int msgType = ShortMessage.CONTROL_CHANGE;
-			int chan= cc.channelIndex;
-	        sendMessage(
-		        new ShortMessage(msgType, chan, 0,  bank >> 7)   // = 9
-	        );
-	        sendMessage(
-		        new ShortMessage(msgType, chan, 32, bank & 0x7f) // = 0
-	        );
-	        createShortEvent(PROGRAM, program);
-        });
+		midiTracker.sendInstrument(cc.channelIndex, mi.instrument, getTick());
 	}
+
+    public @Override void meta(MetaMessage message) {
+        if (message.getType() == 47) {  // 47 is end of track
+            sequenceCallback.run();
+        }
+    }
 
     /**
      * given 120 bpm:
@@ -268,24 +263,9 @@ public class SynthWrapper implements MetaEventListener {
      *      (resolution / 500) ticks per millisecond
      *   ticks = milliseconds * resolution / 500
      */
-    private void createShortEvent(int type, int num) {
-        Except.run(()->{
-	        ShortMessage message = new ShortMessage();
-            message.setMessage(type+cc.channelIndex, num, cc.getVolume());
-            sendMessage(message);
-        });
-    }
-
-    private void sendMessage(ShortMessage msg) {
+    private long getTick() {
         long millis = System.currentTimeMillis() - startTime;
-        long tick = millis * sequence.getResolution() / 500;
-        track.add(new MidiEvent(msg, tick));
-    }
-
-    public @Override void meta(MetaMessage message) {
-        if (message.getType() == 47) {  // 47 is end of track
-            sequenceCallback.run();
-        }
+        return millis * sequence.getResolution() / 500;
     }
 
 }

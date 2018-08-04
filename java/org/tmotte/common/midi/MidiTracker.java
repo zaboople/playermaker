@@ -1,4 +1,4 @@
-package org.tmotte.pm;
+package org.tmotte.common.midi;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +15,7 @@ import javax.sound.midi.*;
 
 
 /**
- * A general-purpose class for sending Midi Messages to midi tracks.
+ * A general-purpose class
  */
 public class MidiTracker  {
 

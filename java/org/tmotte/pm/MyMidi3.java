@@ -1,5 +1,4 @@
 package org.tmotte.pm;
-import org.tmotte.common.function.Except;
 import javax.sound.midi.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.Optional;
+import org.tmotte.common.function.Except;
+import org.tmotte.common.midi.MetaInstrument;
+import org.tmotte.common.midi.MidiTracker;
 
 
 /**
