@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.Optional;
-import org.tmotte.keyboard.MetaChannel;//FIXME make a custom version
+
 
 /**
  * FIXME name MyMidiSequencer
@@ -36,6 +36,7 @@ public class MyMidi3  {
     final static int REVERB = 91;
     final static int BEND = 224;
     final static int SEQUENCER_END_PLAY=47;
+    final static int NO_BEND = 8192;
 
     private static class ChannelAttrs {
 	    int bendSense=2;
@@ -46,14 +47,14 @@ public class MyMidi3  {
 
 
     private MySequencer sequencer;
-    private MetaChannel[] metaChannels;
+    private MidiChannel[] midiChannels;
     private Instrument[] instruments;
     private Map<String, MetaInstrument> instrumentsByName;
 
     private boolean waitForSequencerToStopPlaying=true;
 
+    private MidiTracker midiTracker=new MidiTracker();
     private Sequence sequence;
-    private Track currTrack;
     private ReserveChannels reservedChannels=new ReserveChannels();
     private int currChannelIndex=0;
     public long tickX=0;
@@ -103,7 +104,7 @@ public class MyMidi3  {
             sequencer = new MySequencer(synth);
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
             setBeatsPerMinute(60);
-            metaChannels=MetaChannel.getChannels(synth);
+			midiChannels = synth.getChannels();
         });
     }
 
@@ -147,7 +148,7 @@ public class MyMidi3  {
 
     private void sequencePlayer(Player player) throws Exception {
         // Track & time & defaults:
-        currTrack=sequence.createTrack();
+        midiTracker.setTrack(sequence.createTrack());
         long currTick=player.getStart() * tickX;
         ChannelAttrs channelAttrs=new ChannelAttrs();
         channelAttrs.reverb=player.getReverb();
@@ -163,7 +164,7 @@ public class MyMidi3  {
 			else {
 	            if (firstChord) {
 		            firstChord=false;
-		            setupChannelForPlayer(channelAttrs, currTick);
+		            setupChannelForPlayer(currChannelIndex, channelAttrs, currTick);
 	            }
 	            currTick=processChordEvent(chord, player, channelAttrs, currTick);
             }
@@ -190,17 +191,17 @@ public class MyMidi3  {
         if (eChannel!=null)   {
             currChannelIndex=eChannel;
             if (!firstChord)
-	            setupChannelForPlayer(channelAttrs, currTick);
+	            setupChannelForPlayer(currChannelIndex, channelAttrs, currTick);
         }
         if (eBendSense!=null) {
             channelAttrs.bendSense=eBendSense;
             if (!firstChord)
-                sendBendSense(channelAttrs.bendSense,currTick);
+                midiTracker.sendBendSense(currChannelIndex, channelAttrs.bendSense,currTick);
         }
         if (eInst!=null)  {
             channelAttrs.instrument=eInst;
             if (!firstChord)
-                sendInstrument(currChannelIndex, channelAttrs.instrument, currTick);
+                midiTracker.sendInstrument(currChannelIndex, channelAttrs.instrument, currTick);
         }
     }
 
@@ -239,18 +240,18 @@ public class MyMidi3  {
             if (!noteBends.isEmpty()) {
                 reservedChannels.useSpare(player, channelAttrs, currTick);
                 System.out.println("Using spare: "+currChannelIndex);
-                sendBends(soundStart + restBefore, noteBends);
+                sendBends(currChannelIndex, soundStart + restBefore, noteBends);
             }
             if (pitch<0)
                 throw new RuntimeException("Invalid pitch "+pitch+" from player "+player);
-            event(currChannelIndex, NOTEON, pitch, volume, currTick);
+            midiTracker.noteOn(currChannelIndex, pitch, volume, currTick);
 
 
             // Finish the note:
             currTick += note.duration * tickX;
-            event(currChannelIndex, NOTEOFF, pitch, volume, currTick);
+            midiTracker.noteOff(currChannelIndex, pitch, currTick);
             if (!noteBends.isEmpty())
-                eventBendEnd(currTick);
+                midiTracker.eventBendEnd(currChannelIndex, currTick);
 
             // Get back on channel if we had to use a reserve:
             currChannelIndex=wasChannel;
@@ -259,16 +260,15 @@ public class MyMidi3  {
         // Finish up with the chord bends (if any) and
         // and advance the currTick counter:
         if (!chord.bends().isEmpty())
-            sendBends(soundStart, chord.bends());
+            sendBends(currChannelIndex, soundStart, chord.bends());
         currTick=soundStart+(chord.totalDuration() * tickX);
         if (!chord.bends().isEmpty())
-            eventBendEnd(currTick);
+            midiTracker.eventBendEnd(currChannelIndex, currTick);
 	    return currTick;
     }
 
 
-    /** One instance exists within the main class; ReserveChannels has hooks going back out to currChannelIndex
-        and currTrack. Sort of ugly. */
+    /** One instance exists within the main class; ReserveChannels has hooks going back out to currChannelIndex; sort of ugly. */
     private class ReserveChannels {
         boolean[] reservedAll=new boolean[16];
         Map<Player, Set<Integer>> playerSetupAlready=new HashMap<>();
@@ -288,7 +288,7 @@ public class MyMidi3  {
                 if (!already.contains(currChannelIndex)) {
                     System.out.println("Setting up spare...");
                     already.add(currChannelIndex);
-                    setupChannelForPlayer(channelAttrs, tick);
+                    setupChannelForPlayer(currChannelIndex, channelAttrs, tick);
                 }
             }
             else
@@ -302,38 +302,25 @@ public class MyMidi3  {
         }
     }
 
-	private void setupChannelForPlayer(ChannelAttrs channelAttrs, long currTick) throws Exception {
-        metaChannels[currChannelIndex].setReverb(channelAttrs.reverb);
-        metaChannels[currChannelIndex].setPressure(channelAttrs.pressure);
-        sendBendSense(channelAttrs.bendSense, currTick);
-        sendInstrument(currChannelIndex, channelAttrs.instrument, currTick);
+	private void setupChannelForPlayer(int channel, ChannelAttrs channelAttrs, long currTick) throws Exception {
+        midiChannels[channel].controlChange(REVERB, channelAttrs.reverb);
+        midiChannels[channel].setChannelPressure(channelAttrs.pressure);
+        midiTracker.sendBendSense(channel, channelAttrs.bendSense, currTick);
+        midiTracker.sendInstrument(channel, channelAttrs.instrument, currTick);
     }
 
-    private void sendBends(long soundStart, List<Bend> bends) {
+    private void sendBends(int channel, long soundStart, List<Bend> bends) {
         //System.out.println("MyMidi3: Bends "+bends.size());
-        bender.init(soundStart);
-        for (Bend bend: bends)
-            bender.send(bend.delay, bend.duration, bend.denominator);
-    }
-
-    final Bender bender=new Bender();
-    private class Bender {
-        //FIXME put bend back by itself
-        int pitch;
-        long t;
-        public void init(long soundStart) {
-            this.t=soundStart;
-            this.pitch=8192;//FIXME MAKE CONSTANT
-        }
-        public void send(long delay, long duration, int denominator) {
+        long t=soundStart;
+        int pitch=NO_BEND;
+        for (Bend bend: bends) {
             //System.out.println("Bend delay "+delay+" duration "+duration+" denominator "+denominator);
-            final int max=8192; //FIXME bad name and make constant
-            t+=(delay * tickX);
-            int change=max/denominator;
-            int perTicky = change / (int)duration;
-            int leftover = change % (int)duration;
+            t+=(bend.delay * tickX);
+            int change = NO_BEND / bend.denominator;
+            int perTicky = change / (int)bend.duration;
+            int leftover = change % (int)bend.duration;
             int leftoverIncr=leftover>0 ?1 :-1;
-            for (int i=0; i<duration; i++) {
+            for (int i=0; i<bend.duration; i++) {
                 int thisAmount = perTicky;
                 if (leftover!=0) {
                     thisAmount+=leftoverIncr;
@@ -342,90 +329,11 @@ public class MyMidi3  {
                 pitch+=thisAmount;
                 if (pitch==16384) pitch=16383;
                 //System.out.println("Sending bend "+pitch+" at "+t);
-                eventBend(pitch, t);
+                midiTracker.eventBend(channel, pitch, t);
                 t+=tickX;
             }
         }
     }
-
-    private void eventBend(int amount, long tick) {
-        // A bend is 14 bits - no, not 16. That won't fit in a byte, but
-        // even better, you are required to split it into a 7-bits-each pair.
-        int lsb=amount & 127,
-            msb=amount >>> 7;
-        event(currChannelIndex, BEND, lsb, msb, tick);
-    }
-    private void eventBendEnd(long tick) {
-        eventBend(8192, tick);
-    }
-
-	private void sendInstrument(int channel, Instrument instr, long tick) {
-		Except.run(()-> {
-            Patch patch = instr.getPatch();
-			int bank = patch.getBank(),
-				program=patch.getProgram();
-			int msgType = ShortMessage.CONTROL_CHANGE;
-	        sendMessage(
-		        new ShortMessage(msgType, channel, 0,  bank >> 7), tick   // = 9
-	        );
-	        sendMessage(
-		        new ShortMessage(msgType, channel, 32, bank & 0x7f), tick // = 0
-	        );
-	        event(channel, PROGRAM, program, 0, tick);
-        });
-	}
-
-
-    private void event(int channel, int type, int firstNum, int secondNum, long tick) {
-        Except.run(()-> {
-            ShortMessage message = new ShortMessage();
-            message.setMessage(type + channel, firstNum, secondNum);//FIXME can't we do this in one shot
-            sendMessage(message, tick);
-        });
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    // CONTROL CHANGE:                                                                        //
-    // https://www.midi.org/specifications/item/table-3-control-change-messages-data-bytes-2  //
-    ////////////////////////////////////////////////////////////////////////////////////////////
-
-    /** Short for Bend Sensitivity (hard word to type). */
-    private void sendBendSense(int amount, long tick) throws Exception {
-        //This type of message is command, channel, data1, data2
-        //RPN MSB (always 0)
-        sendMessage(
-            new ShortMessage(
-                ShortMessage.CONTROL_CHANGE, currChannelIndex, 101, 0
-            ),
-            tick
-        );
-        //RPN LSB (for pitch sensitivity, 0)
-        sendMessage(
-            new ShortMessage(
-                ShortMessage.CONTROL_CHANGE, currChannelIndex, 100, 0
-            ),
-            tick
-        );
-        //Data Entry MSB
-        sendMessage(
-            new ShortMessage(
-                ShortMessage.CONTROL_CHANGE, currChannelIndex, 6, amount
-            ),
-            tick
-        );
-        //Data Entry LSB:
-        sendMessage(
-            new ShortMessage(
-                ShortMessage.CONTROL_CHANGE, currChannelIndex, 38, 0
-            ),
-            tick
-        );
-    }
-
-    private void sendMessage(ShortMessage msg, long tick) {
-        currTrack.add(new MidiEvent(msg, tick));
-    }
-
 
 
     ///////////

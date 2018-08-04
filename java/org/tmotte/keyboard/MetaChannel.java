@@ -50,7 +50,7 @@ public  class MetaChannel {
     }
     public int getReverb(){return reverb;}
     public void setMute(boolean b) {
-      channel.setMute(mute = b);
+    	channel.setMute(mute = b);
     }
     public boolean getMute(){return mute;}
     public void setSolo(boolean b) {

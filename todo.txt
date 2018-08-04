@@ -2,6 +2,7 @@
     Label keys C1 - G8 or whatever
 
 - High playermaker
+    - Test TODO's
     - Load instruments into :
         # Example of using an instrument from sound bank 1152 - splitting it into two 7-bit parts
         n the MIDI protocol itself, bank numbers are split into two 7-bit parts and transmitted as the value
