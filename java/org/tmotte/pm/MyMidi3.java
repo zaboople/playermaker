@@ -131,9 +131,6 @@ public class MyMidi3  {
 
 
     public MyMidi3 sequence(Player... players) {
-        return Except.get(()-> sequenceMessy(players));
-    }
-    private MyMidi3 sequenceMessy(Player... players) throws Exception {
         for (Player player: players)
             reservedChannels.reserve(player);
         for (Player player: players)
@@ -142,7 +139,7 @@ public class MyMidi3  {
     }
 
 
-    private void sequencePlayer(Player player) throws Exception {
+    private void sequencePlayer(Player player)  {
         // Track & time & defaults:
         midiTracker.setTrack(sequence.createTrack());
         long currTick=player.getStart() * tickX;
@@ -173,37 +170,33 @@ public class MyMidi3  {
 	 */
     private void processNonChordEvent(
 		    Event event, ChannelAttrs channelAttrs, boolean firstChord, long currTick
-	    ) throws Exception {
-	    // 1 Get the values:
-        Integer eBpm=event.getBeatsPerMinute(),
-            eBendSense=event.getBendSensitivity(),
-            eChannel=event.getChannel(),
-            ePressure=event.getPressure();
-        Instrument eInst=getInstrument(event);
-
-		//2 React to the values:
-        if (eBpm!=null)
-            setBeatsPerMinute(eBpm);
-        if (eChannel!=null)   {
+	    ) {
+        getAndSet(event.getBeatsPerMinute(), eBpm ->
+	        setBeatsPerMinute(eBpm)
+        );
+        getAndSet(event.getChannel(), eChannel ->   {
             channelIndex=eChannel;
             if (!firstChord)
 	            setupChannelForPlayer(channelIndex, channelAttrs, currTick);
-        }
-        if (eBendSense!=null) {
+        });
+        getAndSet(event.getBendSensitivity(), eBendSense -> {
             channelAttrs.bendSense=eBendSense;
             if (!firstChord)
                 midiTracker.sendBendSense(channelIndex, channelAttrs.bendSense,currTick);
-        }
-        if (ePressure!=null) {
+        });
+        getAndSet(event.getPressure(), ePressure -> {
             channelAttrs.pressure=ePressure;
             if (!firstChord)
                 midiTracker.sendPressure(channelIndex, channelAttrs.pressure, currTick);
-        }
-        if (eInst!=null)  {
+        });
+        getAndSet(getInstrument(event), eInst -> {
             channelAttrs.instrument=eInst;
             if (!firstChord)
                 midiTracker.sendInstrument(channelIndex, channelAttrs.instrument, currTick);
-        }
+        });
+    }
+    private <T> void getAndSet(T t, java.util.function.Consumer<T> cons) {
+	    if (t!=null) cons.accept(t);
     }
 
 	/** Only called by processNonChordEvent() */
@@ -223,7 +216,7 @@ public class MyMidi3  {
 
     private long processChordEvent(
 		    Chord chord, Player player, ChannelAttrs channelAttrs, long currTick
-	    ) throws Exception {
+	    ) {
         long soundStart=currTick;
         int wasChannel=channelIndex;
         for (Note note: chord.notes()) {
@@ -282,7 +275,7 @@ public class MyMidi3  {
 		            reservedAll[ch]=true;
             }
         }
-        public int useSpare(int channel, Player player, ChannelAttrs channelAttrs, long tick) throws Exception {
+        public int useSpare(int channel, Player player, ChannelAttrs channelAttrs, long tick) {
 	        if (channel+1==DRUM_CHANNEL)
 		        channel++;
             if (!reservedAll[channel+1]) {
@@ -305,7 +298,7 @@ public class MyMidi3  {
         }
     }
 
-	private void setupChannelForPlayer(int channel, ChannelAttrs channelAttrs, long currTick) throws Exception {
+	private void setupChannelForPlayer(int channel, ChannelAttrs channelAttrs, long currTick)  {
         midiChannels[channel].controlChange(REVERB, channelAttrs.reverb);
         midiTracker.sendBendSense(channel, channelAttrs.bendSense, currTick);
         midiTracker.sendPressure(channel, channelAttrs.pressure, currTick);
