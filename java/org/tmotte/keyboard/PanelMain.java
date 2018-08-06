@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.*;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -22,43 +24,48 @@ import org.tmotte.common.midi.MetaInstrument;
  * Sun Microsystems and has been cleaned up reasonably well.
  */
 public class PanelMain {
+    private final static String BTN_MUTE_TEXT="Mute (Ctrl-M to quick-cycle)";
+    private final static String BTN_UNMUTE_TEXT="Un-mute (Ctrl-M to quick-cycle)";
 
     public static void startApplication(SynthWrapper synthWrapper) {
-		// Get main frame ready:
+        // Get main frame ready:
         JFrame f = new JFrame("Midi Synthesizer");
         f.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {System.exit(0);}
         });
         f.addKeyListener(new KeyAdapter() {
-	        public @Override void keyReleased(KeyEvent k) {if (k.getKeyCode()==KeyEvent.VK_ESCAPE) System.exit(0);}
+            public @Override void keyReleased(KeyEvent k) {if (k.getKeyCode()==KeyEvent.VK_ESCAPE) System.exit(0);}
         });
         final PanelMain pnlMain = new PanelMain(f, synthWrapper);
 
-		// Handle errors so that we know they happened:
-	    Thread.setDefaultUncaughtExceptionHandler(
-	    	new Thread.UncaughtExceptionHandler() {
-		        public void uncaughtException(Thread t, Throwable e){
-			        pnlMain.handleError(e);
-		        }
-	    	}
-	    );
+        // Handle errors so that we know they happened:
+        Thread.setDefaultUncaughtExceptionHandler(
+            new Thread.UncaughtExceptionHandler() {
+                public void uncaughtException(Thread t, Throwable e){
+                    pnlMain.handleError(e);
+                }
+            }
+        );
 
-		// Build up the main panel and get rolling:
+        // Build up the main panel and get rolling:
         f.pack();
         f.setVisible(true);
-        pnlMain.jtfInstrument.requestFocusInWindow();
     }
 
-	// State / Model:
-	private final SynthWrapper synthWrapper;
+    // State / Model:
+    private final SynthWrapper synthWrapper;
     private final Map<String, Integer> instrumentNameToIndex=new HashMap<>();
     private final java.util.List<String> instrumentNames=new ArrayList<>(512);
     private boolean useDefaultInstruments=true;
 
-	// Controls:
-    private JPanel pnlPiano;
+    // Controls:
+    private PanelPiano pnlPiano;
+    private final JButton btnMute=new JButton(BTN_MUTE_TEXT);
     private JSlider sliderVolume, sliderPressureVibrato, sliderBend, sliderReverb;
-    private final JCheckBox mouseOverCB = new JCheckBox("Mouse over (not click)", true);
+    private final JRadioButton
+        jrbMouseOver=new JRadioButton("Mouse over (not click)", true),
+        jrbMouseClick=new JRadioButton("Mouse click"),
+        jrbMouseDouble=new JRadioButton("Click on/click off");
     private final JLabel lblError=new JLabel("Error");
 
     private JComboBox<String> jcbChannel;
@@ -73,44 +80,51 @@ public class PanelMain {
     private final JTextField jtfInstrument=new JTextField();
     private JScrollPane jspInstrument;
     private final DefaultListModel<String> dlfInstrument=new DefaultListModel<>();
-    private JList<String> jlInstrument=new JList<>(dlfInstrument);
+    private final JList<String> jlInstrument=new JList<>(dlfInstrument);
     private MetaInstruments metaInstruments;
 
 
-    public PanelMain(Container c, SynthWrapper synthWrapper) {
-	    this.synthWrapper=synthWrapper;
-	    metaInstruments=synthWrapper.getMetaInstruments();
+    public PanelMain(JFrame c, SynthWrapper synthWrapper) {
+        this.synthWrapper=synthWrapper;
+        metaInstruments=synthWrapper.getMetaInstruments();
 
-	    create();
-	    layout(c);
-	    listen();
+        create();
+        layout(c);
+        listen(c);
 
-	    searchForInstrument();
-	    setChannelSliderValues();
+        searchForInstrument();
+        setChannelSliderValues();
         tblTrackChanged();
         btnPlay.setEnabled(tblTrackModel.getRowCount()>0);
-	}
+    }
 
     private void create() {
         jcbChannel = new JComboBox<>();
-		int count=synthWrapper.getChannelCount();
+        int count=synthWrapper.getChannelCount();
         for (int i = 1; i <= count; i++)
             jcbChannel.addItem("Channel " + String.valueOf(i));
+        btnMute.setMnemonic('m');
 
         sliderVolume = createSlider("Velocity (Volume)");
         sliderPressureVibrato = createSlider("Pressure (Vibrato)");
         sliderReverb = createSlider("Reverb");
-		// create a slider with a 14-bit range of values for pitch-bend
+        // create a slider with a 14-bit range of values for pitch-bend
         sliderBend = create14BitSlider("Bend");
+
+        ButtonGroup bg=new ButtonGroup();
+        bg.add(jrbMouseOver);
+        bg.add(jrbMouseClick);
+        bg.add(jrbMouseDouble);
+
         lblError.setForeground(Color.RED);
         lblError.setVisible(false);
 
-		lblInstrument=new JLabel("Instrument: ");
-		jlInstrument.setVisibleRowCount(28);
-		jlInstrument.setLayoutOrientation(JList.VERTICAL_WRAP);
-		jspInstrument=new JScrollPane(jlInstrument);
+        lblInstrument=new JLabel("Instrument: ");
+        jlInstrument.setVisibleRowCount(28);
+        jlInstrument.setLayoutOrientation(JList.VERTICAL_WRAP);
+        jspInstrument=new JScrollPane(jlInstrument);
 
-		jtfInstrument.setText("*");
+        jtfInstrument.setText("*");
 
         btnRecord = createButton("Record", true);
         btnPlay = createButton("Play", false);
@@ -124,13 +138,14 @@ public class PanelMain {
         sptblTrack = new JScrollPane(tblTrack);
         sptblTrack.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         Dimension prefer=new Dimension(5*65, 130);
-		sptblTrack.setMinimumSize(prefer);
-		sptblTrack.setMaximumSize(prefer);
-		sptblTrack.setPreferredSize(prefer);
+        sptblTrack.setMinimumSize(prefer);
+        sptblTrack.setMaximumSize(prefer);
+        sptblTrack.setPreferredSize(prefer);
         tblTrack.doLayout();
 
-		pnlPiano=new PanelPiano(synthWrapper, ()->mouseOverCB.isSelected());
-	}
+        pnlPiano=new PanelPiano(synthWrapper);
+    }
+
     private static JButton createButton(String name, boolean state) {
         JButton b = new JButton(name);
         //b.setFont(new Font("serif", Font.PLAIN, 10));
@@ -140,9 +155,9 @@ public class PanelMain {
     }
 
     private JFileChooser getFileChooser() {
-	    return saveFileChooser.orElseGet(()->{
+        return saveFileChooser.orElseGet(()->{
             JFileChooser fc = new JFileChooser(
-	            new File(System.getProperty("user.dir"))
+                new File(System.getProperty("user.dir"))
             );
             fc.setAcceptAllFileFilterUsed(true);
             saveFileChooser=Optional.of(fc);
@@ -178,15 +193,15 @@ public class PanelMain {
 
 
     private JSlider createSlider(String name) {
-	    return createSlider(name, false);
+        return createSlider(name, false);
     }
     private JSlider create14BitSlider(String name) {
-	    return createSlider(name, true);
-	}
+        return createSlider(name, true);
+    }
     private JSlider createSlider(String name, boolean fourteenBit) {
         JSlider slider = fourteenBit
-	        ?new JSlider(JSlider.HORIZONTAL, 0, 16383, 8192)
-	        :new JSlider(JSlider.HORIZONTAL, 0, 127, 64);
+            ?new JSlider(JSlider.HORIZONTAL, 0, 16383, 8192)
+            :new JSlider(JSlider.HORIZONTAL, 0, 127, 64);
         TitledBorder tb = new TitledBorder(new LineBorder(Color.LIGHT_GRAY, 1));
         slider.setBorder(tb);
         tb.setTitle(name + " = "+ (fourteenBit ?8192 :64));
@@ -195,39 +210,42 @@ public class PanelMain {
 
 
 
-	/////////////
-	// LAYOUT: //
-	/////////////
+    /////////////
+    // LAYOUT: //
+    /////////////
 
-	private void layout(Container c){
-        GridBug gb=new GridBug(c);
-		gb.setInsets(2);
+    private void layout(Container c){
+        new GridBug(c)
+            .setInsets(2)
 
-		// Piano:
-        gb.anchor(gb.NORTHWEST);
-        //gb.setFill(gb.BOTH);
-        gb.weightXY(1.0, 0.0);
-        gb.add(pnlPiano);
+            // Piano:
+            .anchor(GridBug.NORTHWEST)
+            .weightXY(1.0, 0.0)
+            .add(pnlPiano)
 
-		// Various controls in middle:
-        gb.weightXY(1, 0);
-        gb.setFill(gb.HORIZONTAL);
-        gb.addY(layoutCenterControls());
+            // Various controls in middle:
+            .weightXY(1, 0)
+            .setFill(GridBug.HORIZONTAL)
+            .insetTop(0).insetBottom(0)
+            .addY(btnMute)
+            .insetTop(0)
+            .addY(layoutCenterControls())
+            .insets(2)
 
-		// Instrument textbox:
-		gb
-			.insetBottom(0)
-			.addY(lblInstrument)
-			.insetTop(0)
-			.weightXY(1,0)
-			.setFill(gb.HORIZONTAL)
-			.addY(jtfInstrument);
+            // Instrument textbox:
+            .insetBottom(0)
+            .addY(lblInstrument)
+            .insetTop(0)
+            .weightXY(1,0)
+            .setFill(GridBug.HORIZONTAL)
+            .addY(jtfInstrument)
 
-		// Instrument List
-		gb.setFill(gb.BOTH)
-			.weightXY(0, 1)
-			.insetBottom(2)
-	        .addY(jspInstrument);
+            // Instrument List
+            .setFill(GridBug.BOTH)
+            .weightXY(0, 1)
+            .insetBottom(2)
+            .addY(jspInstrument)
+        ;
     }
 
 
@@ -240,8 +258,8 @@ public class PanelMain {
             .add(layoutLeftControls())
             .insetLeft(20)
             .weightX(.33)
-	        .addX(layoutPanelRecord())
-	        .getContainer();
+            .addX(layoutPanelRecord())
+            .getContainer();
     }
 
     private Container layoutLeftControls(){
@@ -251,8 +269,22 @@ public class PanelMain {
             .weightX(1)
             .add(layoutSliders())
             .weightY(1)
-            .addY(mouseOverCB)
+            .addY(layoutKeyboardActionRadios())
             .addY(lblError)
+            .getContainer();
+    }
+
+    private Container layoutKeyboardActionRadios() {
+        return new GridBug(new JPanel())
+            .anchor(GridBug.NORTHWEST)
+            .weightX(0)
+            .fill(GridBug.NONE)
+            .addY(new JLabel("Keyboard trigger:"))
+            .weightX(1)
+            .fill(GridBug.HORIZONTAL)
+            .addX(jrbMouseOver)
+            .addY(jrbMouseClick)
+            .addY(jrbMouseDouble)
             .getContainer();
     }
 
@@ -279,19 +311,19 @@ public class PanelMain {
             .weightXY(0, 1).insetTop(5).addX(sptblTrack)
             .fill(GridBug.VERTICAL)
             .weightXY(1, 0).insetLeft(5).addX(
-	            new GridBug(new JPanel())
-		            .insets(0)
-		            .anchor(GridBug.NORTHWEST)
-		            .fill(GridBug.NONE)
-		            .add(btnDelete)
-		            .fill(GridBug.BOTH)
-		            .weightXY(1,1)
-		            .addY(new JPanel())
-		            .anchor(GridBug.SOUTHWEST)
-		            .fill(GridBug.NONE)
-		            .insetBottom(5)
-		            .addY(btnOpen)
-		            .getContainer()
+                new GridBug(new JPanel())
+                    .insets(0)
+                    .anchor(GridBug.NORTHWEST)
+                    .fill(GridBug.NONE)
+                    .add(btnDelete)
+                    .fill(GridBug.BOTH)
+                    .weightXY(1,1)
+                    .addY(new JPanel())
+                    .anchor(GridBug.SOUTHWEST)
+                    .fill(GridBug.NONE)
+                    .insetBottom(5)
+                    .addY(btnOpen)
+                    .getContainer()
             )
             .getContainer();
     }
@@ -313,18 +345,20 @@ public class PanelMain {
     }
 
 
-	/////////////
-	// LISTEN: //
-	/////////////
+    /////////////
+    // LISTEN: //
+    /////////////
 
-	private void listen() {
+    private void listen(JFrame mainFrame) {
+        {
+            JRadioButton[] jrbs={jrbMouseOver, jrbMouseClick, jrbMouseDouble};
+            for (JRadioButton jrb: jrbs)
+                jrb.addActionListener(e -> setPianoTriggerAction());
+        }
+        setPianoTriggerAction();
+        btnMute.addActionListener(e->flipMute());
+
         jcbChannel.addActionListener(e->jcbChannelChanged());
-		jlInstrument.addListSelectionListener(x-> {if (!x.getValueIsAdjusting()) instrumentPicked();});
-		jtfInstrument.getDocument().addDocumentListener(new DocumentListener(){
-	        public @Override void insertUpdate(DocumentEvent e)  {searchForInstrument();}
-	        public @Override void removeUpdate(DocumentEvent e)  {searchForInstrument();}
-	        public @Override void changedUpdate(DocumentEvent e) {searchForInstrument();}
-		});
         btnRecord.addActionListener(e -> clickRecord());
         btnPlay.addActionListener(e -> clickPlay());
         btnSave.addActionListener(e -> clickSave());
@@ -335,19 +369,62 @@ public class PanelMain {
         sliderPressureVibrato.addChangeListener(e -> sliderChanged(sliderPressureVibrato));
         sliderBend.addChangeListener(e -> sliderChanged(sliderBend));
 
-        synthWrapper.setSequenceEndCallback(
-	        ()->playbackComplete()
-        );
-		tblTrack.getSelectionModel().addListSelectionListener(
-		    (ListSelectionEvent e) -> {
-			    if (!e.getValueIsAdjusting())
-				    trackSelected();
-		    }
-		);
-	}
+        jlInstrument.addListSelectionListener(x-> {if (!x.getValueIsAdjusting()) instrumentPicked();});
+        jtfInstrument.getDocument().addDocumentListener(new DocumentListener(){
+            public @Override void insertUpdate(DocumentEvent e)  {searchForInstrument();}
+            public @Override void removeUpdate(DocumentEvent e)  {searchForInstrument();}
+            public @Override void changedUpdate(DocumentEvent e) {searchForInstrument();}
+        });
 
+        synthWrapper.setSequenceEndCallback(
+            ()->playbackComplete()
+        );
+        tblTrack.getSelectionModel().addListSelectionListener(
+            (ListSelectionEvent e) -> {
+                if (!e.getValueIsAdjusting())
+                    trackSelected();
+            }
+        );
+        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+          .addKeyEventDispatcher(new KeyEventDispatcher() {
+              public @Override boolean dispatchKeyEvent(KeyEvent e) {
+                    if (e.getKeyCode()==KeyEvent.VK_M &&
+                        e.getID()==KeyEvent.KEY_PRESSED &&
+                        !e.isAltDown() &&
+                        jrbMouseDouble.isSelected()
+                        ) {
+                        flipMute();
+                        if (e.isControlDown())
+                            flipMute();
+                    }
+                    return false;
+              }
+        });
+    }
+
+
+    private void setPianoTriggerAction() {
+        btnMute.setEnabled(jrbMouseDouble.isSelected());
+        pnlPiano.setPianoTriggerAction(
+            jrbMouseOver.isSelected()
+                ?PanelPiano.ACTION_MOUSE_OVER
+                :(jrbMouseClick.isSelected()
+                    ?PanelPiano.ACTION_MOUSE_CLICK
+                    :PanelPiano.ACTION_CLICK_ON_CLICK_OFF
+                )
+        );
+    }
+
+    private void flipMute(){
+        pnlPiano.flipMute();
+        btnMute.setText(
+            pnlPiano.isMuted()
+                ?BTN_UNMUTE_TEXT
+                :BTN_MUTE_TEXT
+        );
+    }
     private void sliderChanged(JSlider slider) {
-	    setChannelSliderValues();
+        setChannelSliderValues();
         setSliderTitle(slider);
         slider.repaint();
     }
@@ -360,9 +437,9 @@ public class PanelMain {
     }
 
     private void jcbChannelChanged() {
-	    getSelectedInstrument().ifPresent(instr->{
-			synthWrapper.instrumentChannelChange(instr, jcbChannel.getSelectedIndex());
-	        setChannelSliderValues();
+        getSelectedInstrument().ifPresent(instr->{
+            synthWrapper.instrumentChannelChange(instr, jcbChannel.getSelectedIndex());
+            setChannelSliderValues();
         });
     }
 
@@ -371,18 +448,18 @@ public class PanelMain {
         boolean record = btnRecord.getText().startsWith("Record");
         Optional<MetaInstrument> optInstrument=getSelectedInstrument();
         if (record) {
-	        optInstrument.ifPresent(metaInstr->{
-		        if (synthWrapper.getTrackCount()>0)
-			        synthWrapper.playBack();
-	            synthWrapper.startRecord(metaInstr);
-	            btnRecord.setText("Stop record");
-	            btnPlay.setEnabled(false);
-	            btnSave.setEnabled(false);
+            optInstrument.ifPresent(metaInstr->{
+                if (synthWrapper.getTrackCount()>0)
+                    synthWrapper.playBack();
+                synthWrapper.startRecord(metaInstr);
+                btnRecord.setText("Stop record");
+                btnPlay.setEnabled(false);
+                btnSave.setEnabled(false);
             });
         } else {
             synthWrapper.stopRecord(optInstrument);
-	        if (synthWrapper.getTrackCount()>1)
-	            synthWrapper.stopPlayback();
+            if (synthWrapper.getTrackCount()>1)
+                synthWrapper.stopPlayback();
             tblTrackChanged();
             tblTrack.sizeColumnsToFit(0);
             btnRecord.setText("Record");
@@ -402,19 +479,19 @@ public class PanelMain {
         }
     }
     private void playbackComplete() {
-	    // This is on the synthesizer thread and won't bubble up to the
-	    // uncaught exception handler because... shrug. I guess that thing
-	    // eats errors.
-	    try {
-		    getSelectedInstrument().ifPresent(instr-> {
-			    // Things tend to go awry after playback, so this will try to reset the mindset:
-				synthWrapper.instrumentChannelChange(instr, jcbChannel.getSelectedIndex());
-				setChannelSliderValues();
-			});
-	        btnPlay.setText("Play");
-	        btnRecord.setEnabled(true);
+        // This is on the synthesizer thread and won't bubble up to the
+        // uncaught exception handler because... shrug. I guess that thing
+        // eats errors.
+        try {
+            getSelectedInstrument().ifPresent(instr-> {
+                // Things tend to go awry after playback, so this will try to reset the mindset:
+                synthWrapper.instrumentChannelChange(instr, jcbChannel.getSelectedIndex());
+                setChannelSliderValues();
+            });
+            btnPlay.setText("Play");
+            btnRecord.setEnabled(true);
         } catch (Exception e) {
-	        handleError(e);
+            handleError(e);
         }
     }
     private void clickSave() {
@@ -427,19 +504,19 @@ public class PanelMain {
         });
     }
     private void clickDelete() {
-	    Optional.of(tblTrack.getSelectedRows())
-		    .filter(array->array.length>0)
-		    .ifPresent(array->{
-			    for (int i=array.length-1; i>=0; i--)
-				    synthWrapper.deleteTrack(array[i]);
-			    tblTrackChanged();
-		    });
+        Optional.of(tblTrack.getSelectedRows())
+            .filter(array->array.length>0)
+            .ifPresent(array->{
+                for (int i=array.length-1; i>=0; i--)
+                    synthWrapper.deleteTrack(array[i]);
+                tblTrackChanged();
+            });
     }
     private void clickOpen() {
         Except.run(()->{
             JFileChooser fc = getFileChooser();
             if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-	            synthWrapper.openSequence(fc.getSelectedFile());
+                synthWrapper.openSequence(fc.getSelectedFile());
                 btnSave.setText("<html><i>Save...</i></html>");
                 btnPlay.setEnabled(true);
                 tblTrackChanged();
@@ -447,59 +524,59 @@ public class PanelMain {
         });
     }
 
-	private void trackSelected() {
-		btnDelete.setEnabled(tblTrack.getSelectedRows().length>0);
-	}
-	private void tblTrackChanged() {
+    private void trackSelected() {
+        btnDelete.setEnabled(tblTrack.getSelectedRows().length>0);
+    }
+    private void tblTrackChanged() {
         tblTrack.tableChanged(new TableModelEvent(tblTrackModel));
-	}
+    }
 
 
 
 
-	private void searchForInstrument() {
-		dlfInstrument.clear();
-		metaInstruments.searchByName(
-			jtfInstrument.getText().trim(),
-			(String displayName) -> dlfInstrument.addElement(displayName)
-		);
-		if (dlfInstrument.size()>0) jlInstrument.setSelectedIndex(0);
-	}
+    private void searchForInstrument() {
+        dlfInstrument.clear();
+        metaInstruments.searchByName(
+            jtfInstrument.getText().trim(),
+            (String displayName) -> dlfInstrument.addElement(displayName)
+        );
+        if (dlfInstrument.size()>0) jlInstrument.setSelectedIndex(0);
+    }
 
-	private void instrumentPicked() {
-		getSelectedInstrument().ifPresent(instr -> {
-			lblInstrument.setText("Instrument: "+instr.displayName+"  -  Bank: "+instr.getBank()+" Program: "+instr.getProgram());
-			int currChannel=jcbChannel.getSelectedIndex();
-			int newChannel=synthWrapper.suggestChannel(instr, currChannel);
-			synthWrapper.instrumentChannelChange(instr, newChannel);
-			if (currChannel!=newChannel)
-				jcbChannel.setSelectedIndex(newChannel);
-			else
-				setChannelSliderValues();
-		});
-	}
+    private void instrumentPicked() {
+        getSelectedInstrument().ifPresent(instr -> {
+            lblInstrument.setText("Instrument: "+instr.displayName+"  -  Bank: "+instr.getBank()+" Program: "+instr.getProgram());
+            int currChannel=jcbChannel.getSelectedIndex();
+            int newChannel=synthWrapper.suggestChannel(instr, currChannel);
+            synthWrapper.instrumentChannelChange(instr, newChannel);
+            if (currChannel!=newChannel)
+                jcbChannel.setSelectedIndex(newChannel);
+            else
+                setChannelSliderValues();
+        });
+    }
 
-	private void setChannelSliderValues() {
+    private void setChannelSliderValues() {
         MetaChannel cc=synthWrapper.getChannel();
         cc.setVolume(sliderVolume.getValue());
         cc.setPressure(sliderPressureVibrato.getValue());
         cc.setBend(sliderBend.getValue());
         cc.setReverb(sliderReverb.getValue());
-	}
+    }
 
     private Optional<MetaInstrument> getSelectedInstrument() {
-	    return Optional.ofNullable(jlInstrument.getSelectedValue())
-		    .map(metaInstruments::get);
+        return Optional.ofNullable(jlInstrument.getSelectedValue())
+            .map(metaInstruments::get);
     }
 
     private void handleError(Throwable e) {
-	    e.printStackTrace();
-	    lblError.setText("Error: "+e.getMessage()+" (see stdout for more detail)");
-	    lblError.setVisible(true);
+        e.printStackTrace();
+        lblError.setText("Error: "+e.getMessage()+" (see stdout for more detail)");
+        lblError.setVisible(true);
     }
 
     public void close() {
-	    synthWrapper.close();
+        synthWrapper.close();
     }
 
 }

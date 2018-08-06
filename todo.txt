@@ -2,19 +2,7 @@
     Label keys C1 - G8 or whatever
 
 - High playermaker
-    - Test TODO's
-    - Load instruments into :
-        # Example of using an instrument from sound bank 1152 - splitting it into two 7-bit parts
-        n the MIDI protocol itself, bank numbers are split into two 7-bit parts and transmitted as the value
-        of two controllers, "Bank Select" and "Bank Select LSB":
-        ... = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 0,  1152 >> 7);   // = 9
-        ... = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 32, 1152 & 0x7f); // = 0
-        ... = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 0, 14, 0);
-    - Capture reverb messages from MidiDemo and figure out how they are sent.
-        Okay they are never sent.
-        Make it where we can send these straight to channel
-            -pressure
-            -reverb
+    - Load instruments into MyMidi3
     - Add C1, C2, C3, D1, D2, D3 to constants; easier than -12 +12 I think.
     - ARGH midi channel 10 is drums!!!!
         This article contains infor about what notes are what - map to constants:

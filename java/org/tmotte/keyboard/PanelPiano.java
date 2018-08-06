@@ -3,17 +3,18 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.table.*;
 import javax.swing.event.*;
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.function.IntSupplier;
 
 /**
  * Piano renders black & white keys and plays the notes for a MIDI
  * channel.
  */
-public class PanelPiano extends JPanel implements MouseListener {
-    private final static int ON = 0, OFF = 1;
+public class PanelPiano extends JComponent {
+
+    // Constants:
+    public final static int ACTION_MOUSE_OVER=0, ACTION_MOUSE_CLICK=1, ACTION_CLICK_ON_CLICK_OFF=2;
     private final static Color jfcBlue = new Color(204, 204, 255);
     private final static Color pink = new Color(255, 175, 175);
     private final static int kw = 34, kh = 100;
@@ -21,19 +22,22 @@ public class PanelPiano extends JPanel implements MouseListener {
     private final static int octaves=6;
     private final static int whiteIDs[] = { 0, 2, 4, 5, 7, 9, 11 };
 
+    // Final objects:
     private final SynthWrapper synthWrapper;
-    private final Supplier<Boolean> mouseOverSelector;
     private final java.util.List<Key>
         allKeys=new ArrayList<>(octaves * 12),
         whiteKeys = new ArrayList<>(octaves * 7),
         blackKeys = new ArrayList<>(octaves * 5);
+
+    // Changeable state:
     private Key prevKey;
+    private int pianoTriggerAction=ACTION_MOUSE_OVER;
+    private boolean mute = false;
 
 
-    public PanelPiano(SynthWrapper synthWrapper, Supplier<Boolean> mouseOverSelector) {
+    public PanelPiano(SynthWrapper synthWrapper) {
         //setLayout(new BorderLayout());
         this.synthWrapper=synthWrapper;
-        this.mouseOverSelector=mouseOverSelector;
 
         Dimension desiredSize=new Dimension(1+(42*kw), kh+1);
         setPreferredSize(desiredSize);
@@ -61,48 +65,111 @@ public class PanelPiano extends JPanel implements MouseListener {
         allKeys.addAll(blackKeys);
         Collections.sort(allKeys, (key1, key2)->key1.x-key2.x);
 
-        addMouseMotionListener(new MouseMotionAdapter() {
-            public void mouseMoved(MouseEvent e) {
-                if (mouseOverSelector.get()) {
-                    Key key = getKey(e.getPoint());
-                    if (prevKey != null && prevKey != key)
-                        prevKey.off();
-                    if (key != null && prevKey != key)
-                        key.on();
-                    prevKey = key;
-                    repaint();
-                }
-            }
-        });
-        addMouseListener(this);
-    }
-    public void allNotesOff() {
-        for (int i = 0; i < allKeys.size(); i++)
-            allKeys.get(i).setNoteState(OFF);
+        addMouseMotionListener(myMouseMoveListener);
+        addMouseListener(myMouseListener);
+        addKeyListener(MyKeyListener);
     }
 
-    public @Override void mousePressed(MouseEvent e) {
-        prevKey = getKey(e.getPoint());
-        if (prevKey != null) {
-            prevKey.on();
+    public void setPianoTriggerAction(int action) {
+        pianoTriggerAction=action;
+        if (pianoTriggerAction!=ACTION_CLICK_ON_CLICK_OFF) {
+            allNotesOff();
+            mute=false;
             repaint();
         }
     }
-    public @Override void mouseReleased(MouseEvent e) {
-        if (prevKey != null) {
-            prevKey.off();
+
+    public void flipMute() {
+        mute=!mute;
+        for (Key key: allKeys) key.flipMute();
+    }
+
+    public boolean isMuted() {
+        return mute;
+    }
+
+    public void allNotesOff() {
+        for (Key key: allKeys) key.off();
+    }
+
+    public @Override boolean isFocusable() {
+        return true;
+    }
+
+    private MouseMotionListener myMouseMoveListener = new MouseMotionAdapter() {
+        public @Override void mouseMoved(MouseEvent e) {
+            if (pianoTriggerAction==ACTION_MOUSE_OVER) {
+                Key key = getKey(e.getPoint());
+                if (prevKey != null && prevKey != key)
+                    prevKey.off();
+                if (key != null && !key.isNoteOn())
+                    key.on();
+                prevKey = key;
+                repaint();
+            }
+        }
+    };
+    private MouseListener myMouseListener = new MouseListener() {
+        public @Override void mousePressed(MouseEvent e) {
+            prevKey = getKey(e.getPoint());
+            if (prevKey != null) {
+                if (isClickOnClickOff())
+                    prevKey.flip();
+                else
+                    prevKey.on();
+                repaint();
+            }
+        }
+        public @Override void mouseReleased(MouseEvent e) {
+            if (prevKey != null) {
+                if (!isClickOnClickOff())
+                    prevKey.off();
+                repaint();
+            }
+        }
+        public @Override void mouseExited(MouseEvent e) {
+            if (prevKey != null) {
+                if (!isClickOnClickOff())
+                    prevKey.off();
+                repaint();
+            }
+        }
+        public @Override void mouseClicked(MouseEvent e) { }
+        public @Override void mouseEntered(MouseEvent e) { }
+    };
+
+    private boolean isClickOnClickOff() {
+        return pianoTriggerAction==ACTION_CLICK_ON_CLICK_OFF;
+    }
+
+
+    private KeyListener MyKeyListener = new KeyAdapter() {
+        public @Override void keyPressed(KeyEvent e) {
+            int keyCode=e.getKeyCode();
+            final boolean
+                bLeft=keyCode==KeyEvent.VK_LEFT,
+                bRight=keyCode==KeyEvent.VK_RIGHT,
+                bSpace=keyCode==KeyEvent.VK_SPACE;
+            if (bLeft || bRight) {
+                int keyIndex=prevKey==null
+                    ?0
+                    :(prevKey.kNum + (bLeft ?-1 :+1) - transpose);
+                if (keyIndex<0)
+                    keyIndex=allKeys.size()-1;
+                else
+                if (keyIndex>=allKeys.size())
+                    keyIndex=0;
+                prevKey=allKeys.get(keyIndex);
+            }
+            else
+            if (bSpace) {
+                if (prevKey==null)
+                    prevKey=allKeys.get(0);
+                prevKey.flip();
+            }
             repaint();
         }
-    }
-    public @Override void mouseExited(MouseEvent e) {
-        if (prevKey != null) {
-            prevKey.off();
-            repaint();
-            prevKey = null;
-        }
-    }
-    public @Override void mouseClicked(MouseEvent e) { }
-    public @Override void mouseEntered(MouseEvent e) { }
+    };
 
 
     private Key getKey(Point point) {
@@ -137,7 +204,7 @@ public class PanelPiano extends JPanel implements MouseListener {
                 g2.setColor(synthWrapper.recording() ? pink : jfcBlue);
                 g2.fill(key);
             }
-            g2.setColor(Color.black);
+            g2.setColor(key==prevKey && hasFocus() ?Color.GREEN :Color.black);
             g2.draw(key);
         }
         for (int i = 0; i < blackKeys.size(); i++) {
@@ -148,7 +215,7 @@ public class PanelPiano extends JPanel implements MouseListener {
                 g2.setColor(Color.black);
                 g2.draw(key);
             } else {
-                g2.setColor(Color.black);
+                g2.setColor(key==prevKey && hasFocus() ?Color.GREEN :Color.black);
                 g2.fill(key);
             }
         }
@@ -158,25 +225,35 @@ public class PanelPiano extends JPanel implements MouseListener {
      * Black and white keys or notes on the piano.
      */
     private class Key extends Rectangle {
-        private int noteState = OFF;
+        private boolean noteOn = false;
         private int kNum;
         public Key(int x, int y, int width, int height, int num) {
             super(x, y, width, height);
             kNum = num;
         }
         public boolean isNoteOn() {
-            return noteState == ON;
+            return noteOn;
+        }
+        public void flip() {
+            if (isNoteOn()) off();
+            else on();
+        }
+        public void flipMute() {
+            if (isNoteOn()) {
+                if (mute)
+                    synthWrapper.sendNoteOff(kNum);
+                else
+                    on();
+            }
         }
         public void on() {
-            setNoteState(ON);
-            synthWrapper.sendNoteOn(kNum);
+            noteOn=true;
+            if (!mute)
+                synthWrapper.sendNoteOn(kNum);
         }
         public void off() {
-            setNoteState(OFF);
+            noteOn =false;
             synthWrapper.sendNoteOff(kNum);
-        }
-        public void setNoteState(int state) {
-            noteState = state;
         }
         public String toString() {
             return kNum +" "+x+" "+width;
