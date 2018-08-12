@@ -31,10 +31,10 @@ public class MyMidi3  {
     public final static int TICKS_PER_SECOND=SEQUENCE_RESOLUTION*2;
     public final static int TICKS_PER_MINUTE=TICKS_PER_SECOND*60;
 
-    final static int NO_BEND = 8192;
-    final static int REVERB = 91;
-    final static int SEQUENCER_END_PLAY=47;
-    final static int DRUM_CHANNEL=9;
+    private final static int NO_BEND = 8192;
+    private final static int REVERB = 91;
+    private final static int SEQUENCER_END_PLAY=47;
+    private final static int DRUM_CHANNEL=9;
 
     private static class ChannelAttrs {
 	    int bendSense=2;
