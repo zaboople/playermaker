@@ -3,9 +3,8 @@ import javax.sound.midi.*;
 
 /**
  * Stores MidiChannel information.
- * FIXME promote to common.
  */
-public  class MetaChannel {
+class MetaChannel {
     final int SUSTAIN = 64;
     final int REVERB = 91;
     private boolean solo, mono, mute, sustain;

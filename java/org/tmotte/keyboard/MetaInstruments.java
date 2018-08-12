@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import org.tmotte.common.midi.MetaInstrument;
 
-/** FIXME REUSE */
 public class MetaInstruments {
     private final Map<String, Integer> displayNameToIndex=new HashMap<>();
     private final List<MetaInstrument> metaInstruments=new ArrayList<>();
