@@ -43,34 +43,21 @@ public class MyMidi3  {
 	    Instrument instrument;
     }
 
-
-    private MySequencer sequencer;
-    private MidiChannel[] midiChannels;
-    private Instrument[] instruments;
-    private Map<String, MetaInstrument> instrumentsByName;
-
-    private boolean waitForSequencerToStopPlaying=true;
-
-    private MidiTracker midiTracker=new MidiTracker();
-    private Sequence sequence;
-    private ReserveChannels reservedChannels=new ReserveChannels();
-    private int channelIndex=0;
-    public long tickX=0;
-
     /**
      * This wrapper for Sequencer allows me to put in a shutdown hook
      */
-    static class MySequencer {
+    private static class SequencerManager {
         private final ArrayBlockingQueue<Integer> eventHook=new ArrayBlockingQueue<>(1);
 
         boolean waitForEndPlay=true, closeOnEndPlay=false;
         Sequencer realSequencer;
 
-        public MySequencer(Synthesizer synth) {
+        public SequencerManager(Synthesizer synth) {
             Except.run(()-> {
                 realSequencer=MidiSystem.getSequencer();
                 for (Transmitter t: realSequencer.getTransmitters())
-                    Optional.ofNullable(t.getReceiver()).ifPresent(Receiver::close);
+                    Optional.ofNullable(t.getReceiver())
+	                    .ifPresent(Receiver::close);
                 realSequencer.getTransmitters().stream()
                     .findFirst()
                     .orElse(realSequencer.getTransmitter())
@@ -93,18 +80,33 @@ public class MyMidi3  {
         }
     }
 
+
+    private SequencerManager sequencer;
+    private MidiChannel[] midiChannels;
+    private Instrument[] instruments;
+    private Map<String, MetaInstrument> instrumentsByName;
+
+    private boolean waitForSequencerToStopPlaying=true;
+
+    private MidiTracker midiTracker=new MidiTracker();
+    private Sequence sequence;
+    private ReserveChannels reservedChannels=new ReserveChannels();
+    private int channelIndex=0;
+    public long tickX=0;
+
     public MyMidi3() {
         Except.run(()-> {
             Synthesizer synth=MidiSystem.getSynthesizer();
             synth.open();
             this.instruments=synth.getDefaultSoundbank().getInstruments();
             instrumentsByName=MetaInstrument.map(instruments);
-            sequencer = new MySequencer(synth);
+            sequencer = new SequencerManager(synth);
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
             setBeatsPerMinute(60);
 			midiChannels = synth.getChannels();
         });
     }
+
 
     /** Currently the quarter note always gets 1 beat */
     public MyMidi3 setBeatsPerMinute(int bpm) {

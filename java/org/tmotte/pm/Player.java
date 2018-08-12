@@ -86,16 +86,20 @@ public class Player extends AttributeHolder<Player> implements Notable {
 
 
     /**
-     * BPM means "beats per minute". Different players can play at their own speeds (might be... trickY) or one player can act as
-     * "lead", setting the BPM for everyone - as long as they are the first player sequenced. This is event-based, so it can be set
-     * more than once, affecting all Chords added afterwards.
+     * BPM means "beats per minute". This setting is event-based, so it affects only the notes added after BPM is changed.
      * <br>
-     * MyMidi uses this setting until told otherwise, so the next Player will inherit it (usually desirable) unless they set it explicitly.
+     * However: BPM is really a function of the MyMidi sequencer; when it changes, all Players are affected. So if Player A sets BPM
+     * to 60 and plays a quarter note, and Player B also plays a quarter note, both notes will play for one second. Thus it's easiest
+     * think of Player A as a "lead" that the others will automatically follow when they slow down or speed up, which is fairly
+     * similar to real-world situations.
      */
     public Player setBeatsPerMinute(int bpm) {
         return event(new Event().setBeatsPerMinute(bpm));
     }
     public Player setBPM(int bpm) {
+        return setBeatsPerMinute(bpm);
+    }
+    public Player bpm(int bpm) {
         return setBeatsPerMinute(bpm);
     }
 
