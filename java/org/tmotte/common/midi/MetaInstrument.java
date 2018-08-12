@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
-/* FIXME promote back to keyboard? */
+/**
+ * This deals with various quirks I've noticed about instrument names.
+ */
 public class MetaInstrument {
     public final static String categories[] = {
         "Piano", "Chromatic Perc.", "Organ", "Guitar",

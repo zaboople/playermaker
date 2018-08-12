@@ -1,12 +1,13 @@
 package org.tmotte.keyboard;
-import javax.sound.midi.*;
-import java.util.*;
-import java.util.function.Supplier;
 import java.io.File;
 import java.io.IOException;
-import org.tmotte.common.midi.MetaInstrument;
+import java.util.*;
+import java.util.function.Supplier;
+import javax.sound.midi.*;
 import org.tmotte.common.function.Except;
+import org.tmotte.common.midi.MetaInstrument;
 import org.tmotte.common.midi.MidiTracker;
+import org.tmotte.common.midi.SequencerUtils;
 
 public class SynthWrapper implements MetaEventListener {
 
@@ -44,21 +45,7 @@ public class SynthWrapper implements MetaEventListener {
         synthesizer.open();
         sequencer = MidiSystem.getSequencer();
         sequencer.addMetaEventListener(this);
-
-		// The sequencer is not necessarily using the same synthesizer as you'd expect. But
-		// more importantly, there is a BIG difference between these two:
-		//   -  Sequencer.getTransmitters(): Gets existing transmitters, if there are any
-		//   -  Sequencer.getTransmitter(): CREATES a new transmitter, even if one or more
-		//      already exist.
-		// The API works this way so that a sequencer can transmit the same thing to multiple resources;
-		// the problem is that getTransmitter() should be renamed createTransmitter().
-		for (Transmitter t: sequencer.getTransmitters())
-			Optional.ofNullable(t.getReceiver()).ifPresent(Receiver::close);
-		sequencer.getTransmitters().stream()
-	        .findFirst()
-	        .orElse(sequencer.getTransmitter())
-	        .setReceiver(synthesizer.getReceiver());
-
+        SequencerUtils.hookSequencerToSynth(sequencer, synthesizer);
 
 		// Create default sequence:
         sequenceFile.ifPresentOrElse(

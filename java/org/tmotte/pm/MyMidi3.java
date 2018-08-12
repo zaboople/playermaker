@@ -8,11 +8,12 @@ import java.util.Map;
 import java.util.Set;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.Optional;
 import org.tmotte.common.function.Except;
 import org.tmotte.common.midi.MetaInstrument;
 import org.tmotte.common.midi.MidiTracker;
+import org.tmotte.common.midi.SequencerUtils;
+import org.tmotte.common.midi.SequencerWatcher;
 
 
 /**
@@ -33,7 +34,6 @@ public class MyMidi3  {
 
     private final static int NO_BEND = 8192;
     private final static int REVERB = 91;
-    private final static int SEQUENCER_END_PLAY=47;
     private final static int DRUM_CHANNEL=9;
 
     private static class ChannelAttrs {
@@ -43,48 +43,12 @@ public class MyMidi3  {
 	    Instrument instrument;
     }
 
-    /**
-     * This wrapper for Sequencer allows me to put in a shutdown hook
-     */
-    private static class SequencerManager {
-        private final ArrayBlockingQueue<Integer> eventHook=new ArrayBlockingQueue<>(1);
 
-        boolean waitForEndPlay=true, closeOnEndPlay=false;
-        Sequencer realSequencer;
-
-        public SequencerManager(Synthesizer synth) {
-            Except.run(()-> {
-                realSequencer=MidiSystem.getSequencer();
-                for (Transmitter t: realSequencer.getTransmitters())
-                    Optional.ofNullable(t.getReceiver())
-	                    .ifPresent(Receiver::close);
-                realSequencer.getTransmitters().stream()
-                    .findFirst()
-                    .orElse(realSequencer.getTransmitter())
-                    .setReceiver(synth.getReceiver());
-            });
-            realSequencer.addMetaEventListener(
-                event ->{
-                    if (event.getType() == SEQUENCER_END_PLAY){
-                        if (closeOnEndPlay)
-                            realSequencer.close();
-                        if (waitForEndPlay)
-                            eventHook.add(1);
-                    }
-                }
-            );
-        }
-        void waitForIf() {
-            if (waitForEndPlay)
-                Except.run(()->eventHook.take());
-        }
-    }
-
-
-    private SequencerManager sequencer;
+    private Sequencer sequencer;
     private MidiChannel[] midiChannels;
     private Instrument[] instruments;
     private Map<String, MetaInstrument> instrumentsByName;
+    private SequencerWatcher sequencerWatcher;
 
     private boolean waitForSequencerToStopPlaying=true;
 
@@ -100,7 +64,9 @@ public class MyMidi3  {
             synth.open();
             this.instruments=synth.getDefaultSoundbank().getInstruments();
             instrumentsByName=MetaInstrument.map(instruments);
-            sequencer = new SequencerManager(synth);
+            sequencer=MidiSystem.getSequencer();
+            sequencerWatcher=new SequencerWatcher(sequencer);
+            SequencerUtils.hookSequencerToSynth(sequencer, synth);
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
             setBeatsPerMinute(60);
 			midiChannels = synth.getChannels();
@@ -356,31 +322,30 @@ public class MyMidi3  {
         play(true);
     }
     public MyMidi3 play(boolean andThenStop) {
-        sequencer.closeOnEndPlay=andThenStop;
-        Sequencer sqr=sequencer.realSequencer;
+        sequencerWatcher.closeOnFinishPlay(andThenStop);
         try {
             //System.out.println("MyMidi3.play() starting..."+sequencer+" "+andThenStop);
-            if (!sqr.isOpen())
-                sqr.open();
-            sqr.setSequence(sequence);
-            sqr.setLoopCount(0);
-            sqr.setLoopStartPoint(0);
-            sqr.setTickPosition(0);
-            sqr.start();
-            sequencer.waitForIf();
+            if (!sequencer.isOpen())
+                sequencer.open();
+            sequencer.setSequence(sequence);
+            sequencer.setLoopCount(0);
+            sequencer.setLoopStartPoint(0);
+            sequencer.setTickPosition(0);
+            sequencer.start();
+            sequencerWatcher.waitForIf();
         } catch (Exception e) {
-            sqr.close();
+            sequencer.close();
             throw new RuntimeException(e);
         }
         return this;
     }
 
     public void stopPlay() {
-        sequencer.realSequencer.stop();
+        sequencer.stop();
     }
     public void close() {
         System.out.println("MyMidi3.close()");
-        sequencer.realSequencer.close();
+        sequencer.close();
         //sequencer=null;
     }
 

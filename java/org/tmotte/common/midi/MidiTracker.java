@@ -16,8 +16,8 @@ import javax.sound.midi.*;
 
 /**
  * A general-purpose class for sending Midi Messages to a given Track. It exposes a certain number of high-level
- * messages that I've figured out, like "tell this channel to play this instrument at this time" i.e. sendInstrument(), but it also
- * exposes some lower-level helpers (for no good reason).
+ * messages that I've figured out, like "tell this channel to play this instrument at this time" i.e. sendInstrument(),
+ * but it also exposes some lower-level helpers (for no good reason).
  */
 public class MidiTracker  {
 
@@ -110,6 +110,5 @@ public class MidiTracker  {
     public void sendMessage(ShortMessage msg, long tick) {
         currTrack.add(new MidiEvent(msg, tick));
     }
-
 
 }
