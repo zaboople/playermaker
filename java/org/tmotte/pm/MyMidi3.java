@@ -45,6 +45,7 @@ public class MyMidi3  {
 
 
     private Sequencer sequencer;
+    private Synthesizer synth;
     private MidiChannel[] midiChannels;
     private Instrument[] instruments;
     private Map<String, MetaInstrument> instrumentsByName;
@@ -59,11 +60,15 @@ public class MyMidi3  {
     public long tickX=0;
 
     public MyMidi3() {
+	    this(Optional.empty());
+    }
+    public MyMidi3(Optional<File> replaceInstruments) {
         Except.run(()-> {
-            Synthesizer synth=MidiSystem.getSynthesizer();
+            synth=MidiSystem.getSynthesizer();
             synth.open();
-            this.instruments=synth.getDefaultSoundbank().getInstruments();
-            instrumentsByName=MetaInstrument.map(instruments);
+            setInstruments(
+	            SequencerUtils.getOrReplaceInstruments(synth, replaceInstruments)
+            );
             sequencer=MidiSystem.getSequencer();
             sequencerWatcher=new SequencerWatcher(sequencer);
             SequencerUtils.hookSequencerToSynth(sequencer, synth);
@@ -73,6 +78,15 @@ public class MyMidi3  {
         });
     }
 
+    public MyMidi3 setInstruments(Instrument... instruments) {
+        this.instruments=instruments;
+        instrumentsByName=MetaInstrument.map(true, instruments);
+        return this;
+    }
+
+    public Instrument[] getInstruments() {
+	    return this.instruments;
+    }
 
     /** Currently the quarter note always gets 1 beat */
     public MyMidi3 setBeatsPerMinute(int bpm) {
@@ -161,6 +175,7 @@ public class MyMidi3  {
         });
         getAndSet(getInstrument(event), eInst -> {
             channelAttrs.instrument=eInst;
+            synth.loadInstrument(eInst);
             if (!firstChord)
                 midiTracker.sendInstrument(channelIndex, channelAttrs.instrument, currTick);
         });

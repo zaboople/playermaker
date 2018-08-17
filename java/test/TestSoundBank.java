@@ -3,11 +3,14 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.sound.midi.Instrument;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Soundbank;
+import org.tmotte.common.midi.SequencerUtils;
 import org.tmotte.pm.Divisions;
 import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
@@ -18,47 +21,48 @@ import static org.tmotte.pm.Pitches.*;
 public class TestSoundBank  {
     public static void main(String args[]) throws Exception {
 	    if (args.length<1)
-		    throw new Exception("Need a file & optionally, an instrument name.");
-		File file=new File(args[0]);
-		if (!file.exists())
-			throw new Exception("Can't load nonexistent file "+file);
-
-		Soundbank soundbank=MidiSystem.getSoundbank(file);
-		Instrument[] instruments=soundbank.getInstruments();
+		    System.err.println("Need a file & optionally, an instrument name.");
+		Optional<File> file=Optional.ofNullable(
+				args.length>0 ?args[0] :null
+			)
+			.map(name -> new File(name));
+		MyMidi3 midi=new MyMidi3(file);
+		Instrument[] instruments=midi.getInstruments();
 		List<Instrument> insList=Arrays.asList(instruments)
 			.stream().sorted(
 				(x, y)->x.getName().compareTo(y.getName())
 			)
 			.collect(Collectors.toList());
-		Map<String, Instrument> insMap=insList
-			.stream().collect(
-				Collectors.toMap(Instrument::getName, i->i)
-			);
 		for (Instrument inst: insList)
 			System.out.println(inst.getName()+" "+inst.getPatch().getBank()+" "+inst.getPatch().getProgram());
 		System.out.println("-----------------------------");
 		System.out.println("Total count: "+insList.size());
 
+		Map<String, Instrument> insMap = new HashMap<>();
+		insList.stream().forEach(instr -> insMap.put(instr.getName(), instr));
 
-		if (args.length>1) {
-			String instrName=args[1];
-			Instrument instr=insMap.get(instrName);
-			if (instr==null) throw new Exception("Not found: "+instrName);
-			System.out.println("-------------");
-			System.out.println("Selected: "+instr.getName()+": "+instr.getPatch().getBank()+": "+instr.getPatch().getProgram());
-			//MidiSystem.getSynthesizer().loadInstrument(instr);
-			new MyMidi3().playAndStop(
-				new Player()
-					.instrument(instr.getPatch().getProgram())
-					.setBPM(70)
-					.r4()
-					.octave(4)
-					.p(4, A-12, D_, E)
-					.p(4, B-12, D, F)
-					.r4()
+		Optional<String> instrName=Optional.ofNullable(
+				args.length>1 ?args[1] :null
 			);
-		} else {
-			System.out.println("Next time give me one of the names and I'll play it.");
-		}
+		System.out.println("-------------");
+		Player player=new Player();
+		instrName.ifPresent(i -> player.instrument(i));
+		if (!instrName.isPresent())
+			player.instrument(0);
+		midi.playAndStop(
+			player
+				.setBPM(60)
+				.setReverb(127)
+				.r4()
+				.octave(3)
+				.p(4, F, B_, F+12)
+				.r(8)
+				.p(4, F, B_, F+12, A+12, C+24)
+				.r(8)
+				.p(4, A+12, C+24, E+24, E+36, C+48)
+				.r(8)
+				.p(4, F, B_, F+12, A+12, C+12)
+				.r4()
+		);
     }
 }

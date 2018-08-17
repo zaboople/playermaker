@@ -1,6 +1,10 @@
 package org.tmotte.common.midi;
+import java.io.File;
 import java.util.Optional;
+import javax.sound.midi.Instrument;
+import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.Soundbank;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.Transmitter;
 import javax.sound.midi.Receiver;
@@ -25,6 +29,20 @@ public class SequencerUtils  {
 	        .findFirst()
 	        .orElse(sequencer.getTransmitter())
 	        .setReceiver(synthesizer.getReceiver());
+    }
+
+    public static Instrument[] getOrReplaceInstruments(Synthesizer synth, Optional<File> replacementFile) {
+		return replacementFile
+			.map(file ->
+				Except.get(()->{
+					synth.unloadAllInstruments(synth.getDefaultSoundbank());
+					Soundbank soundbank=MidiSystem.getSoundbank(file);
+					//synth.loadAllInstruments(soundbank);
+					return soundbank.getInstruments();
+				})
+			).orElseGet(()->
+				synth.getDefaultSoundbank().getInstruments()
+			);
     }
 
 }

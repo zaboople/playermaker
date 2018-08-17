@@ -56,17 +56,7 @@ public class SynthWrapper implements MetaEventListener {
 
 
 		// Meta-instruments:
-		final Instrument[] instruments=instrumentFile
-			.map(file ->
-				Except.get(()->{
-					synthesizer.unloadAllInstruments(synthesizer.getDefaultSoundbank());
-					Soundbank soundbank=MidiSystem.getSoundbank(file);
-					//synthesizer.loadAllInstruments(soundbank);
-					return soundbank.getInstruments();
-				})
-			).orElseGet(()->
-				synthesizer.getDefaultSoundbank().getInstruments()
-			);
+		final Instrument[] instruments=SequencerUtils.getOrReplaceInstruments(synthesizer, instrumentFile);
 		metaInstruments.init(instruments, true);
         synthesizer.loadInstrument(metaInstruments.get(0).instrument);
 

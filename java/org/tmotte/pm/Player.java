@@ -14,7 +14,7 @@ public class Player extends AttributeHolder<Player> implements Notable {
     }
     private TimeTracking timeTracker=new TimeTracking();
     private List<Event> events=new ArrayList<>();
-    private int reverb=0, pressure=0;
+    private int reverb=0;
     private long startTime=0;
     private boolean reverbSetOnce=false;
 
