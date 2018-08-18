@@ -26,6 +26,9 @@ import org.tmotte.common.midi.MetaInstrument;
 public class PanelMain {
     private final static String BTN_MUTE_TEXT="Mute (Ctrl-M to quick-cycle)";
     private final static String BTN_UNMUTE_TEXT="Un-mute (Ctrl-M to quick-cycle)";
+    private final static String KEYBOARD_TRIGGER_MOUSE_OVER="Mouse over (not click)";
+    private final static String KEYBOARD_TRIGGER_MOUSE_CLICK="Mouse click";
+    private final static String KEYBOARD_TRIGGER_MOUSE_CLICK_ON_OFF="Click on/click off";
 
     public static void startApplication(SynthWrapper synthWrapper) {
         // Get main frame ready:
@@ -62,10 +65,14 @@ public class PanelMain {
     private PanelPiano pnlPiano;
     private final JButton btnMute=new JButton(BTN_MUTE_TEXT);
     private JSlider sliderVolume, sliderPressureVibrato, sliderBend, sliderReverb;
-    private final JRadioButton
-        jrbMouseOver=new JRadioButton("Mouse over (not click)", true),
-        jrbMouseClick=new JRadioButton("Mouse click"),
-        jrbMouseDouble=new JRadioButton("Click on/click off");
+    private final JComboBox<String> jcbKeyboardTriggers=new JComboBox<>(new String[]{
+        KEYBOARD_TRIGGER_MOUSE_OVER,
+        KEYBOARD_TRIGGER_MOUSE_CLICK,
+        KEYBOARD_TRIGGER_MOUSE_CLICK_ON_OFF,
+    });
+    private final JComboBox<Integer> jcbOctave=new JComboBox<>(new Integer[]{
+        1, 2, 3, 4
+    });
     private final JLabel lblError=new JLabel("Error");
 
     private JComboBox<String> jcbChannel;
@@ -110,11 +117,7 @@ public class PanelMain {
         sliderReverb = createSlider("Reverb");
         // create a slider with a 14-bit range of values for pitch-bend
         sliderBend = create14BitSlider("Bend");
-
-        ButtonGroup bg=new ButtonGroup();
-        bg.add(jrbMouseOver);
-        bg.add(jrbMouseClick);
-        bg.add(jrbMouseDouble);
+        jcbOctave.setSelectedIndex(2);
 
         lblError.setForeground(Color.RED);
         lblError.setVisible(false);
@@ -269,22 +272,28 @@ public class PanelMain {
             .weightX(1)
             .add(layoutSliders())
             .weightY(1)
-            .addY(layoutKeyboardActionRadios())
+            .insetTop(3)
+            .addY(layoutKeyboardTriggers())
             .addY(lblError)
             .getContainer();
     }
 
-    private Container layoutKeyboardActionRadios() {
+    private Container layoutKeyboardTriggers() {
         return new GridBug(new JPanel())
-            .anchor(GridBug.NORTHWEST)
+            .anchor(GridBug.WEST)
+            .setX(0)
             .weightX(0)
+            .insetLeft(3)
             .fill(GridBug.NONE)
-            .addY(new JLabel("Keyboard trigger:"))
+            .add(new JLabel("Keyboard trigger:"))
             .weightX(1)
-            .fill(GridBug.HORIZONTAL)
-            .addX(jrbMouseOver)
-            .addY(jrbMouseClick)
-            .addY(jrbMouseDouble)
+            .addX(jcbKeyboardTriggers)
+            .setX(0)
+            .weightX(0)
+            .insetTop(3)
+            .addY(new JLabel("Octave:"))
+            .weightX(1)
+            .addX(jcbOctave)
             .getContainer();
     }
 
@@ -350,12 +359,10 @@ public class PanelMain {
     /////////////
 
     private void listen(JFrame mainFrame) {
-        {
-            JRadioButton[] jrbs={jrbMouseOver, jrbMouseClick, jrbMouseDouble};
-            for (JRadioButton jrb: jrbs)
-                jrb.addActionListener(e -> setPianoTriggerAction());
-        }
+        jcbKeyboardTriggers.addActionListener(e -> setPianoTriggerAction());
         setPianoTriggerAction();
+        jcbOctave.addActionListener(e -> setPianoOctave());
+        setPianoOctave();
         btnMute.addActionListener(e->flipMute());
 
         jcbChannel.addActionListener(e->jcbChannelChanged());
@@ -385,35 +392,29 @@ public class PanelMain {
                     trackSelected();
             }
         );
+
+        // This seems dumb
+        // When the mute button gets pressed we flip its state; in the special event
+        // that Ctrl-M is pressed, double flip it for an on-off-on effect, so that
+        // the user can hear the "attack" of the chord:
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
-          .addKeyEventDispatcher(new KeyEventDispatcher() {
-              public @Override boolean dispatchKeyEvent(KeyEvent e) {
+            .addKeyEventDispatcher(new KeyEventDispatcher() {
+                public @Override boolean dispatchKeyEvent(KeyEvent e) {
                     if (e.getKeyCode()==KeyEvent.VK_M &&
                         e.getID()==KeyEvent.KEY_PRESSED &&
-                        !e.isAltDown() &&
-                        jrbMouseDouble.isSelected()
+                        jcbKeyboardTriggers.getSelectedItem().equals(KEYBOARD_TRIGGER_MOUSE_CLICK_ON_OFF) &&
+                        e.isControlDown()
                         ) {
                         flipMute();
-                        if (e.isControlDown())
-                            flipMute();
+                        flipMute();
+                        return true;
                     }
                     return false;
-              }
-        });
+                }
+            });
     }
 
 
-    private void setPianoTriggerAction() {
-        btnMute.setEnabled(jrbMouseDouble.isSelected());
-        pnlPiano.setPianoTriggerAction(
-            jrbMouseOver.isSelected()
-                ?PanelPiano.ACTION_MOUSE_OVER
-                :(jrbMouseClick.isSelected()
-                    ?PanelPiano.ACTION_MOUSE_CLICK
-                    :PanelPiano.ACTION_CLICK_ON_CLICK_OFF
-                )
-        );
-    }
 
     private void flipMute(){
         pnlPiano.flipMute();
@@ -423,18 +424,41 @@ public class PanelMain {
                 :BTN_MUTE_TEXT
         );
     }
+
     private void sliderChanged(JSlider slider) {
         setChannelSliderValues();
         setSliderTitle(slider);
         slider.repaint();
     }
-
     private void setSliderTitle(JSlider slider) {
         int value = slider.getValue();
         TitledBorder tb = (TitledBorder) slider.getBorder();
         String s = tb.getTitle();
         tb.setTitle(s.substring(0, s.indexOf('=')+1) + s.valueOf(value));
     }
+
+    private void setPianoTriggerAction() {
+        btnMute.setEnabled(
+            jcbKeyboardTriggers.getSelectedItem().equals(KEYBOARD_TRIGGER_MOUSE_CLICK_ON_OFF)
+        );
+        pnlPiano.setPianoTriggerAction(
+            jcbKeyboardTriggers.getSelectedItem().equals(KEYBOARD_TRIGGER_MOUSE_OVER)
+                ?PanelPiano.ACTION_MOUSE_OVER
+                :(jcbKeyboardTriggers.getSelectedItem().equals(KEYBOARD_TRIGGER_MOUSE_CLICK)
+                    ?PanelPiano.ACTION_MOUSE_CLICK
+                    :PanelPiano.ACTION_CLICK_ON_CLICK_OFF
+                )
+        );
+    }
+
+    private void setPianoOctave() {
+        pnlPiano.setOctave(
+            jcbOctave.getModel().getElementAt(
+                jcbOctave.getSelectedIndex()
+            )
+        );
+    }
+
 
     private void jcbChannelChanged() {
         getSelectedInstrument().ifPresent(instr->{

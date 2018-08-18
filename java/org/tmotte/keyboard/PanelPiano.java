@@ -18,7 +18,6 @@ public class PanelPiano extends JComponent {
     private final static Color jfcBlue = new Color(204, 204, 255);
     private final static Color pink = new Color(255, 175, 175);
     private final static int kw = 34, kh = 100;
-    private final static int transpose = 24;
     private final static int octaves=6;
     private final static int whiteIDs[] = { 0, 2, 4, 5, 7, 9, 11 };
 
@@ -33,6 +32,7 @@ public class PanelPiano extends JComponent {
     private Key prevKey;
     private int pianoTriggerAction=ACTION_MOUSE_OVER;
     private boolean mute = false;
+    private int transpose = 24;
 
 
     public PanelPiano(SynthWrapper synthWrapper) {
@@ -46,13 +46,13 @@ public class PanelPiano extends JComponent {
 
         for (int i = 0, x = 0; i < octaves; i++)
             for (int j = 0; j < whiteIDs.length; j++, x += kw) {
-                int keyNum = i * 12 + whiteIDs[j] + transpose;
+                int keyNum = i * 12 + whiteIDs[j];
                 whiteKeys.add(new Key(x, 0, kw, kh, keyNum));
             }
         int bkw=(kw/2), bkh=kh/2;
         int xoffset=bkw/2;
         for (int i = 0, x = 0; i < octaves; i++, x += kw) {
-            int keyNum = i * 12 + transpose;
+            int keyNum = i * 12;
             blackKeys.add(new Key((x += kw)-xoffset, 0, bkw, bkh, keyNum+1));
             blackKeys.add(new Key((x += kw)-xoffset, 0, bkw, bkh, keyNum+3));
             x += kw;
@@ -69,6 +69,10 @@ public class PanelPiano extends JComponent {
         addMouseListener(myMouseListener);
         addKeyListener(MyKeyListener);
     }
+
+    /////////////////////////////////////////
+    // PUBLIC METHODS EXPOSED FOR PnlMain: //
+    /////////////////////////////////////////
 
     public void setPianoTriggerAction(int action) {
         pianoTriggerAction=action;
@@ -88,104 +92,22 @@ public class PanelPiano extends JComponent {
         return mute;
     }
 
+    /** Transposes the keyboard by octave-1 (i.e. 1 is lowest) octaves. */
+    public void setOctave(int octave) {
+        assert(octave > 0);
+        transpose=(octave-1) * 12;
+    }
+
     public void allNotesOff() {
         for (Key key: allKeys) key.off();
     }
 
+    //////////////////////
+    // SWING OVERRIDES: //
+    //////////////////////
+
     public @Override boolean isFocusable() {
         return true;
-    }
-
-    private MouseMotionListener myMouseMoveListener = new MouseMotionAdapter() {
-        public @Override void mouseMoved(MouseEvent e) {
-            if (pianoTriggerAction==ACTION_MOUSE_OVER) {
-                Key key = getKey(e.getPoint());
-                if (prevKey != null && prevKey != key)
-                    prevKey.off();
-                if (key != null && !key.isNoteOn())
-                    key.on();
-                prevKey = key;
-                repaint();
-            }
-        }
-    };
-    private MouseListener myMouseListener = new MouseListener() {
-        public @Override void mousePressed(MouseEvent e) {
-            prevKey = getKey(e.getPoint());
-            if (prevKey != null) {
-                if (isClickOnClickOff())
-                    prevKey.flip();
-                else
-                    prevKey.on();
-                repaint();
-            }
-        }
-        public @Override void mouseReleased(MouseEvent e) {
-            if (prevKey != null) {
-                if (!isClickOnClickOff())
-                    prevKey.off();
-                repaint();
-            }
-        }
-        public @Override void mouseExited(MouseEvent e) {
-            if (prevKey != null) {
-                if (!isClickOnClickOff())
-                    prevKey.off();
-                repaint();
-            }
-        }
-        public @Override void mouseClicked(MouseEvent e) { }
-        public @Override void mouseEntered(MouseEvent e) { }
-    };
-
-    private boolean isClickOnClickOff() {
-        return pianoTriggerAction==ACTION_CLICK_ON_CLICK_OFF;
-    }
-
-
-    private KeyListener MyKeyListener = new KeyAdapter() {
-        public @Override void keyPressed(KeyEvent e) {
-            int keyCode=e.getKeyCode();
-            final boolean
-                bLeft=keyCode==KeyEvent.VK_LEFT,
-                bRight=keyCode==KeyEvent.VK_RIGHT,
-                bSpace=keyCode==KeyEvent.VK_SPACE;
-            if (bLeft || bRight) {
-                int keyIndex=prevKey==null
-                    ?0
-                    :(prevKey.kNum + (bLeft ?-1 :+1) - transpose);
-                if (keyIndex<0)
-                    keyIndex=allKeys.size()-1;
-                else
-                if (keyIndex>=allKeys.size())
-                    keyIndex=0;
-                prevKey=allKeys.get(keyIndex);
-            }
-            else
-            if (bSpace) {
-                if (prevKey==null)
-                    prevKey=allKeys.get(0);
-                prevKey.flip();
-            }
-            repaint();
-        }
-    };
-
-
-    private Key getKey(Point point) {
-        Key closestWhite=whiteKeys.get((point.x-1) / kw);
-        int whiteIndex=closestWhite.kNum-transpose;
-        if (whiteIndex>0) {
-            Key leftBlack=allKeys.get(whiteIndex-1);
-            if (leftBlack.contains(point))
-                return leftBlack;
-        }
-        if (whiteIndex<allKeys.size()-1) {
-            Key rightBlack=allKeys.get(whiteIndex+1);
-            if (rightBlack.contains(point))
-                return rightBlack;
-        }
-        return closestWhite;
     }
 
     public @Override void paint(Graphics g) {
@@ -221,6 +143,10 @@ public class PanelPiano extends JComponent {
         }
     }
 
+    ////////////////////
+    // PRIVATE LOGIC: //
+    ////////////////////
+
     /**
      * Black and white keys or notes on the piano.
      */
@@ -241,7 +167,7 @@ public class PanelPiano extends JComponent {
         public void flipMute() {
             if (isNoteOn()) {
                 if (mute)
-                    synthWrapper.sendNoteOff(kNum);
+                    synthWrapper.sendNoteOff(kNum + transpose);
                 else
                     on();
             }
@@ -249,15 +175,108 @@ public class PanelPiano extends JComponent {
         public void on() {
             noteOn=true;
             if (!mute)
-                synthWrapper.sendNoteOn(kNum);
+                synthWrapper.sendNoteOn(kNum + transpose);
         }
         public void off() {
             noteOn =false;
-            synthWrapper.sendNoteOff(kNum);
+            synthWrapper.sendNoteOff(kNum + transpose);
         }
         public String toString() {
             return kNum +" "+x+" "+width;
         }
     } // End class Key
+
+
+    private MouseMotionListener myMouseMoveListener = new MouseMotionAdapter() {
+        public @Override void mouseMoved(MouseEvent e) {
+            if (pianoTriggerAction==ACTION_MOUSE_OVER) {
+                Key key = getKey(e.getPoint());
+                if (prevKey != null && prevKey != key)
+                    prevKey.off();
+                if (key != null && !key.isNoteOn())
+                    key.on();
+                prevKey = key;
+                repaint();
+            }
+        }
+    };
+
+    private MouseListener myMouseListener = new MouseListener() {
+        public @Override void mousePressed(MouseEvent e) {
+            prevKey = getKey(e.getPoint());
+            if (prevKey != null) {
+                if (isClickOnClickOff())
+                    prevKey.flip();
+                else
+                    prevKey.on();
+                repaint();
+            }
+        }
+        public @Override void mouseReleased(MouseEvent e) {
+            if (prevKey != null) {
+                if (!isClickOnClickOff())
+                    prevKey.off();
+                repaint();
+            }
+        }
+        public @Override void mouseExited(MouseEvent e) {
+            if (prevKey != null) {
+                if (!isClickOnClickOff())
+                    prevKey.off();
+                repaint();
+            }
+        }
+        public @Override void mouseClicked(MouseEvent e) { }
+        public @Override void mouseEntered(MouseEvent e) { }
+    };
+
+    private KeyListener MyKeyListener = new KeyAdapter() {
+        public @Override void keyPressed(KeyEvent e) {
+            int keyCode=e.getKeyCode();
+            final boolean
+                bLeft=keyCode==KeyEvent.VK_LEFT,
+                bRight=keyCode==KeyEvent.VK_RIGHT,
+                bSpace=keyCode==KeyEvent.VK_SPACE;
+            if (bLeft || bRight) {
+                int keyIndex=prevKey==null
+                    ?0
+                    :(prevKey.kNum + (bLeft ?-1 :+1));
+                if (keyIndex<0)
+                    keyIndex=allKeys.size()-1;
+                else
+                if (keyIndex>=allKeys.size())
+                    keyIndex=0;
+                prevKey=allKeys.get(keyIndex);
+            }
+            else
+            if (bSpace) {
+                if (prevKey==null)
+                    prevKey=allKeys.get(0);
+                prevKey.flip();
+            }
+            repaint();
+        }
+    };
+
+    private boolean isClickOnClickOff() {
+        return pianoTriggerAction==ACTION_CLICK_ON_CLICK_OFF;
+    }
+
+    private Key getKey(Point point) {
+        Key closestWhite=whiteKeys.get((point.x-1) / kw);
+        int whiteIndex=closestWhite.kNum;
+        if (whiteIndex>0) {
+            Key leftBlack=allKeys.get(whiteIndex-1);
+            if (leftBlack.contains(point))
+                return leftBlack;
+        }
+        if (whiteIndex<allKeys.size()-1) {
+            Key rightBlack=allKeys.get(whiteIndex+1);
+            if (rightBlack.contains(point))
+                return rightBlack;
+        }
+        return closestWhite;
+    }
+
 
 } // End class Piano
