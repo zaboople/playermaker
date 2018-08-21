@@ -18,6 +18,7 @@ public class Rest implements Notable {
         return addChord(chord.totalDuration()-restFor, pitches);
     }
 
+    /** Ties this Rest to another - actually returns itself after extending its duration. */
     public Rest t(long duration) {
         restFor+=duration;
         return this;
