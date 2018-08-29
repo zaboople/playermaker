@@ -10,6 +10,7 @@ public class XTester {
         MyMidi3 midi=new MyMidi3();
         test(midi,
             new TestArpeggio(),
+            new Test7Slash16Time(),
             new TestBeatWithSound(),
             new TestBends(),
             new TestBends2(),

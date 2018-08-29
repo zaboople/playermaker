@@ -88,6 +88,10 @@ public class MyMidi3  {
 	    return this.instruments;
     }
 
+    public Instrument getInstrument(String name) {
+	    return instrumentsByName.get(name).instrument;
+    }
+
     /** Currently the quarter note always gets 1 beat */
     public MyMidi3 setBeatsPerMinute(int bpm) {
         tickX = Math.round(

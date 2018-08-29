@@ -22,6 +22,12 @@ import java.util.List;
  * <p>
  * However, you can change the "Bend sensitivity" to increase
  * the range from a whole step to many more steps. The 16383/8192/0 limits remain the same.
+ * <br>
+ * Note that bends & vibratos are done sequentially, so you can do
+     <pre>
+     chord.bend(...).bend(....)..vibrato(...).bend(...)
+     </pre>
+   and each bend will happen after the previous bend. Same applies to vibrato
  *
  * @see Player#setBendSensitivity(int)
  */

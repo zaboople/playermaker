@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * FIXME WHY OH WHY DID YOU DO "DENOMINATOR"? Why couldn't you just send... well
  *
  * @see Player#setBendSensitivity(int)
  */

@@ -4,6 +4,8 @@ package org.tmotte.pm;
  * This is extended by Chord, Note & Player. Player passes its attributes on to Chord, and Chord
  * passes its on to Note. Chord and Note can in turn override the passed-on settings.
  * <br>
+ * The only actual things set in here are octave/transpose & volume.
+ * <br>
  * This is not an "inheritance" relationship, however. The passing-on is done in the AttributeHolder(other)
  * constructor.
  */
@@ -24,18 +26,30 @@ public abstract class AttributeHolder<T> {
     public int getVolume() {
         return volume;
     }
+    /**
+     * Sets the volume at a specific level.
+     */
     public T volume(int v) {
         volume=v;
         return self();
     }
+    /**
+     * Adds the given amount to the current volume setting.
+     */
     public T addVolume(int change) {
         volume+=change;
         return self();
     }
+    /**
+     * Select 0 for the default octave, or any positive number to modulate up by that many octaves.
+     */
     public T octave(int octave) {
         transpose=octave*12;
         return self();
     }
+    /**
+     * Modulates by individual semitones, not octaves.
+     */
     public T modulate(int semitones) {
         transpose+=semitones;
         return self();

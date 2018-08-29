@@ -7,7 +7,7 @@ public class TestBeatWithSound implements XTest {
     public static void main(String args[]) throws Exception {
 	    new TestBeatWithSound().test(new MyMidi3(), true);
     }
-    public void test(MyMidi3 midi, boolean stop)  {
+    public @Override void test(MyMidi3 midi, boolean stop)  {
 	    midi.setBeatsPerMinute(60);
 	    Player player=new Player().octave(3);
 		int checks=10;
