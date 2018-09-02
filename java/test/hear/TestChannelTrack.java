@@ -21,9 +21,9 @@ public class TestChannelTrack implements XTest {
 		    .octave(5)
 		    .r4()
 
-			.s4(G).vibrato(64, 8).up()
+			.c(4, G).vibrato(64, 8).up()
 			.r4()
-			.s4(E).vibrato(64, 8).up()
+			.c(4, E).vibrato(64, 8).up()
 			.r4()
 
 			.r4()

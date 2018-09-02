@@ -13,38 +13,38 @@ public class TestBends implements XTest {
 	    Player player=new Player()
 		    .instrument(16)
 		    .octave(6)
-		    .r4()
+		    .r(4)
 
-		    .p8(C)
-		    .s4(D_).bend(16, 2).up()
+		    .p(8, C)
+		    .c(4, D_).bend(16, 2).up()
 
-		    .p8(B)
+		    .p(8, B)
 		    .octave(5)
-		    .p4(B_, D_-12)
+		    .p(4, B_, D_-12)
 
 		    .octave(6)
-		    .p8(D_)
-		    .p4(E_, G)
+		    .p(8, D_)
+		    .p(4, E_, G)
 
-		    .p8(B-12)
-		    .s8(C).bend(16, 4).bend(16, -4).up()
+		    .p(8, B-12)
+		    .c(8, C).bend(16, 4).bend(16, -4).up()
 		    .octave(5)
-		    .p8(E_)
+		    .p(8, E_)
 		    .octave(4)
-		    .p8(C)
+		    .p(8, C)
 
-		    .p8(B_, B_+3, B_+5)
-		    .p8(B_+2, B_+4, B_+5)
+		    .p(8, B_, B_+3, B_+5)
+		    .p(8, B_+2, B_+4, B_+5)
 		    .octave(2)
-		    .r8()
-		    .p8(C)
+		    .r(8)
+		    .p(8, C)
 
 			.volume(100)
-		    .p8(B_)
+		    .p(8, B_)
 		    .octave(1)
-		    .p8(E_, G, E_+12)
-		    .p16(E_, E_+12)
-		    .r4();
+		    .p(8, E_, G, E_+12)
+		    .p(16, E_, E_+12)
+		    .r(4);
 	    midi
 		    .setBeatsPerMinute(90)
 		    .play(stop, player);

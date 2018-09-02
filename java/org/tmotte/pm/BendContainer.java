@@ -99,6 +99,17 @@ public interface BendContainer<T> {
     // VIBRATO: //
     //////////////
 
+    /**
+     * Aside from using Player.setPressure(), this gives a more fine-tuned variation.
+     * Note that for delay/duration/frequency, you can use other overloads that allow
+     * you to provide a decimal value as usual, (e.g. 8., 8.3).
+     *
+     * @param delay Time to wait before delay
+     * @param duration The period of duration for the vibrato
+     * @param frequency The speed of the vibrato, expressed as a duration (larger numbers are faster).
+     * @param denominator The pitch variation of the vibrato; lower gives more variation,
+     *    as determined by <code>variation=pitch_sensitivy/denominator</code>
+     */
     public default T vibrato(long delay, long duration, long frequency, int denominator) {
         Bend.vibrato(makeBends(), delay, duration, frequency, denominator);
         return self();

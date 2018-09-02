@@ -25,7 +25,7 @@ public class TestVibratoTriplet implements XTest {
 			.p(8.3, E, A_)
 
 			//3
-			.s4(D_, A, G).vibrato(64, 8).up()
+			.c(4, D_, A, G).vibrato(64, 8).up()
 
 			//4
 			.c(16, E_, C-24).vibrato(64, 8).up()
@@ -35,7 +35,7 @@ public class TestVibratoTriplet implements XTest {
 			.p(16.3, C, D-24)
 			.p(16.3, E_)
 			.p(16.3, C, E_-24)
-			.p8(D_)
+			.p(8, D_)
 
 			//6.1-2
 			.p(16, C)
