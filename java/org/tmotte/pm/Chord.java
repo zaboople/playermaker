@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 /**
  * Represents a chord, be it one note or many. While a chord will often sound all of its
@@ -13,13 +14,14 @@ import java.util.stream.Stream;
  *
  */
 public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord>, Notable {
-    private Player player;
+    private final Player player;
+    private Attributes attributes;
     private List<Note> notes=new ArrayList<>();
     private List<Bend> bends=null;
 
     protected Chord(Player player, long duration, int... pitches) {
-        super(player);
         this.player=player;
+        this.attributes=player.getAttributesForRead();
         addChord(duration, pitches);
     }
 
@@ -113,4 +115,42 @@ public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord
         return new Rest(this, duration);
     }
 
+    protected @Override Attributes getAttributesForRead(){
+        return attributes;
+    }
+
+    /**
+     * Sets the volume at a specific level.
+     */
+    protected @Override Chord setVolume(int v) {
+        passOnToNotes(note->{
+            if (note.volume()==this.attributes.volume)
+                note.setVolume(v);
+        });
+        this.attributes.volume=v;
+        return this;
+    }
+    protected @Override Chord setTranspose(int semitones) {
+        passOnToNotes(note->{
+            if (note.getTranspose()==this.attributes.transpose)
+                note.setTranspose(semitones);
+        });
+        this.attributes.transpose=semitones;
+        return this;
+    }
+    private void getAttributesForWrite(){
+        Attributes old=attributes;
+        if (attributes==player.getAttributesForRead()) {
+            attributes=new Attributes(old);
+            for (Note note: notes)
+                if (note.getAttributesForRead()==old)
+                    note.setAttributes(attributes);
+        }
+    }
+    private void passOnToNotes(Consumer<Note> consumer) {
+        getAttributesForWrite();
+        for (Note note: notes)
+            if (note.getAttributesForRead()!=this.attributes)
+                consumer.accept(note);
+    }
 }

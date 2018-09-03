@@ -32,6 +32,8 @@ import javax.sound.midi.Instrument;
  *    <li>Channel: While this can be set more than once, it generally isn't useful to change its initial
  *        setting (arguably channel should be a constructor parameter for Player()).
  * </ul>
+ * FIXME talk about volume & transpose.
+ * <br>
  * And then we have: Reverb. For whatever reasons, the Java Sequencer ignores reverb events, so we apply
  * reverb directly to the synthesizer at the very beginning of playback, once and only once. This means
  * you can have only one reverb setting per Player; also, if you save your composition to a
@@ -54,6 +56,7 @@ public class Player extends AttributeHolder<Player> implements Notable {
     private int reverb=0;
     private long startTime=0;
     private boolean reverbSetOnce=false;
+    private Attributes attributes=new Attributes();
 
     public Player() {
         super();
@@ -171,6 +174,18 @@ public class Player extends AttributeHolder<Player> implements Notable {
         return setBendSensitivity(sensitivity);
     }
 
+    /**
+     * Sets the volume at a specific level.
+     */
+    protected @Override Player setVolume(int v) {
+        getAttributesForWrite().volume=v;
+        return this;
+    }
+    protected @Override Player setTranspose(int semitones) {
+        getAttributesForWrite().transpose=semitones;
+        return this;
+    }
+
     public Player setPressure(int pressure) {
         event(new Event().setPressure(pressure));
         return this;
@@ -244,8 +259,11 @@ public class Player extends AttributeHolder<Player> implements Notable {
         return addChord(duration, pitch).notes().get(0);
     }
 
-    /** For internal use, required by AttributeHolder &amp; BendContainer*/
-    protected @Override Player self(){
-        return this;
+    protected @Override Attributes getAttributesForRead(){
+        return attributes;
     }
+    private Attributes getAttributesForWrite(){
+        return attributes=new Attributes(attributes);
+    }
+
 }

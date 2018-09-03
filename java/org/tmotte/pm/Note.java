@@ -4,19 +4,20 @@ import java.util.List;
 import java.util.Collections;
 
 public class Note extends AttributeHolder<Note> implements BendContainer<Note> {
-    long duration;
-    private List<Bend> bends=null;
-
+    final Chord chord;
     final long restBefore;
     final int pitch;
-    final Chord sound;
 
-    public Note(Chord sound, long duration, long restBefore, int pitch) {
-        super(sound);
-        this.sound=sound;
-        this.duration=duration;
+    long duration;
+    private List<Bend> bends=null;
+    private Attributes attributes;
+
+    public Note(Chord chord, long duration, long restBefore, int pitch) {
+        this.chord=chord;
         this.restBefore=restBefore;
         this.pitch=pitch;
+        this.duration=duration;
+        this.attributes=chord.getAttributesForRead();
     }
 
     public Note t(long duration) {
@@ -31,10 +32,10 @@ public class Note extends AttributeHolder<Note> implements BendContainer<Note> {
     }
 
     public Chord up() {
-        return this.sound;
+        return this.chord;
     }
     public Player upup() {
-        return this.sound.up();
+        return this.chord.up();
     }
 
     List<Bend> bends() {
@@ -56,5 +57,29 @@ public class Note extends AttributeHolder<Note> implements BendContainer<Note> {
         return duration;
     }
 
+
+    protected @Override Note setVolume(int v) {
+        getAttributesForWrite().volume=v;
+        return this;
+    }
+    protected @Override Note setTranspose(int semitones) {
+        getAttributesForWrite().transpose=semitones;
+        return this;
+    }
+    protected @Override Attributes getAttributesForRead(){
+        return attributes;
+    }
+    /**
+     * Used by Chord to pass along an Attributes change
+     * if we haven't customized.
+     */
+    protected void setAttributes(Attributes a) {
+        this.attributes=a;
+    }
+    private Attributes getAttributesForWrite(){
+        return attributes==chord.getAttributesForRead()
+            ?attributes=new Attributes(attributes)
+            :attributes;
+    }
 
 }

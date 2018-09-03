@@ -9,49 +9,47 @@ package org.tmotte.pm;
  * FIXME I bet settings aren't passed on to Note, since you change Chord after its notes.
  */
 public abstract class AttributeHolder<T> {
-    private int volume=64, transpose=0;
-    protected AttributeHolder() {
-    }
-    protected AttributeHolder(AttributeHolder<?> other) {
-        this.volume=other.getVolume();
-        this.transpose=other.getTranspose();
+    boolean notDefault=false;
+
+
+    public T volume(int v) {
+        return setVolume(v);
     }
     public int volume() {
-        return volume;
-    }
-    public int getTranspose() {
-        return transpose;
-    }
-    public int getVolume() {
-        return volume;
+        return getAttributesForRead().volume;
     }
     /**
-     * Sets the volume at a specific level.
+     * Select 0 for the default octave, or any positive number to modulate up from 0 by that many octaves.
      */
-    public T volume(int v) {
-        volume=v;
-        return self();
+    public T octave(int octave) {
+        return setTranspose(octave*12);
     }
+    /**
+     * Modulates by individual semitones, not octaves; adds to the current transposition
+     * setting instead of treating semitones as an absolute value.
+     */
+    public T modulate(int semitones) {
+        return setTranspose(
+            getAttributesForRead().transpose+semitones
+        );
+    }
+    public int getTranspose() {
+        return getAttributesForRead().transpose;
+    }
+
     /**
      * Adds the given amount to the current volume setting.
      */
     public T addVolume(int change) {
-        return volume(volume+change);
-    }
-    /**
-     * Select 0 for the default octave, or any positive number to modulate up by that many octaves.
-     */
-    public T octave(int octave) {
-        transpose=octave*12;
-        return self();
-    }
-    /**
-     * Modulates by individual semitones, not octaves.
-     */
-    public T modulate(int semitones) {
-        transpose+=semitones;
-        return self();
+        return volume(getAttributesForRead().volume+change);
     }
 
-    protected abstract T self();
+    public int getVolume() {
+        return getAttributesForRead().volume;
+    }
+
+    protected abstract Attributes getAttributesForRead();
+    protected abstract T setVolume(int v);
+    protected abstract T setTranspose(int semitones);
+
 }
