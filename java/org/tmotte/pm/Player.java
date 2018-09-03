@@ -6,6 +6,43 @@ import java.util.ArrayList;
 import java.util.Collection;
 import javax.sound.midi.Instrument;
 
+/**
+ * FIXME Player needs to set channel in the constructor.
+ *
+ * A Player is roughly analagous to a human musician, and thereby to a Midi Channel.
+ * It can play any instrument, but only one instrument at any given time. A composition
+ * can be made of many Players. Notes are added to a Player using methods inherited from
+ * {@link Notable}.
+ * <br>
+ * <b>Event-based attributes</b>
+ * While it may be unexpected, many of the attributes of Player cannot be attributes
+ * of a Chord or Note because they are applied to the entire channel. Most of them can be changed
+ * throughout the course of a composition, however, because these settings are treated as events,
+ * the same as Chords/Notes. Thus a call to, say, setInstrument() will only affect the instrument for
+ * notes added after that call is made.
+ * <br>
+ * These attributes include:
+ * <ul>
+ *    <li>Pressure: Which usually means vibrato. See {@link BendContainer} for more fine-grained vibrato
+ *        as well as bend control.
+ *    <li>Beats per minute, commonly abbreviated as "BPM". This can be used to speed up & slow down
+ *        play at various points during the composition.
+ *    <li>Bend sensitivity: Refer to {@link BendContainer} for more information.
+ *    <li>Instrument
+ *    <li>Channel: While this can be set more than once, it generally isn't useful to change its initial
+ *        setting (arguably channel should be a constructor parameter for Player()).
+ * </ul>
+ * And then we have: Reverb. For whatever reasons, the Java Sequencer ignores reverb events, so we apply
+ * reverb directly to the synthesizer at the very beginning of playback, once and only once. This means
+ * you can have only one reverb setting per Player; also, if you save your composition to a
+ * standard Midi sequence file, any reverb settings are lost.
+ * <br>
+ * <b>Timing</b>
+ * Timing values in Midi are called "ticks". PlayerMaker has its own separate internal system of ticks,
+ * leaving the actual Midi ticks inaccessible. Normally you will use setBPM() in combination with
+ * classical timing notation to control timing, but it is often useful to synchronize different players
+ * using the internal relative timing with methods like {@link #setStartTime(long)} and {@link #getEndTime()}.
+ */
 public class Player extends AttributeHolder<Player> implements Notable {
     private static class TimeTracking {
         long timeUpToIndex=0;
@@ -38,37 +75,56 @@ public class Player extends AttributeHolder<Player> implements Notable {
         instrument(instrument);
         return this;
     }
-    /**
-       Player can only store 1 track and 1 channel, so if this is invoked multiple times,
-       the last values are the only ones that count.
-
-       @param Channel: When there are multiple players, you are responsible for assigning each
-       its own channel. If possible, create "gaps" between the tracks for different
-       players; MyMidi will make use of these unused channels in cases where
-       one player needs extra channels, most common example being bent & not-bent
-       notes in the same Chord.
-     */
     public Player instrumentChannel(int instrumentIndex, int channelIndex) {
         channel(channelIndex);
         instrument(instrumentIndex);
         return this;
     }
+    /**
+       Assigns the Player a Midi channel index, which is 0 by default. Two Players can
+       use the same Midi channel, but since many sound effects and instrument settings
+       are applied to the entire channel, sharing is likely to have undesirable effects.
+       Most Midi sequencers allow 16 channels, with channel 10 reserved for percussion/drum
+       instruments only.
+       @param Channel: The channel index, usually constrained to 0-15 allowed values.
+     */
     public Player channel(int channel) {
-        return event(new Event().setChannel(channel)); //FIXME should we default to zero somehow?
+        return event(new Event().setChannel(channel));
     }
 
 
 
-
+    /**
+     * Sets the start time in ticks. Changing the start time <i>after</i> adding notes/chords/rests is forbidden
+     * and will throw an IllegalStateException
+     */
+    public Player setStartTime(long time) {
+        for (Event e: events)
+            if (e.hasChord())
+                throw new IllegalStateException("Cannot change start time after events are added.");
+        this.startTime=time;
+        return this;
+    }
     public Player setStart(long time) {
         this.startTime=time;
         return this;
+    }
+    /** Gets the start time in ticks. */
+    public long getStartTime() {
+        return startTime;
     }
     public long getStart() {
         return startTime;
     }
     public long getEndTime() {
+        return getEnd();
+    }
+    public long getEnd() {
         return startTime + getTimeLength();
+    }
+    /** Gets the duration of the composition in ticks. */
+    public long duration() {
+        return getTimeLength();
     }
     public long getTimeLength() {
         int eventCount=events.size();
@@ -137,10 +193,23 @@ public class Player extends AttributeHolder<Player> implements Notable {
         return reverb;
     }
 
-    public Player r(long i) {return rest(i);}
-    public Player r(int i) {return rest(Divisions.convert(i));}
-    public Player r(double d) {return rest(Divisions.convert(d));}
 
+    /**
+     * The "r" is short for "rest". The Player will pause for
+     * the specified duration. Use rest(int) for whole/half/quarter/eigth/etc. notes,
+     * and {@link #rest(double)} for dotted & triplet rests.
+     * <br>
+     * Internally, a rest is actually represented as a Chord.
+     */
+    public Player r(int duration) {return rest(Divisions.convert(duration));}
+    public Player r(double duration) {return rest(Divisions.convert(duration));}
+    /**
+     * This special version of rest() allows one to specify a rest duration using the internal timing
+     * values by getTimeLength(), getStart(), getEndTime(), etc.
+     */
+    public Player r(long i) {return rest(i);}
+
+    /** This and the other numbered r#() methods are legacy & deprecated. */
     public Player r1() {return rest(Divisions.reg2);}
     public Player r2() {return rest(Divisions.reg2);}
     public Player r4() {return rest(Divisions.reg4);}

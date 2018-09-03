@@ -18,7 +18,8 @@ import java.util.List;
      <pre>
      chord.bend(...).bend(....)..vibrato(...).bend(...)
      </pre>
-   and each bend or vibrato will happen after the previous.
+   and each bend or vibrato will happen after the previous. So, no, you can't do vibrato & bend at the same
+   time, although that is a technically feasible feature.
  * <p>
  * (Note: This is an interface because I want default methods i.e. multiple inheritance. However, some
  * things that shouldn't be public are, because interfaces are that way. And I am a bad person.)
