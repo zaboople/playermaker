@@ -2,34 +2,26 @@ package org.tmotte.pm;
 import java.util.List;
 
 /**
- * Same as Bend(int, int, int) but the doubles are for expressing
- * <ul>
- *   <li>Triplets - e.g. 8.3 means a single eighth-note from a triplet
- *   <li>Dotted notes - e.g. 8.2 means a dotted eighth-note. FIXME
- *      how to delay/duration 8.3 but twice???? 16.6??? 8.6???
- * <li>
- * FIXME
- */
-
-/**
- * (This is an interface because I want default methods i.e. multiple inheritance. However, some
- * things that shouldn't be public are, because interfaces are that way. And I am a bad person.)
- * <p>
- * Background: By default, a bend can go a "whole step", which is to say, two notes up or down.
- * 0 is all the way down, and 16384-1 is all the way up. So, 8192 is no bend at all.
- * Bends apply to the whole channel, regardless of what track they appear on. Finally,
- * the bend stays applied until it is unapplied.
- * <p>
- * However, you can change the "Bend sensitivity" to increase
- * the range from a whole step to many more steps. The 16383/8192/0 limits remain the same.
+ * Background: In Midi a bend can go a "whole step" by default, which is to say, two notes up or down.
+ * However, you can change the "Bend sensitivity" to increase the range from a whole step to many more
+ * steps. Internally, the 16383/8192/0 limits remain the same. Refer to {@link Player#setBendSensitivity(int}
+ * for this setting.
+ * <br>
+ * Also in Midi, bends apply to the whole channel. This is rather inflexible, so internally we make use of "spare"
+ * channels when bends are applied differently to simultaneous notes (refer to Chord#n).
+ * When using multiple Players and bending notes, you should assign them channels with gaps
+ * in between, e.g. for three Players you might assign 0, 3, 6 instead of 0, 1, 2. This would give the first two
+ * players two extra channels, and the 3rd player all of the rest (except channel 10, which can only play drums).
+ * Refer to {@link Player#channel}.
  * <br>
  * Note that bends & vibratos are done sequentially, so you can do
      <pre>
      chord.bend(...).bend(....)..vibrato(...).bend(...)
      </pre>
-   and each bend will happen after the previous bend. Same applies to vibrato
- *
- * @see Player#setBendSensitivity(int)
+   and each bend or vibrato will happen after the previous.
+ * <p>
+ * (Note: This is an interface because I want default methods i.e. multiple inheritance. However, some
+ * things that shouldn't be public are, because interfaces are that way. And I am a bad person.)
  */
 public interface BendContainer<T> {
 
