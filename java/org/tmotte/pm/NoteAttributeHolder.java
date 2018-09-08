@@ -5,19 +5,31 @@ package org.tmotte.pm;
  * and Chord passes its on to Note. Chord and Note can in turn override the passed-on settings.
  * <br>
  * The only actual things set in here are octave/transpose & volume.
- * <br>
- * FIXME I bet settings aren't passed on to Note, since you change Chord after its notes.
  */
-public abstract class AttributeHolder<T> {
-    boolean notDefault=false;
+public abstract class NoteAttributeHolder<T> {
 
-
+    /**
+     * Sets an absolute value for volume.
+     * @param volume Should be between 0 &amp; 127 inclusive.
+     * @return The orginal object
+     */
     public T volume(int v) {
         return setVolume(v);
     }
-    public int volume() {
-        return getAttributesForRead().volume;
+    /**
+     * Adds the given amount to the current volume setting.
+     */
+    public T addVolume(int change) {
+        return volume(getNoteAttributesForRead().volume+change);
     }
+    public int volume() {
+        return getNoteAttributesForRead().volume;
+    }
+    public int getVolume() {
+        return getNoteAttributesForRead().volume;
+    }
+
+
     /**
      * Select 0 for the default octave, or any positive number to modulate up from 0 by that many octaves.
      */
@@ -30,25 +42,16 @@ public abstract class AttributeHolder<T> {
      */
     public T modulate(int semitones) {
         return setTranspose(
-            getAttributesForRead().transpose+semitones
+            getNoteAttributesForRead().transpose+semitones
         );
     }
     public int getTranspose() {
-        return getAttributesForRead().transpose;
+        return getNoteAttributesForRead().transpose;
     }
 
-    /**
-     * Adds the given amount to the current volume setting.
-     */
-    public T addVolume(int change) {
-        return volume(getAttributesForRead().volume+change);
-    }
 
-    public int getVolume() {
-        return getAttributesForRead().volume;
-    }
 
-    protected abstract Attributes getAttributesForRead();
+    protected abstract NoteAttributes getNoteAttributesForRead();
     protected abstract T setVolume(int v);
     protected abstract T setTranspose(int semitones);
 

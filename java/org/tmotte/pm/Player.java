@@ -45,7 +45,7 @@ import javax.sound.midi.Instrument;
  * classical timing notation to control timing, but it is often useful to synchronize different players
  * using the internal relative timing with methods like {@link #setStartTime(long)} and {@link #getEndTime()}.
  */
-public class Player extends AttributeHolder<Player> implements Notable {
+public class Player extends NoteAttributeHolder<Player> implements Notable {
     private static class TimeTracking {
         long timeUpToIndex=0;
         long timeAtIndex=0;
@@ -56,7 +56,7 @@ public class Player extends AttributeHolder<Player> implements Notable {
     private int reverb=0;
     private long startTime=0;
     private boolean reverbSetOnce=false;
-    private Attributes attributes=new Attributes();
+    private NoteAttributes attributes=new NoteAttributes();
 
     public Player() {
         super();
@@ -178,11 +178,11 @@ public class Player extends AttributeHolder<Player> implements Notable {
      * Sets the volume at a specific level.
      */
     protected @Override Player setVolume(int v) {
-        getAttributesForWrite().volume=v;
+        getNoteAttributesForWrite().volume=v;
         return this;
     }
     protected @Override Player setTranspose(int semitones) {
-        getAttributesForWrite().transpose=semitones;
+        getNoteAttributesForWrite().transpose=semitones;
         return this;
     }
 
@@ -249,7 +249,7 @@ public class Player extends AttributeHolder<Player> implements Notable {
 
     /** For internal use, required by Notable */
     public @Override Chord addChord(long duration, int... pitches) {
-        Chord chord=new Chord(this, duration, pitches);
+        var chord=new Chord(this, duration, pitches);
         events.add(new Event(chord));
         return chord;
     }
@@ -259,11 +259,11 @@ public class Player extends AttributeHolder<Player> implements Notable {
         return addChord(duration, pitch).notes().get(0);
     }
 
-    protected @Override Attributes getAttributesForRead(){
+    protected @Override NoteAttributes getNoteAttributesForRead(){
         return attributes;
     }
-    private Attributes getAttributesForWrite(){
-        return attributes=new Attributes(attributes);
+    private NoteAttributes getNoteAttributesForWrite(){
+        return attributes=new NoteAttributes(attributes);
     }
 
 }

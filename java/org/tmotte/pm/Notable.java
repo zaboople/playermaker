@@ -19,15 +19,17 @@ package org.tmotte.pm;
    <ul>
         <li>p() adds notes to the existing chord, then returns Player. The Chord is
             committed and later Chords/Notes will be played after it.
-        <li>c() does the same as Player.c(), but adds to the existing notes in the Chord,
+        <li>c() Adds to the existing notes in the Chord,
             thus starting at the same time but optionally with different duration.
-        <li>n() does the same as Player.c()
+        <li>n() Adds a note to the chord, starting at the same time but optionally
+            with different duration; and returns that Note allowing for followup
+            customization.
     <ul/>
    {@link Rest}:
    <br>
    Acts the same as Chord; all Rest does is add a delay before the Chord/Notes created
-   with p/c/n(). {@link Rest#fin(int...)} provides a shortcut for making the specified
-   notes last as long as the duration of the original Chord.
+   with p/c/n(), so they start at a later time. {@link Rest#fin(int...)} provides a shortcut
+   for making the specified notes last as long as the remaining duration of the original Chord.
 
  */
 public interface Notable {

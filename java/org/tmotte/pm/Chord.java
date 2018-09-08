@@ -13,15 +13,15 @@ import java.util.function.Consumer;
  * FIXME test much overlapping waxing/waning etc.
  *
  */
-public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord>, Notable {
+public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<Chord>, Notable {
     private final Player player;
-    private Attributes attributes;
+    private NoteAttributes attributes;
     private List<Note> notes=new ArrayList<>();
     private List<Bend> bends=null;
 
     protected Chord(Player player, long duration, int... pitches) {
         this.player=player;
-        this.attributes=player.getAttributesForRead();
+        this.attributes=player.getNoteAttributesForRead();
         addChord(duration, pitches);
     }
 
@@ -92,7 +92,7 @@ public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord
         return addNote(duration, 0, pitch);
     }
 
-    /** For internal use, required by BendContainer &amp; AttributeHolder */
+    /** For internal use, required by BendContainer */
     public @Override Chord self() {
         return this;
     }
@@ -115,42 +115,48 @@ public class Chord extends AttributeHolder<Chord> implements BendContainer<Chord
         return new Rest(this, duration);
     }
 
-    protected @Override Attributes getAttributesForRead(){
-        return attributes;
-    }
+    /////////////////////////////////////////
+    // INTERNAL LOGIC FOR NoteAttributes : //
+    /////////////////////////////////////////
 
     /**
-     * Sets the volume at a specific level.
-     */
+       This is tricky because Notes are created immediately for the
+       chord as well as after (via Chord.n()) so we may or may not
+       want the notes to inherit attributes. Complicating this is:
+       1. We start with the Player's attributes, which we must not change.
+          So we have to create a new NoteAttributes if we are still using
+          the NoteAttributes we got from Player.
+       2. We want Notes to get our changes, but we just made
+          a new NoteAttributes, so we'll tell them to use it instead of
+          the old one they already have.
+       3. But if the Note already customized its attributes... we'll leave
+          their Attributes object alone, but still pass on the individual
+          attribute value to them and tell them to accept it.
+    */
+
+    protected @Override NoteAttributes getNoteAttributesForRead(){
+        return attributes;
+    }
     protected @Override Chord setVolume(int v) {
-        passOnToNotes(note->{
-            if (note.volume()==this.attributes.volume)
-                note.setVolume(v);
-        });
+        passOnToNotes(note-> note.setVolume(v));
         this.attributes.volume=v;
         return this;
     }
     protected @Override Chord setTranspose(int semitones) {
-        passOnToNotes(note->{
-            if (note.getTranspose()==this.attributes.transpose)
-                note.setTranspose(semitones);
-        });
+        passOnToNotes(note-> note.setTranspose(semitones));
         this.attributes.transpose=semitones;
         return this;
     }
-    private void getAttributesForWrite(){
-        Attributes old=attributes;
-        if (attributes==player.getAttributesForRead()) {
-            attributes=new Attributes(old);
-            for (Note note: notes)
-                if (note.getAttributesForRead()==old)
-                    note.setAttributes(attributes);
-        }
-    }
     private void passOnToNotes(Consumer<Note> consumer) {
-        getAttributesForWrite();
+        NoteAttributes old=attributes;
+        if (attributes==player.getNoteAttributesForRead()) {
+            attributes=new NoteAttributes(old);
+            for (Note note: notes)
+                if (note.getNoteAttributesForRead()==old)
+                    note.setNoteAttributes(attributes);
+        }
         for (Note note: notes)
-            if (note.getAttributesForRead()!=this.attributes)
+            if (note.getNoteAttributesForRead()!=this.attributes)
                 consumer.accept(note);
     }
 }

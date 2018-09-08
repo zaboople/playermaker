@@ -8,8 +8,9 @@ public class TestVolume implements XTest {
 	    new TestVolume().test(new MyMidi3(), true);
     }
     public void test(MyMidi3 midi, boolean stop)  {
-		int checks=15;
-	    midi.play(stop,
+	    var bv=20;
+	    midi.play(
+		    stop,
 		    new Player()
 			    .setBPM(50)
 			    .setBendSensitivity(4)
@@ -18,16 +19,16 @@ public class TestVolume implements XTest {
 			    .r4()
 			    .octave(5)
 
-			    .c(8., D_).volume(12).up()
-		        .c(16, D).volume(16).up()
-			    .c(4, E)
-				    .volume(24)
+			    .c(8., D_, C+12, A_).volume(bv).up()
+		        .c(16, D).volume(bv+=4).up()
+			    .c(4, E, C+12, E+12)
+				    .volume(bv+=4)
 				    .up()
 
-			    .c(8., G_).volume(36).up()
-			    .c(16, E_).volume(42).up()
-			    .c(4, E)
-				    .volume(48)
+			    .c(8., G_, A+12).volume(bv+=8).up()
+			    .c(16, E_).volume(bv+=8).up()
+			    .c(4, E, D_+12, E+12)
+				    .volume(bv+=8)
 				    .up()
 
 				// Note how here it sounds like a pitch change
@@ -41,6 +42,15 @@ public class TestVolume implements XTest {
 				    .n(4, F).volume(48).up()
 				    .n(4, G).volume(20).up()
 				    .up()
+			    .c(4, D)
+				    .volume(48)
+				    .n(2, E-12).volume(28).up()
+				    .n(2, E-24).volume(28).up()
+				    .n(2, E-36).volume(28).up()
+				    .n(2, E+12).volume(28).up()
+				    .r(4).c(4, D_)
+				    .up()
+			    .c(2, C, E-12, D_-24).volume(30).up()
 			    .r(4)
 	    );
     }

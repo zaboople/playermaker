@@ -3,21 +3,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
-public class Note extends AttributeHolder<Note> implements BendContainer<Note> {
+public class Note extends NoteAttributeHolder<Note> implements BendContainer<Note> {
     final Chord chord;
     final long restBefore;
     final int pitch;
 
     long duration;
     private List<Bend> bends=null;
-    private Attributes attributes;
+    private NoteAttributes attributes;
 
     public Note(Chord chord, long duration, long restBefore, int pitch) {
         this.chord=chord;
         this.restBefore=restBefore;
         this.pitch=pitch;
         this.duration=duration;
-        this.attributes=chord.getAttributesForRead();
+        this.attributes=chord.getNoteAttributesForRead();
     }
 
     public Note t(long duration) {
@@ -57,28 +57,31 @@ public class Note extends AttributeHolder<Note> implements BendContainer<Note> {
         return duration;
     }
 
+    /////////////////////////////////////////
+    // INTERNAL LOGIC FOR NoteAttributes : //
+    /////////////////////////////////////////
 
     protected @Override Note setVolume(int v) {
-        getAttributesForWrite().volume=v;
+        getNoteAttributesForWrite().volume=v;
         return this;
     }
     protected @Override Note setTranspose(int semitones) {
-        getAttributesForWrite().transpose=semitones;
+        getNoteAttributesForWrite().transpose=semitones;
         return this;
     }
-    protected @Override Attributes getAttributesForRead(){
+    protected @Override NoteAttributes getNoteAttributesForRead(){
         return attributes;
     }
     /**
-     * Used by Chord to pass along an Attributes change
+     * Used by Chord to pass along an NoteAttributes change
      * if we haven't customized.
      */
-    protected void setAttributes(Attributes a) {
+    protected void setNoteAttributes(NoteAttributes a) {
         this.attributes=a;
     }
-    private Attributes getAttributesForWrite(){
-        return attributes==chord.getAttributesForRead()
-            ?attributes=new Attributes(attributes)
+    private NoteAttributes getNoteAttributesForWrite(){
+        return attributes==chord.getNoteAttributesForRead()
+            ?attributes=new NoteAttributes(attributes)
             :attributes;
     }
 
