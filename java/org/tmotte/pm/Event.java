@@ -3,14 +3,24 @@ import javax.sound.midi.Instrument;
 import java.util.function.Function;
 
 /**
- * Used by Player to record changes. This is roughly speaking, a pseudo-Track.
- * Most Events will be Chords.
+ * Used by Player to record changes. This is roughly speaking, a pseudo-MidiMessage.
+ * Most Events will be Chords. MyMidi reads the Events back out during playback.
  */
-public class Event {
+class Event {
 
-    // FIXME we can make more efficient storage here, either
-    // by nesting an "AnythingButChord" class, or making one
-    // int value and a short switch to tell us which type it is.
+    /**
+     * This is sort of a shortcut around a more typical (and more verbose) design
+     * where Event is subclassed into 8 or 9 specializations for each type of event:
+     * Bleagh. Instead, since most Events are Chords, Event has only two instance variables:
+     <ul>
+       <li>Chord
+       <li>AnythingButChord
+     </ul>
+     * Then we just jam the union of all possible non-chord events into AnythingButChord.
+     * Each event type is exclusive of all others (there's no such thing as a union type, so
+     * take it as implied), and it's kind of wasteful to have a bunch of null pointers,
+     * but since the "anything" instance variable is itself usually null, the waste isn't so bad.
+     */
     private static class AnythingButChord {
         private Instrument instrument=null;
         private String instrumentName=null;
@@ -86,9 +96,11 @@ public class Event {
         return anything(a -> a.bpm);
     }
 
+    /** For setting things. */
     private AnythingButChord anything() {
         return anything!=null ?anything :(anything=new AnythingButChord());
     }
+    /** For getting things. */
     private <T> T anything(Function<AnythingButChord, T> f) {
         return anything==null ?null :f.apply(anything);
     }

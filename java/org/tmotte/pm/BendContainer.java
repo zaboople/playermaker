@@ -8,8 +8,8 @@ import java.util.List;
  * for this setting.
  * <br>
  * Also in Midi, bends apply to the whole channel. This is rather inflexible, so internally we make use of "spare"
- * channels when bends are applied differently to simultaneous notes (refer to Chord#n).
- * When using multiple Players and bending notes, you should assign them channels with gaps
+ * channels when bends are applied differently to simultaneous Notes (refer to Chord#n(int, int...)).
+ * When using multiple Players and bending notes, you should assign the Players channels with gaps
  * in between, e.g. for three Players you might assign 0, 3, 6 instead of 0, 1, 2. This would give the first two
  * players two extra channels, and the 3rd player all of the rest (except channel 10, which can only play drums).
  * Refer to {@link Player#channel}.
@@ -43,49 +43,64 @@ public interface BendContainer<T> {
     /**
      * @param delay A period to wait before the bend; this can be expressed as
      *        2/4/8/16/32/64 etc to indicate a period corresponding to half/quarter/eighth/etc
-     *        notes (for triplet and dotted note delays, use Bend(double, double, int)).
-     * @param duration The time over which the bend takes place; if this is shorter than the length
+     *        notes, or 8.3 for triplet and 8. for dotted notes.
+     * @param duration The time over which the bend takes place, expressed in the same notation
+     *        as delay; if this is shorter than the length
      *        of the given Note/Chord, the pitch remains constant for the rest of the Note/Chord's duration.
      * @param denominator Can be negative or positive. Indicates the 1/denominator of our bend range to go
-     * up or down. So, if our bend sensitivity is set to the default of one whole step:
+     *        up or down. So, if our bend sensitivity is set to the default of one whole step (which is to say,
+     *        2 semitones):
        <ul>
            <li>1 is a whole step, e.g. C to D
            <li>2 is a half step, e.g. C to C#
            <li>4 is a quarter step (obviously off key but it's jazzy that way)
        </ul>
-     * And so forth.
-     * The denominator must be divisible by 2, but it's okay for it to be larger than our bend sensitivity.
+     * ... and so forth.
+     * <br>
+     * The denominator must be divisible by 2.
      */
-    public default T bend(long delay, long duration, int denominator) {
-        Bend.add(makeBends(), delay, duration, denominator);
-        return self();
-    }
-    public default T bend(long duration, int denominator) {
-        return bend(0L, duration, denominator);
-    }
-
-
-    public default T bend(int denominator) {
-        return bend(0L, totalDuration(), denominator);
-    }
-    public default T bend(int duration, int denominator) {
-        return bend(0, duration, denominator);
-    }
-    public default T bend(int delay, int duration, int denominator) {
-       Bend.add(makeBends(), delay, duration, denominator);
-       return self();
-    }
     public default T bend(Number delay, Number duration, int denominator) {
        return bend(Divisions.convert(delay), Divisions.convert(duration), denominator);
     }
 
+    public default T bend(int delay, int duration, int denominator) {
+       Bend.add(makeBends(), delay, duration, denominator);
+       return self();
+    }
 
+
+    /**
+     * A shortcut for a bend spread across the entire duration of the note with no delay,
+     * i.e. bend(0, <duration>, denominator.
+     * FIXME test this
+     */
+    public default T bend(int denominator) {
+        return bend(0L, totalDuration(), denominator);
+    }
+
+    /**
+     * A shortcut to bend(0, duration, denominator) (that is, 0 delay).
+     */
+    public default T bend(int duration, int denominator) {
+        return bend(0, duration, denominator);
+    }
+
+    /** FIXME test and verify we need the doubles, probably don't */
     public default T bend(double duration, int denominator) {
         return bend(0D, duration, denominator);
     }
     public default T bend(double delay, double duration, int denominator) {
         Bend.add(makeBends(), delay, duration, denominator);
         return self();
+    }
+
+    private T bend(long delay, long duration, int denominator) {
+        Bend.add(makeBends(), delay, duration, denominator);
+        return self();
+    }
+
+    private T bend(long duration, int denominator) {
+        return bend(0L, duration, denominator);
     }
 
     //////////////

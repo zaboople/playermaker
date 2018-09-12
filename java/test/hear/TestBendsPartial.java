@@ -10,6 +10,7 @@ public class TestBendsPartial implements XTest {
     public void test(MyMidi3 midi, boolean stop)  {
 	    //Organ 1:
 	    Player player=new Player()
+		    .setBeatsPerMinute(90)
 		    .instrument(16)
 		    .octave(5)
 
@@ -64,7 +65,6 @@ public class TestBendsPartial implements XTest {
 
 		    .r4();
 	    midi
-		    .setBeatsPerMinute(90)
 		    .play(stop, player);
 	    System.out.println("Done");
     }

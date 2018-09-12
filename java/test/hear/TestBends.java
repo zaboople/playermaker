@@ -11,6 +11,7 @@ public class TestBends implements XTest {
 	    //Organ 1:
 		int base=10;
 	    Player player=new Player()
+		    .setBeatsPerMinute(90)
 		    .instrument(16)
 		    .octave(6)
 		    .r(4)
@@ -45,9 +46,7 @@ public class TestBends implements XTest {
 		    .p(8, E_, G, E_+12)
 		    .p(16, E_, E_+12)
 		    .r(4);
-	    midi
-		    .setBeatsPerMinute(90)
-		    .play(stop, player);
+	    midi.play(stop, player);
     }
 
 }

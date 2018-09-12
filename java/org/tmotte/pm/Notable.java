@@ -35,21 +35,35 @@ package org.tmotte.pm;
 public interface Notable {
 
 
-    /** Adds a Chord made of the given notes for the specified duration, and returns the original Player object */
+    /**
+     * Adds a Chord made of the given notes for the specified duration, and returns the original Player object.
+     * @param duration Use 1 for a whole note, 2 for a half note, 4 for a quarter, and so on. For dotted notes
+     *       and triplets, use {@link #p(double, int...)}
+     * @param notes Follows the 12-tone western scale, with low C at 0, D&#x266d; at 1, and so on, allowing up
+     *       as many octaves high as the synthesizer can perform.
+     */
     public default Player p(int duration, int... notes) {
         return c(duration, notes).up();
     }
-    /** Adds a Chord made of the given notes for the specified duration, and returns that Chord, which can be further modified. */
+    /**
+     * Adds a Chord made of the given notes for the specified duration, and returns that Chord, which can be further modified.
+     * Duration and notes work the same as for @link{#p(int, int...)}
+     */
     public default Chord c(int duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
     }
     /**
      * Adds a Chord containing one Note for the specified duration, and returns that Note.
+     * Duration and notes work the same as for @link{#p(int, int...)}
      */
     public default Note n(int duration, int note) {
         return addNote(Divisions.convert(duration), note);
     }
 
+    /**
+     * An alternate version of {@link #p(int, int...)} that accepts a double, allowing
+     * dotted and triplet notes, e.g. "8." and "8.3" as respective examples.
+     */
     public default Player p(double duration, int... notes) {
         return c(duration, notes).up();
     }

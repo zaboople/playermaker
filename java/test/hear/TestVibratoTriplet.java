@@ -10,6 +10,7 @@ public class TestVibratoTriplet implements XTest {
     public void test(MyMidi3 midi, boolean stop)  {
 	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
+		    .setBeatsPerMinute(60)
 		    .instrument(41)
 		    .setBendSensitivity(4)
 		    .setReverb(80)
@@ -53,9 +54,7 @@ public class TestVibratoTriplet implements XTest {
 				.vibrato(2., 64, 8).up() //FIXME what is a 2. doing here?
 		    .r8()
 			;
-	    midi
-		    .setBeatsPerMinute(60)
-		    .play(stop, player);
+	    midi.play(stop, player);
     }
 
 }

@@ -10,6 +10,7 @@ public class TestVibratoSpeed implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
+			.setBeatsPerMinute(80)
 		    .instrumentChannel(23, 0)
 		    .setBendSensitivity(4)
 		    .octave(5)
@@ -46,6 +47,6 @@ public class TestVibratoSpeed implements XTest {
 				.vibrato(32, 16).up()
 
 		    .r4();
-	    midi.setBeatsPerMinute(80).play(stop, player);
+	    midi.play(stop, player);
     }
 }

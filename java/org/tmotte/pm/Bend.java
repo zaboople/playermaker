@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  *
- * @see Player#setBendSensitivity(int)
+ * @see BendContainer
  */
 final class Bend {
 

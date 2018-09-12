@@ -1,5 +1,6 @@
 package org.tmotte.pm;
 
+/** For internal use only. This is exposed only for unit tests. */
 public class Divisions {
     public final static int triplet128=2;
     public final static int triplet64=triplet128 * 2;
@@ -21,7 +22,7 @@ public class Divisions {
      * as well as a dotted e.g. expressed as 8.0 to an 8th + 16th
      * - note that 8.0 can be written as "8.", i.e. without the zero. Nice.
      */
-    public static long convert(double d) {
+    static long convert(double d) {
         long main=(long)Math.floor(d);
         long fractional=Math.round((d-main) * 10);
         double dd=8.;
@@ -36,14 +37,14 @@ public class Divisions {
             throw new RuntimeException("Don't know what to do with "+d);
     }
 
-    public static long convert(int d) { //FIXME what a mess but it works
+    static long convert(int d) { //FIXME what a mess but it works
         //System.out.println("unconvert "+d+" / 128 * "+reg128);
         if (d==0) return 0;
         //if (d>128) throw new RuntimeException("The value "+d+" is greater than the limit of 128");
         return 128L  * reg128 / ((long)d);
     }
 
-    public static long convert(Number number) {
+    static long convert(Number number) {
         if (number instanceof Long)
             return (Long) number;
         else

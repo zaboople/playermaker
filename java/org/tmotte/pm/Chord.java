@@ -15,8 +15,8 @@ import java.util.function.Consumer;
  */
 public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<Chord>, Notable {
     private final Player player;
+    private final List<Note> notes=new ArrayList<>();
     private NoteAttributes attributes;
-    private List<Note> notes=new ArrayList<>();
     private List<Bend> bends=null;
 
     protected Chord(Player player, long duration, int... pitches) {
@@ -25,15 +25,23 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
         addChord(duration, pitches);
     }
 
+    /**
+     * Takes us back to the original Player, for the sake of "fluent"
+     * programming.
+     */
     public Player up() {
         return player;
     }
 
-    public Chord t(long duration) {
-        for (Note n: notes)
-            n.t(duration);
-        return this;
-    }
+    /**
+     * Use to create "tied" notes, for example if you wanted to
+     * extend an quarter note by a sixteenth, you could write
+        <pre>
+        player.c(4, C).t(16).up()
+        </pre>
+        Use {@link t(double)} for dotted & triplet notes.
+     * @param duration A time period expressed in the typical notation.
+     */
     public Chord t(int duration) {
         return t(Divisions.convert(duration));
     }
@@ -41,8 +49,25 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
         return t(Divisions.convert(duration));
     }
 
+    /////////////////////////////////////////////
+    // RESTS - INCLUDES OUTMODED r#() methods. //
+    /////////////////////////////////////////////
 
+    /**
+     * Allows one to add delayed, overlapping notes to the Chord.
+     * {@link Rest} implements Notable, so it has a {@link Rest#n(int, int)},
+     * {@link Rest#c(int, int)}, etc. methods for adding notes. This is similar
+     * to the notes &amp; staves practice of placing a rest above/below a note
+     * to indicate an amount of time to wait before playing a parallel note.
+     * @param A standard notation integer duration: 4 for a quarter rest, 8
+     *        for an eighth rest, etc.
+     */
     public Rest r(int i) {return rest(Divisions.convert(i));}
+
+    /**
+     * Does the same as {@link #r(int)} but allowing for triplet &amp; dotted-note
+     * values.
+     */
     public Rest r(double d) {return rest(Divisions.convert(d));}
 
     public Rest r1() {return rest(Divisions.reg2);}
@@ -50,26 +75,19 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
     public Rest r4() {return rest(Divisions.reg4);}
     public Rest r8() {return rest(Divisions.reg8);}
     public Rest r16() {return rest(Divisions.reg16);}
-    public Rest r32() {return rest(Divisions.reg32);}
-    public Rest r64() {return rest(Divisions.reg64);}
 
-    public Rest r8_3() {return rest(Divisions.triplet8);}
-    public Rest r16_3() {return rest(Divisions.triplet16);}
-    public Rest r32_3() {return rest(Divisions.triplet32);}
-    public Rest r64_3() {return rest(Divisions.triplet64);}
 
-    List<Note> notes() {
-        return notes;
-    }
-    List<Bend> bends() {
-        return bends==null ?Collections.emptyList() :bends;
-    }
 
-    ////////////////
-    // INTERNALS: //
-    ////////////////
+    ////////////////////////////////////
+    //                                //
+    // PUBLIC BUT INTERNAL OVERRIDES: //
+    //                                //
+    ////////////////////////////////////
 
-    /** For internal use by BendContainer (from which we override) and MyMidi3 and ok other things....*/
+    /**
+     * Mostly for internal use; obtains the total duration of the Chord by our internal (not midi) tick system,
+     * not in the general notation used for Chord/Note input durations.
+     */
     public @Override long totalDuration() {
         return
             notes.stream().map(n ->
@@ -104,6 +122,19 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
         return bends;
     }
 
+    ////////////////
+    //            //
+    // INTERNALS: //
+    //            //
+    ////////////////
+
+    List<Note> notes() {
+        return notes;
+    }
+    List<Bend> bends() {
+        return bends==null ?Collections.emptyList() :bends;
+    }
+
     /** Exposed for use by Rest, which will supply a non-zero restBefore */
     Note addNote(long duration, long restBefore, int pitch) {
         Note n=new Note(this, duration, restBefore, pitch);
@@ -113,6 +144,12 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
 
     private Rest rest(long duration) {
         return new Rest(this, duration);
+    }
+
+    private Chord t(long duration) {
+        for (Note n: notes)
+            n.t(duration);
+        return this;
     }
 
     /////////////////////////////////////////

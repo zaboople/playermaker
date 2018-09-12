@@ -11,6 +11,7 @@ public class TestArpeggio implements XTest {
     public void test(MyMidi3 midi, boolean stop)  {
 	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
+		    .setBeatsPerMinute(80)
 		    .instrument(1)
 		    .bendSense(4)
 		    .r8()
@@ -43,9 +44,7 @@ public class TestArpeggio implements XTest {
 			//1
 			.r2()
 			;
-	    midi
-		    .setBeatsPerMinute(80)
-		    .play(stop, player);
+	    midi.play(stop, player);
     }
 
 }

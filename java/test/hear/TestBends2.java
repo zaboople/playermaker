@@ -11,12 +11,14 @@ public class TestBends2 implements XTest {
 	    //Organ 1, with double bend-sensitivity:
 		int base=10;
 	    Player player=new Player()
-		    .instrument(16)
-		    .setBendSensitivity(4)
 		    .setBeatsPerMinute(60)
+		    .setBendSensitivity(4)
+		    .instrument(16)
 		    .octave(5)
 		    .r(4)
-			.c(4, G+2, B+2, D+2).bend(8, 2).up()
+			.c(4, G+2, B+2, D+2)
+				.bend(8, 2)
+				.up()
 			.p(4, A, D_, E)
 			.p(8, E, D_, F)
 			.c(4, C, E, G)
@@ -40,8 +42,7 @@ public class TestBends2 implements XTest {
 				.bend(64, 8).bend(64, -8)
 				.up()
 		    .r(4);
-	    midi
-		    .play(stop, player);
+	    midi.play(stop, player);
 	    System.out.println("Done");
     }
 

@@ -16,6 +16,7 @@ public class TestChannelTrack implements XTest {
     public void test(MyMidi3 midi, boolean stop)  {
 	    //Accordion:
 	    Player player1=new Player()
+		    .setBeatsPerMinute(60)
 		    .instrumentChannel(21, 1)
 		    .setReverb(0)
 		    .octave(5)
@@ -59,7 +60,6 @@ public class TestChannelTrack implements XTest {
 
 		    .r4();
 	    midi
-		    .setBeatsPerMinute(60)
 		    .play(stop, player1, player2);
     }
 

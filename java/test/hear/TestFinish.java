@@ -12,6 +12,7 @@ public class TestFinish implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
+		    .setBeatsPerMinute(60)
 		    .instrumentChannel(43, 3)
 		    .setBendSensitivity(4)
 		    .r4()
@@ -33,7 +34,6 @@ public class TestFinish implements XTest {
 
 			.r4();
 	    midi
-		    .setBeatsPerMinute(60)
 		    .play(stop, player);
     }
 

@@ -8,8 +8,9 @@ public class TestBeatWithSound implements XTest {
 	    new TestBeatWithSound().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
-	    midi.setBeatsPerMinute(60);
-	    Player player=new Player().octave(3);
+	    Player player=new Player()
+		    .setBeatsPerMinute(60)
+		    .octave(3);
 		int checks=10;
 		for (int i=0; i<checks; i++)
 		    player.c(4, 24+i).c(8, 28+i).c(16, 31+i).up();

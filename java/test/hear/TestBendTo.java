@@ -9,6 +9,7 @@ public class TestBendTo implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
+		    .setBeatsPerMinute(60)
 		    .instrumentChannel(41, 3)
 		    .setBendSensitivity(4)
 		    .r4()
@@ -48,7 +49,6 @@ public class TestBendTo implements XTest {
 			.p(4., A, A-12, A+12)
 		    .r4();
 	    midi
-		    .setBeatsPerMinute(60)
 		    .play(stop, player);
     }
 

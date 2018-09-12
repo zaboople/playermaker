@@ -18,8 +18,8 @@ import org.tmotte.common.midi.SequencerWatcher;
 
 /**
  * FIXME name MyMidiSequencer
- * This is really intended to support a group of Player objects who should be
- * passed to sequence() all at once.
+ * Whereas Player is used to compose musical "tracks" (analagous but not exactly the same
+ * as Midi Tracks), MyMidi is used for playback of the composition.
  */
 public class MyMidi3  {
 
@@ -93,7 +93,7 @@ public class MyMidi3  {
     }
 
     /** Currently the quarter note always gets 1 beat */
-    public MyMidi3 setBeatsPerMinute(int bpm) {
+    private MyMidi3 setBeatsPerMinute(int bpm) {
         tickX = Math.round(
             ((double)TICKS_PER_MINUTE) /
             (
