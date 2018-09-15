@@ -57,7 +57,8 @@
       failonerror="true"
       >
       <compilerarg value="-Xlint:unchecked"/>
-      <src path="${src.dir}"/>
+      <src path="${src.dir}/main"/>
+      <src path="${src.dir}/test"/>
       <!--classpath><fileset dir="${lib.dir}" includes="*.jar"/></classpath-->
     </javac>
   </target>
@@ -76,7 +77,7 @@
   <!--*************************************-->
   <target name="javadoc" description="JavaDoc" depends="compile">
     <mkdir dir="${javadoc.dir}"/>
-    <javadoc sourcepath="${src.dir}"
+    <javadoc sourcepath="${src.dir}/main"
              destdir="${javadoc.dir}"
              packagenames="org.**,com.**"
              Public="true"
@@ -85,7 +86,7 @@
          <pathelement path="${build.dir}"/>
          <fileset dir="${lib.dir}" includes="*.jar"/>
       </classpath>
-      <fileset dir="${src.dir}">
+      <fileset dir="${src.dir}/main">
         <include name="**/*.java"/>
       </fileset>
     </javadoc>
