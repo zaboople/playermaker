@@ -5,14 +5,15 @@ import java.util.Collections;
 
 public class Note extends NoteAttributeHolder<Note> implements BendContainer<Note> {
     final Chord chord;
-    final long restBefore;
-    final int pitch;
-
-    long duration;
     private List<Bend> bends=null;
     private NoteAttributes attributes;
 
-    public Note(Chord chord, long duration, long restBefore, int pitch) {
+    final long restBefore;
+    final int pitch;
+    long duration;
+
+
+    protected Note(Chord chord, long duration, long restBefore, int pitch) {
         this.chord=chord;
         this.restBefore=restBefore;
         this.pitch=pitch;

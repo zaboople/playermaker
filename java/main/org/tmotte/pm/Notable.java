@@ -85,29 +85,6 @@ public interface Notable {
     // but kind of repetitive to maintain:    //
     ////////////////////////////////////////////
 
-    public default Note n1(int note) {
-        return addNote(Divisions.whole, note);
-    }
-    public default Note n2(int note) {
-        return addNote(Divisions.reg2, note);
-    }
-    public default Note n4(int note) {
-        return addNote(Divisions.reg4, note);
-    }
-    public default Note n8(int note) {
-        return addNote(Divisions.reg8, note);
-    }
-    public default Note n16(int note) {
-        return addNote(Divisions.reg16, note);
-    }
-    public default Note n32(int note) {
-        return addNote(Divisions.reg32, note);
-    }
-    public default Note n64(int note) {
-        return addNote(Divisions.reg64, note);
-    }
-
-
     public default Player p1(int... notes) {
         return c(1, notes).up();
     }
