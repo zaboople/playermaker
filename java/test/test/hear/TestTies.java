@@ -9,6 +9,7 @@ public class TestTies implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
+		    .setBeatsPerMinute(60)
 		    .instrumentChannel(43, 3)
 		    .setBendSensitivity(4)
 		    .r4()
@@ -38,9 +39,7 @@ public class TestTies implements XTest {
 			    .up()
 
 			.r4();
-	    midi
-		    .setBeatsPerMinute(60)
-		    .play(stop, player);
+	    midi.play(stop, player);
     }
 
 }

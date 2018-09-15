@@ -12,6 +12,7 @@ public class TestPlayAfter implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
         Player player1=new Player()
+            .setBeatsPerMinute(60)
             .instrumentChannel(3, 0)
             .setBendSensitivity(4)
             .octave(4)
@@ -63,10 +64,7 @@ public class TestPlayAfter implements XTest {
         player1.r4();
         player2.r4();
         player3.r4();
-        midi
-            .setBeatsPerMinute(60)
-            .play(stop, player1, player2, player3)
-            ;
+        midi.play(stop, player1, player2, player3);
     }
 
 }

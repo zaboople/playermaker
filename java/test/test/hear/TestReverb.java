@@ -10,6 +10,7 @@ public class TestReverb implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
 		Player player=new Player()
+			.setBeatsPerMinute(65)
 		    .instrument(16)
 		    .setReverb(100)
 		    .setPressure(0)
@@ -80,7 +81,7 @@ public class TestReverb implements XTest {
 
 		    .r4()
 			;
-		midi.setBeatsPerMinute(65).play(stop, player);
+		midi.play(stop, player);
 
     }
 

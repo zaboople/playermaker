@@ -1,7 +1,4 @@
-package test;
-import org.tmotte.pm.MyMidi3;
-import org.tmotte.pm.Divisions;
-import org.tmotte.pm.Player;
+package org.tmotte.pm;
 
 /**
  * The way things are done now, there is some loss of information when calculating

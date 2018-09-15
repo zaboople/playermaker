@@ -9,6 +9,7 @@ public class TestVibrato implements XTest {
     }
     public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
+		    .setBeatsPerMinute(60)
 		    .instrument(16)
 		    .setBendSensitivity(4)
 		    .octave(5)
@@ -30,9 +31,7 @@ public class TestVibrato implements XTest {
 				.vibrato(64, 12)
 				.up()
 		    .r(4);
-	    midi
-		    .setBeatsPerMinute(60)
-		    .play(stop, player);
+	    midi.play(stop, player);
     }
 
 }

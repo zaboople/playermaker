@@ -92,16 +92,6 @@ public class MyMidi3  {
 	    return instrumentsByName.get(name).instrument;
     }
 
-    /** Exposed only for testing. Use Player.bpm() instead */
-    public MyMidi3 setBeatsPerMinute(int bpm) {
-        tickX = Math.round(
-            ((double)TICKS_PER_MINUTE) /
-            (
-                ((double)bpm) * ((double) Divisions.reg4)
-            )
-        );
-        return this;
-    }
 
     public MyMidi3 reset() {
         Except.run(()-> {
@@ -126,6 +116,16 @@ public class MyMidi3  {
         return this;
     }
 
+	/** Exposed only for testing. */
+    protected MyMidi3 setBeatsPerMinute(int bpm) {
+        tickX = Math.round(
+            ((double)TICKS_PER_MINUTE) /
+            (
+                ((double)bpm) * ((double) Divisions.reg4)
+            )
+        );
+        return this;
+    }
 
     private void sequencePlayer(Player player)  {
         // Track & time & defaults:
