@@ -9,13 +9,14 @@ public class XTester {
     public static void main(String[] args){
         MyMidi3 midi=new MyMidi3();
         test(midi,
-            new TestArpeggio(),
             new Test7Slash16Time(),
+            new TestArpeggio(),
             new TestBeatWithSound(),
             new TestBends(),
             new TestBends2(),
             new TestBendsPartial(),
             new TestBendTo(),
+            //new TestBPM(), FIXME
             new TestChannelTrack(),
             new TestChords(),
             new TestFinish(),
