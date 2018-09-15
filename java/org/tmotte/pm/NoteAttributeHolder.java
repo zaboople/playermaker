@@ -9,7 +9,7 @@ package org.tmotte.pm;
 public abstract class NoteAttributeHolder<T> {
 
     /**
-     * Sets an absolute value for volume.
+     * Sets an absolute value for volume, directly corresponding to the midi standard volume settings.
      * @param volume Should be between 0 &amp; 127 inclusive.
      * @return The orginal object
      */
@@ -17,7 +17,8 @@ public abstract class NoteAttributeHolder<T> {
         return setVolume(v);
     }
     /**
-     * Adds the given amount to the current volume setting.
+     * Adds the given amount to the current volume setting; both positive & negative values
+     * are allowed as long as the resulting value fits within standard limits.
      */
     public T addVolume(int change) {
         return volume(getNoteAttributesForRead().volume+change);

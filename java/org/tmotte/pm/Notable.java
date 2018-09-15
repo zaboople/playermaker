@@ -9,8 +9,7 @@ package org.tmotte.pm;
            will create a new Chord that <em>follows</em> the first. Thus the Chord
            is committed: It cannot be further modified, and additional Chord/Note
            objects will play after it.
-        <li>c() creates &amp; returns a Chord object representing a chord, allowing
-            for further modification of itself.
+        <li>c() creates &amp; returns a Chord that can be further modified.
         <li>n() creates a Chord with one Note, and returns that Note directly. This
             allows detailed modification (vibrato, bend) of only that Note. You can
             still go Note.up() back to the Chord and add more notes, etc.
@@ -40,7 +39,8 @@ public interface Notable {
      * @param duration Use 1 for a whole note, 2 for a half note, 4 for a quarter, and so on. For dotted notes
      *       and triplets, use {@link #p(double, int...)}
      * @param notes Follows the 12-tone western scale, with low C at 0, D&#x266d; at 1, and so on, allowing up
-     *       as many octaves high as the synthesizer can perform.
+     *       as many octaves high as the synthesizer can perform. Note values directly correspond to the midi
+     *       standard.
      */
     public default Player p(int duration, int... notes) {
         return c(duration, notes).up();

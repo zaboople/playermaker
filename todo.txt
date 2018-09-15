@@ -1,8 +1,10 @@
+- Okay maybe make the tests in the same package as the source. Bleagh.
+    TestBeats
+    setBeatsPerMinute
 - Player
     Label keys C1 - G8 or whatever
 
 - High playermaker
-    - Load instruments into MyMidi3
     - Add C1, C2, C3, D1, D2, D3 to constants; easier than -12 +12 I think.
     - ARGH midi channel 10 is drums!!!!
         This article contains infor about what notes are what - map to constants:

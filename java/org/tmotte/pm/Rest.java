@@ -10,7 +10,7 @@ public class Rest implements Notable {
     private final Chord chord;
     private long restFor;
 
-    public Rest(Chord chord, long restFor) {
+    protected Rest(Chord chord, long restFor) {
         this.chord=chord;
         this.restFor=restFor;
     }
@@ -23,16 +23,21 @@ public class Rest implements Notable {
         return addChord(chord.totalDuration()-restFor, pitches);
     }
 
-    /** Ties this Rest to another - actually returns itself after extending its duration. */
-    public Rest t(long duration) {
-        restFor+=duration;
-        return this;
-    }
+    /**
+     * Ties this Rest to another - actually returns itself after extending its duration.
+     * @param duration A period expressed using the same notation as Player.p(), Chord.c(), etc.
+     */
     public Rest t(int duration) {
         return t(Divisions.convert(duration));
     }
+    /** A double version of t(int) for use with dotted & triplet notes.*/
     public Rest t(double duration) {
         return t(Divisions.convert(duration));
+    }
+
+    private Rest t(long duration) {
+        restFor+=duration;
+        return this;
     }
 
 
