@@ -97,6 +97,7 @@ public class MyMidi3  {
         Except.run(()-> {
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
         });
+        reservedChannels.clear();
         return this;
     }
 
@@ -256,8 +257,13 @@ public class MyMidi3  {
         boolean[] reservedAll=new boolean[16];
         Map<Player, Set<Integer>> playerSetupAlready=new HashMap<>();
 
+		public void clear() {
+			playerSetupAlready.clear();
+			for (int i=0; i<reservedAll.length; i++)
+				reservedAll[i]=false;
+		}
         /** Players can overlap on a channel, assuming it won't cause a problem. */
-        public void reserve(Player player) {
+        public void reserve(Player player) { //FIXME see this would be less stupid if we only allow channel to change once.
 	        for (Event event: player.events()) {
 		        Integer ch=event.getChannel();
 		        if (ch!=null)
@@ -271,7 +277,7 @@ public class MyMidi3  {
                 channel+=1;
                 Set<Integer> already=playerSetupAlready.computeIfAbsent(player, p -> new HashSet<>());
                 if (!already.contains(channel)) {
-                    System.out.println("Setting up spare...");
+                    System.out.println("Setting up spare: "+channel);
                     already.add(channel);
                     setupChannelForPlayer(channel, channelAttrs, tick);
                 }
