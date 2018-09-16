@@ -1,6 +1,38 @@
-- Okay maybe make the tests in the same package as the source. Bleagh.
-    TestBeats
-    setBeatsPerMinute
+- MyMidi3.ReserveChannels appears to have state problems and is global
+- Divisions.* can be hidden since we can share packages with test
+
+- Big problem
+    - Player.c().r().c() does not return a _new_ chord; it adds delayed notes to the existing chord.
+    That's kind of confusing, for one thing... but also, suppose I want to do
+        Player.c().r().c().t(16)
+    So I'm trying to extend the second "chord" by a sixteenth, but _not_ the original chord. Just the second.
+    Well, that's not gonna work, because it's all one chord. Ouch!
+    - Solution:
+        Player
+            .c()
+                .r(8).c()
+                    .r(8).c()
+                    .up()
+                .up()
+            .up()
+        - This is actually kind of nice, because I can time notes in terms of their relationship to the
+        previous chord, not the original chord. Less mathy.
+        - It's also kind of hairy with the nesting, so I have to carefully time my up()'s, although I
+        can always do a .p() which should automatically leap to the top. Cool.
+        - n() is my workaround, but n() is dumb. It's a c() that can only have one note. Yes we need
+        Note objects, but we don't need to expose them.
+        - If n() goes, then really all attributes of Note except pitch move up to Chord. So the
+        List<Note> in Chord is really List<Integer>. Wow.
+        - Actually, I'd rather that n() is an alias to c() or vice versa, because tests currently use n().
+          But even then, tests use c().r().c(), which will no longer compile because you need more than one
+          up()
+        - Maybe n() should make a new Chord, and c() should append to the chord. Kind of confusing though.
+          Maybe on a temporary basis.
+        - Actually no, c() can set its own duration, so it should be a new Chord.
+            Maybe n() could just be adding notes but why would you do that.
+        Not a note, no, just make a new chord, that way you have both options.
+
+
 - Player
     Label keys C1 - G8 or whatever
 
