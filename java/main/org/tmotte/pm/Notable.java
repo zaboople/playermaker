@@ -80,32 +80,6 @@ public interface Notable {
     /** Internal use */
     Chord addChord(long duration, int... notes);
 
-    ////////////////////////////////////////////
-    // Old way of adding notes... not all bad //
-    // but kind of repetitive to maintain:    //
-    ////////////////////////////////////////////
-
-    public default Player p1(int... notes) {
-        return c(1, notes).up();
-    }
-    public default Player p2(int... notes) {
-        return c(2, notes).up();
-    }
-    public default Player p4(int... notes) {
-        return c(4, notes).up();
-    }
-    public default Player p8(int... notes) {
-        return c(8, notes).up();
-    }
-    public default Player p16(int... notes) {
-        return c(16, notes).up();
-    }
-    public default Player p32(int... notes) {
-        return c(32, notes).up();
-    }
-    public default Player p64(int... notes) {
-        return c(64, notes).up();
-    }
 
 
 }

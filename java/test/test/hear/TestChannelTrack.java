@@ -52,11 +52,11 @@ public class TestChannelTrack implements XTest {
 			.r4()
 			.r4()
 			.r4()
-			.p4(A)
+			.p(4, A)
 
-			.p4(G, B, D)
+			.p(4, G, B, D)
 			.r4()
-			.p4(E, G_, B)
+			.p(4, E, G_, B)
 
 		    .r4();
 	    midi
