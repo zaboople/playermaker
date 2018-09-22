@@ -54,14 +54,18 @@ public class Player extends NoteAttributeHolder<Player> implements Notable {
     private TimeTracking timeTracker=new TimeTracking();
     private List<Event> events=new ArrayList<>();
     private int reverb=0;
-    private long startTime=0;
     private boolean reverbSetOnce=false;
+    private long startTime=0;
     private NoteAttributes attributes=new NoteAttributes();
 
     public Player() {
         super();
         volume(64);
     }
+
+    //////////////////////////////////
+    // INSTRUMENT / CHANNEL EVENTS: //
+    //////////////////////////////////
 
     /** Achieves the equivalent of instrumentChannel(instrumentIndex, 0) */
     public Player instrument(int instrumentIndex) {
@@ -95,7 +99,59 @@ public class Player extends NoteAttributeHolder<Player> implements Notable {
         return event(new Event().setChannel(channel));
     }
 
+    ///////////////////////////////////
+    // OTHER EVENT-BASED ATTRIBUTES: //
+    ///////////////////////////////////
 
+    /**
+     * FIXME test BPM changes in mid-flight!
+     * BPM means "beats per minute". This setting is event-based, so it affects only the notes added after BPM is changed.
+     * <br>
+     * However: BPM is really a function of the MyMidi pseudo-sequencer; when it changes, all Players are affected. So if Player A sets BPM
+     * to 60 and plays a quarter note, and Player B also plays a quarter note, both notes will play for one second. Thus it's easiest
+     * think of Player A as a "lead" that the others will automatically follow when they slow down or speed up, which is fairly
+     * similar to real-world situations. Thus it's also important to pass Player A as the first Player argument to
+     * MyMidi.play(playerA, playerB...).
+     */
+    public Player bpm(int bpm) {
+        return setBeatsPerMinute(bpm);
+    }
+    public Player setBeatsPerMinute(int bpm) {
+        return event(new Event().setBeatsPerMinute(bpm));
+    }
+    public Player setBPM(int bpm) {
+        return setBeatsPerMinute(bpm);
+    }
+
+    public Player setBendSensitivity(int sensitivity) {
+        event(new Event().setBendSensitivity(sensitivity));
+        return this;
+    }
+    public Player bendSense(int sensitivity) {
+        return setBendSensitivity(sensitivity);
+    }
+
+    public Player setPressure(int pressure) {
+        event(new Event().setPressure(pressure));
+        return this;
+    }
+
+    /** Note: Reverb can only be set once, because it is not event-based like most other attributes. */
+    public Player setReverb(int reverb) {
+        if (reverbSetOnce)
+            throw new RuntimeException("There is no point in setting the reverb more than once.");
+        reverbSetOnce=true;
+        this.reverb=reverb;
+        return this;
+    }
+    public int getReverb() {
+        return reverb;
+    }
+
+
+    /////////////////////////////
+    // START / END / DURATION: //
+    /////////////////////////////
 
     /**
      * Sets the start time in ticks. Changing the start time <i>after</i> adding notes/chords/rests is forbidden
@@ -144,71 +200,9 @@ public class Player extends NoteAttributeHolder<Player> implements Notable {
     }
 
 
-    /**
-     * FIXME test BPM changes in mid-flight!
-     * BPM means "beats per minute". This setting is event-based, so it affects only the notes added after BPM is changed.
-     * <br>
-     * However: BPM is really a function of the MyMidi pseudo-sequencer; when it changes, all Players are affected. So if Player A sets BPM
-     * to 60 and plays a quarter note, and Player B also plays a quarter note, both notes will play for one second. Thus it's easiest
-     * think of Player A as a "lead" that the others will automatically follow when they slow down or speed up, which is fairly
-     * similar to real-world situations. Thus it's also important to pass Player A as the first Player argument to
-     * MyMidi.play(playerA, playerB...).
-     */
-    public Player bpm(int bpm) {
-        return setBeatsPerMinute(bpm);
-    }
-    public Player setBeatsPerMinute(int bpm) {
-        return event(new Event().setBeatsPerMinute(bpm));
-    }
-    public Player setBPM(int bpm) {
-        return setBeatsPerMinute(bpm);
-    }
-
-    public Collection<Event> events() {
-        return events;
-    }
-
-    public Player setBendSensitivity(int sensitivity) {
-        event(new Event().setBendSensitivity(sensitivity));
-        return this;
-    }
-    public Player bendSense(int sensitivity) {
-        return setBendSensitivity(sensitivity);
-    }
-
-    /**
-     * Sets the volume at a specific level.
-     */
-    protected @Override Player setVolume(int v) {
-        getNoteAttributesForWrite().volume=v;
-        return this;
-    }
-    protected @Override Player setTranspose(int semitones) {
-        getNoteAttributesForWrite().transpose=semitones;
-        return this;
-    }
-
-    public Player setPressure(int pressure) {
-        event(new Event().setPressure(pressure));
-        return this;
-    }
-
-    private Player event(Event e) {
-        events.add(e);
-        return this;
-    }
-
-    /** Warning: Reverb can only be set once */
-    public Player setReverb(int reverb) {
-        if (reverbSetOnce)
-            throw new RuntimeException("There is no point in setting the reverb more than once.");
-        reverbSetOnce=true;
-        this.reverb=reverb;
-        return this;
-    }
-    public int getReverb() {
-        return reverb;
-    }
+    ///////////////////////////////////
+    // RESTS (NOT LIKE CHORD RESTS): //
+    ///////////////////////////////////
 
 
     /**
@@ -226,11 +220,6 @@ public class Player extends NoteAttributeHolder<Player> implements Notable {
      */
     public Player r(long i) {return rest(i);}
 
-    /** This and the other numbered r#() methods are legacy & deprecated. */
-    public Player r4() {return rest(Divisions.reg4);}
-    public Player r8() {return rest(Divisions.reg8);}
-
-
     private Player rest(long division) {
         int v=volume();
         volume(0);
@@ -239,6 +228,9 @@ public class Player extends NoteAttributeHolder<Player> implements Notable {
         return this;
     }
 
+    /////////////
+    // CHORDS: //
+    /////////////
 
     /** For internal use, required by Notable */
     public @Override Chord addChord(long duration, int... pitches) {
@@ -252,6 +244,31 @@ public class Player extends NoteAttributeHolder<Player> implements Notable {
         return addChord(duration, pitch).notes().get(0);
     }
 
+    //////////////////////
+    // EVENT INTERNALS: //
+    //////////////////////
+
+    protected Collection<Event> events() {
+        return events;
+    }
+    private Player event(Event e) {
+        events.add(e);
+        return this;
+    }
+
+    //////////////////////////////////////////
+    // NoteAttributesHolder IMPLEMENTATION: //
+    //////////////////////////////////////////
+
+
+    protected @Override Player setVolume(int v) {
+        getNoteAttributesForWrite().volume=v;
+        return this;
+    }
+    protected @Override Player setTranspose(int semitones) {
+        getNoteAttributesForWrite().transpose=semitones;
+        return this;
+    }
     protected @Override NoteAttributes getNoteAttributesForRead(){
         return attributes;
     }

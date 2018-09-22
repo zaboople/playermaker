@@ -52,13 +52,6 @@ public interface Notable {
     public default Chord c(int duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
     }
-    /**
-     * Adds a Chord containing one Note for the specified duration, and returns that Note.
-     * Duration and notes work the same as for @link{#p(int, int...)}
-     */
-    public default Note n(int duration, int note) {
-        return addNote(Divisions.convert(duration), note);
-    }
 
     /**
      * An alternate version of {@link #p(int, int...)} that accepts a double, allowing
@@ -69,6 +62,14 @@ public interface Notable {
     }
     public default Chord c(double duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
+    }
+
+    /**
+     * Adds a Chord containing one Note for the specified duration, and returns that Note.
+     * Duration and notes work the same as for @link{#p(int, int...)}
+     */
+    public default Note n(int duration, int note) {
+        return addNote(Divisions.convert(duration), note);
     }
     public default Note n(double duration, int note) {
         return addNote(Divisions.convert(duration), note);

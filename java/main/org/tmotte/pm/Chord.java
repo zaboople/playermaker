@@ -49,9 +49,9 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
         return t(Divisions.convert(duration));
     }
 
-    /////////////////////////////////////////////
-    // RESTS - INCLUDES OUTMODED r#() methods. //
-    /////////////////////////////////////////////
+    ///////////
+    // RESTS //
+    ///////////
 
     /**
      * Allows one to add delayed, overlapping notes to the Chord.
@@ -69,13 +69,6 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
      * values.
      */
     public Rest r(double d) {return rest(Divisions.convert(d));}
-
-    public Rest r1() {return rest(Divisions.reg2);}
-    public Rest r2() {return rest(Divisions.reg2);}
-    public Rest r4() {return rest(Divisions.reg4);}
-    public Rest r8() {return rest(Divisions.reg8);}
-    public Rest r16() {return rest(Divisions.reg16);}
-
 
 
     ////////////////////////////////////
