@@ -1,3 +1,4 @@
+- Test two players doing bends at once, running off channels 0 & 1
 - Player channel should only be set once
 - MyMidi3.ReserveChannels appears to have state problems and is global
 - Divisions.* can be hidden since we can share packages with test
