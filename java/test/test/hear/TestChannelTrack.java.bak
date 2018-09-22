@@ -47,18 +47,18 @@ public class TestChannelTrack implements XTest {
 		    .instrumentChannel(83, 10)
 		    .setReverb(127)
 		    .octave(4)
-		    .r(4)
+		    .r4()
 
-			.r(4)
-			.r(4)
-			.r(4)
+			.r4()
+			.r4()
+			.r4()
 			.p(4, A)
 
 			.p(4, G, B, D)
-			.r(4)
+			.r4()
 			.p(4, E, G_, B)
 
-		    .r(4);
+		    .r4();
 	    midi
 		    .play(stop, player1, player2);
     }

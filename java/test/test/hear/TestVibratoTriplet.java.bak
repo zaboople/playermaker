@@ -15,7 +15,7 @@ public class TestVibratoTriplet implements XTest {
 		    .setBendSensitivity(4)
 		    .setReverb(80)
 		    .octave(5)
-		    .r(4)
+		    .r4()
 
 			//1
 			.c(4, A-12, D_-12).vibrato(64, 8).up()
@@ -52,7 +52,7 @@ public class TestVibratoTriplet implements XTest {
 			.c(2, F-12, C, G)
 				.bend(4, 2)
 				.vibrato(2., 64, 8).up() //FIXME what is a 2. doing here?
-		    .r(8)
+		    .r8()
 			;
 	    midi.play(stop, player);
     }

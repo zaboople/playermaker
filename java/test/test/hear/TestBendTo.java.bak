@@ -12,7 +12,7 @@ public class TestBendTo implements XTest {
 		    .setBeatsPerMinute(60)
 		    .instrumentChannel(41, 3)
 		    .setBendSensitivity(4)
-		    .r(4)
+		    .r4()
 
 		    .octave(4)
 
@@ -47,7 +47,7 @@ public class TestBendTo implements XTest {
 			.p(16.3, G, B)
 			.p(16.3, D, B_)
 			.p(4., A, A-12, A+12)
-		    .r(4);
+		    .r4();
 	    midi
 		    .play(stop, player);
     }

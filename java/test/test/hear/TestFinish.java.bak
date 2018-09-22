@@ -15,7 +15,7 @@ public class TestFinish implements XTest {
 		    .setBeatsPerMinute(60)
 		    .instrumentChannel(43, 3)
 		    .setBendSensitivity(4)
-		    .r(4)
+		    .r4()
 
 		    .octave(4)
 		    .c(1, D)
@@ -32,7 +32,7 @@ public class TestFinish implements XTest {
 			    .t(4)
 			    .up()
 
-			.r(4);
+			.r4();
 	    midi
 		    .play(stop, player);
     }

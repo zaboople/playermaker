@@ -16,7 +16,7 @@ public class TestVolume implements XTest {
 			    .setBendSensitivity(4)
 			    .setPressure(0)
 			    .instrument("Strings - Viola")
-			    .r(4)
+			    .r4()
 			    .octave(5)
 
 			    .c(8., D_, C+12, A_).volume(bv).up()

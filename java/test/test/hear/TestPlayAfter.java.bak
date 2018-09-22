@@ -16,7 +16,7 @@ public class TestPlayAfter implements XTest {
             .instrumentChannel(3, 0)
             .setBendSensitivity(4)
             .octave(4)
-            .r(4);
+            .r4();
         Player player2=new Player()
             .instrumentChannel(22, 3)
             .setBendSensitivity(4)
@@ -61,9 +61,9 @@ public class TestPlayAfter implements XTest {
         player2
             .r(player1.getEndTime() - player2.getEndTime())//tricky
             .p(4, F);
-        player1.r(4);
-        player2.r(4);
-        player3.r(4);
+        player1.r4();
+        player2.r4();
+        player3.r4();
         midi.play(stop, player1, player2, player3);
     }
 

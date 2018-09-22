@@ -45,7 +45,7 @@ public class TestVibratoChanging implements XTest {
 				.vibrato(4, 32, 16)
 				.vibrato(2, 16, 16)
 				.up()
-			.r(4);
+			.r4();
 	    midi.play(stop, player);
     }
 

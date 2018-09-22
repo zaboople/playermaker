@@ -13,7 +13,7 @@ public class TestBPM implements XTest {
 		    .channel(0)
 		    .setBendSensitivity(4)
 		    .octave(3)
-		    .r(4)
+		    .r4()
 
 
 		    .bpm(30)
@@ -76,7 +76,7 @@ public class TestBPM implements XTest {
 		    .p(16.3, D_)
 		    .p(16.3, G)
 
-			.r(4);
+			.r4();
 	    midi.play(stop, player);
     }
 
