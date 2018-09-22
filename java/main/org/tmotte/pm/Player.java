@@ -25,7 +25,7 @@ import javax.sound.midi.Instrument;
  * <ul>
  *    <li>Pressure: Which usually means vibrato. See {@link BendContainer} for more fine-grained vibrato
  *        as well as bend control.
- *    <li>Beats per minute, commonly abbreviated as "BPM". This can be used to speed up & slow down
+ *    <li>Beats per minute: Commonly abbreviated as "BPM". This can be used to speed up & slow down
  *        play at various points during the composition.
  *    <li>Bend sensitivity: Refer to {@link BendContainer} for more information.
  *    <li>Instrument
@@ -227,18 +227,9 @@ public class Player extends NoteAttributeHolder<Player> implements Notable {
     public Player r(long i) {return rest(i);}
 
     /** This and the other numbered r#() methods are legacy & deprecated. */
-    public Player r1() {return rest(Divisions.reg2);}
-    public Player r2() {return rest(Divisions.reg2);}
     public Player r4() {return rest(Divisions.reg4);}
     public Player r8() {return rest(Divisions.reg8);}
-    public Player r16() {return rest(Divisions.reg16);}
-    public Player r32() {return rest(Divisions.reg32);}
-    public Player r64() {return rest(Divisions.reg64);}
 
-    public Player r8_3() {return rest(Divisions.triplet8);}
-    public Player r16_3() {return rest(Divisions.triplet16);}
-    public Player r32_3() {return rest(Divisions.triplet32);}
-    public Player r64_3() {return rest(Divisions.triplet64);}
 
     private Player rest(long division) {
         int v=volume();

@@ -4,8 +4,7 @@ import java.util.List;
 /**
  * Background: In Midi a bend can go a "whole step" by default, which is to say, two notes up or down.
  * However, you can change the "Bend sensitivity" to increase the range from a whole step to many more
- * steps. Internally, the 16383/8192/0 limits remain the same. Refer to {@link Player#setBendSensitivity(int}
- * for this setting.
+ * steps. Refer to {@link Player#setBendSensitivity(int} for this setting.
  * <br>
  * Also in Midi, bends apply to the whole channel. This is rather inflexible, so internally we make use of "spare"
  * channels when bends are applied differently to simultaneous Notes (refer to Chord#n(int, int...)).
@@ -26,15 +25,11 @@ import java.util.List;
  */
 public interface BendContainer<T> {
 
-    /**
-     * Internal Use. (We can't have an internal variable unless it's final, which is dumb. Being obsessed with
-     * memory, then, implementors maintain a List<Bend> and initialize when they need to.)
-     */
-    List<Bend> makeBends();
-    /* Internal use */
-    long totalDuration();
-    /* Internal use */
-    T self();
+    // Remember the limits on bends are
+    //    0     bend all the way down
+    //    8192  no bend at all
+    //    16383 bend all the way up
+
 
     ///////////
     // BEND: //
@@ -166,4 +161,10 @@ public interface BendContainer<T> {
         );
     }
 
+    /** Internal use */
+    List<Bend> makeBends();
+    /* Internal use */
+    long totalDuration();
+    /* Internal use */
+    T self();
 }

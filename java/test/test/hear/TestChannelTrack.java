@@ -20,16 +20,16 @@ public class TestChannelTrack implements XTest {
 		    .instrumentChannel(21, 1)
 		    .setReverb(0)
 		    .octave(5)
-		    .r4()
+		    .r(4)
 
 			.c(4, G).vibrato(64, 8).up()
-			.r4()
+			.r(4)
 			.c(4, E).vibrato(64, 8).up()
-			.r4()
+			.r(4)
 
-			.r4()
-			.r4()
-			.r4()
+			.r(4)
+			.r(4)
+			.r(4)
 			.octave(3)
 			.p(8.3, D+12, D)
 			.p(8.3, D_+12, F)
@@ -39,9 +39,9 @@ public class TestChannelTrack implements XTest {
 			.c(16, G, G+12, G+24).up()
 			.octave(5)
 			.c(16, E, E+12, E+24).vibrato(64,8).up()
-			.r32()
+			.r(32)
 			.c(4, E, E+12, E+24).vibrato(64,8).up()
-		    .r4();
+		    .r(4);
 	    //Chiffer Lead:
 	    Player player2=new Player()
 		    .instrumentChannel(83, 10)

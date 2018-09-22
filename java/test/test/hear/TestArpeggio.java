@@ -14,7 +14,7 @@ public class TestArpeggio implements XTest {
 		    .setBeatsPerMinute(80)
 		    .instrument(1)
 		    .bendSense(4)
-		    .r8()
+		    .r(8)
 		    .octave(2)
 		    .c(1, A)
 			    .r(4).c(2., C)
@@ -42,7 +42,7 @@ public class TestArpeggio implements XTest {
 
 
 			//1
-			.r2()
+			.r(2)
 			;
 	    midi.play(stop, player);
     }
