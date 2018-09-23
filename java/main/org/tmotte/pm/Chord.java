@@ -17,6 +17,7 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
     private final Player player;
     private final List<Note> notes=new ArrayList<>();
     private NoteAttributes attributes;
+    private boolean usingParentAttributes=true;
     private List<Bend> bends=null;
 
     protected Chord(Player player, long duration, int... pitches) {
@@ -179,7 +180,8 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
     }
     private void passOnToNotes(Consumer<Note> consumer) {
         NoteAttributes old=attributes;
-        if (attributes==player.getNoteAttributesForRead()) {
+        if (usingParentAttributes) {
+            usingParentAttributes=false;
             attributes=new NoteAttributes(old);
             for (Note note: notes)
                 if (note.getNoteAttributesForRead()==old)

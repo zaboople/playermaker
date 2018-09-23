@@ -242,14 +242,13 @@ public class MyMidi3  {
         }
         reserveChannels.clearSpares();
 
-        // Finish up with the chord bends (if any) and
-        // and advance the currTick counter:
-        if (!chord.bends().isEmpty())
+        // Finish up with the chord bends (if any) and advance the currTick counter:
+        long endTick=soundStart+(chord.totalDuration() * tickX);
+        if (!chord.bends().isEmpty()) {
             sendBends(channelIndex, soundStart, chord.bends());
-        currTick=soundStart+(chord.totalDuration() * tickX);
-        if (!chord.bends().isEmpty())
-            midiTracker.eventBendEnd(channelIndex, currTick);
-        return currTick;
+            midiTracker.eventBendEnd(channelIndex, endTick);
+        }
+        return endTick;
     }
 
 
