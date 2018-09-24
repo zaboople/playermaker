@@ -3,8 +3,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
-public class Note extends NoteAttributeHolder<Note> implements BendContainer<Note> {
-    final Chord chord;
+public class Note<T> extends NoteAttributeHolder<Note<T>> implements BendContainer<Note<T>> {
+    final Chord<T> chord;
     private List<Bend> bends=null;
     private NoteAttributes attributes;
 
@@ -13,7 +13,7 @@ public class Note extends NoteAttributeHolder<Note> implements BendContainer<Not
     long duration;
 
 
-    protected Note(Chord chord, long duration, long restBefore, int pitch) {
+    protected Note(Chord<T> chord, long duration, long restBefore, int pitch) {
         this.chord=chord;
         this.restBefore=restBefore;
         this.pitch=pitch;
@@ -21,21 +21,21 @@ public class Note extends NoteAttributeHolder<Note> implements BendContainer<Not
         this.attributes=chord.getNoteAttributesForRead();
     }
 
-    public Note t(long duration) {
+    public Note<T> t(long duration) {
         this.duration+=duration;
         return this;
     }
-    public Note t(int duration) {
+    public Note<T> t(int duration) {
         return t(Divisions.convert(duration));
     }
-    public Note t(double duration) {
+    public Note<T> t(double duration) {
         return t(Divisions.convert(duration));
     }
 
-    public Chord up() {
+    public Chord<T> up() {
         return this.chord;
     }
-    public Player upup() {
+    public T upup() {
         return this.chord.up();
     }
 
@@ -50,7 +50,7 @@ public class Note extends NoteAttributeHolder<Note> implements BendContainer<Not
         return bends;
     }
     /** For internal use */
-    public @Override Note self(){
+    public @Override Note<T> self(){
         return this;
     }
     /** For internal use */
@@ -62,11 +62,11 @@ public class Note extends NoteAttributeHolder<Note> implements BendContainer<Not
     // INTERNAL LOGIC FOR NoteAttributes : //
     /////////////////////////////////////////
 
-    protected @Override Note setVolume(int v) {
+    protected @Override Note<T> setVolume(int v) {
         getNoteAttributesForWrite().volume=v;
         return this;
     }
-    protected @Override Note setTranspose(int semitones) {
+    protected @Override Note<T> setTranspose(int semitones) {
         getNoteAttributesForWrite().transpose=semitones;
         return this;
     }

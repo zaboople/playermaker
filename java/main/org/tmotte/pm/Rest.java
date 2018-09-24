@@ -6,11 +6,11 @@ package org.tmotte.pm;
  *
  * @see Player#r(int)
  */
-public class Rest implements Notable {
-    private final Chord chord;
+public class Rest<T> implements Notable<T> {
+    private final Chord<T> chord;
     private long restFor;
 
-    protected Rest(Chord chord, long restFor) {
+    protected Rest(Chord<T> chord, long restFor) {
         this.chord=chord;
         this.restFor=restFor;
     }
@@ -19,7 +19,7 @@ public class Rest implements Notable {
      * Indicates that we should "finish", i.e. play the pitches for the remaining duration of the original Chord.
      * @return The original Chord.
      */
-    public Chord fin(int... pitches) {
+    public Chord<T> fin(int... pitches) {
         return addChord(chord.totalDuration()-restFor, pitches);
     }
 
@@ -27,15 +27,15 @@ public class Rest implements Notable {
      * Ties this Rest to another - actually returns itself after extending its duration.
      * @param duration A period expressed using the same notation as Player.p(), Chord.c(), etc.
      */
-    public Rest t(int duration) {
+    public Rest<T> t(int duration) {
         return t(Divisions.convert(duration));
     }
     /** A double version of t(int) for use with dotted & triplet notes.*/
-    public Rest t(double duration) {
+    public Rest<T> t(double duration) {
         return t(Divisions.convert(duration));
     }
 
-    private Rest t(long duration) {
+    private Rest<T> t(long duration) {
         restFor+=duration;
         return this;
     }
@@ -46,12 +46,12 @@ public class Rest implements Notable {
     ////////////////
 
     /** For internal use, required by Notable */
-    public @Override Note addNote(long duration, int pitch) {
+    public @Override Note<T> addNote(long duration, int pitch) {
         return chord.addNote(duration, restFor, pitch);
     }
 
     /** For internal use, required by Notable */
-    public @Override Chord addChord(long duration, int... pitches){
+    public @Override Chord<T> addChord(long duration, int... pitches){
         for (int n: pitches)
             addNote(duration, n);
         return chord;

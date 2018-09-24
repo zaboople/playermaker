@@ -31,7 +31,7 @@ package org.tmotte.pm;
    for making the specified notes last as long as the remaining duration of the original Chord.
 
  */
-public interface Notable {
+public interface Notable<T> {
 
 
     /**
@@ -42,14 +42,14 @@ public interface Notable {
      *       as many octaves high as the synthesizer can perform. Note values directly correspond to the midi
      *       standard.
      */
-    public default Player p(int duration, int... notes) {
+    public default T p(int duration, int... notes) {
         return c(duration, notes).up();
     }
     /**
      * Adds a Chord made of the given notes for the specified duration, and returns that Chord, which can be further modified.
      * Duration and notes work the same as for @link{#p(int, int...)}
      */
-    public default Chord c(int duration, int... notes) {
+    public default Chord<T> c(int duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
     }
 
@@ -57,10 +57,10 @@ public interface Notable {
      * An alternate version of {@link #p(int, int...)} that accepts a double, allowing
      * dotted and triplet notes, e.g. "8." and "8.3" as respective examples.
      */
-    public default Player p(double duration, int... notes) {
+    public default T p(double duration, int... notes) {
         return c(duration, notes).up();
     }
-    public default Chord c(double duration, int... notes) {
+    public default Chord<T> c(double duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
     }
 
@@ -68,19 +68,17 @@ public interface Notable {
      * Adds a Chord containing one Note for the specified duration, and returns that Note.
      * Duration and notes work the same as for @link{#p(int, int...)}
      */
-    public default Note n(int duration, int note) {
+    public default Note<T> n(int duration, int note) {
         return addNote(Divisions.convert(duration), note);
     }
-    public default Note n(double duration, int note) {
+    public default Note<T> n(double duration, int note) {
         return addNote(Divisions.convert(duration), note);
     }
 
 
     /** Internal use */
-    Note addNote(long duration, int note);
+    Note<T> addNote(long duration, int note);
     /** Internal use */
-    Chord addChord(long duration, int... notes);
-
-
+    Chord<T> addChord(long duration, int... notes);
 
 }

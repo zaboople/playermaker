@@ -139,7 +139,7 @@ public class MyMidi3  {
         // And blast off the rocket:
         boolean firstChord=true;
         for (Event event: player.events()){
-            final Chord chord=event.getChord();
+            final Chord<?> chord=event.getChord();
             if (chord==null)
                 processNonChordEvent(event, channelAttrs, firstChord, currTick);
             else {
@@ -205,11 +205,11 @@ public class MyMidi3  {
     }
 
     private long processChordEvent(
-            Chord chord, Player player, ChannelAttrs channelAttrs, long currTick
+            Chord<?> chord, Player player, ChannelAttrs channelAttrs, long currTick
         ) {
         long soundStart=currTick;
         int wasChannel=channelIndex;
-        for (Note note: chord.notes()) {
+        for (Note<?> note: chord.notes()) {
 
             // Local variables for note attributes:
             int pitch=note.pitch+note.getTranspose(),

@@ -45,7 +45,7 @@ import javax.sound.midi.Instrument;
  * classical timing notation to control timing, but it is often useful to synchronize different players
  * using the internal relative timing with methods like {@link #setStartTime(long)} and {@link #getEndTime()}.
  */
-public class Player extends NoteAttributeHolder<Player> implements Notable {
+public class Player extends NoteAttributeHolder<Player> implements Notable<Player> {
     private static class TimeTracking {
         long timeUpToIndex=0;
         long timeAtIndex=0;
@@ -195,7 +195,7 @@ public class Player extends NoteAttributeHolder<Player> implements Notable {
         return timeTracker.timeUpToIndex + last;
     }
     private long getDuration(int index) {
-        Chord chord=events.get(index).getChord();
+        Chord<Player> chord=events.get(index).getChord();
         return chord==null ?0L :chord.totalDuration();
     }
 
@@ -233,14 +233,14 @@ public class Player extends NoteAttributeHolder<Player> implements Notable {
     /////////////
 
     /** For internal use, required by Notable */
-    public @Override Chord addChord(long duration, int... pitches) {
-        var chord=new Chord(this, duration, pitches);
+    public @Override Chord<Player> addChord(long duration, int... pitches) {
+        var chord=new Chord<>(this, attributes, duration, pitches);
         events.add(new Event(chord));
         return chord;
     }
 
     /** For internal use, required by Notable */
-    public @Override Note addNote(long duration, int pitch) {
+    public @Override Note<Player> addNote(long duration, int pitch) {
         return addChord(duration, pitch).notes().get(0);
     }
 

@@ -31,12 +31,12 @@ class Event {
         private Integer pressure=null;
     }
 
-    private Chord chord=null;
+    private Chord<Player> chord=null;
     private AnythingButChord anything=null;
 
     public Event() {
     }
-    public Event(Chord chord) {
+    public Event(Chord<Player> chord) {
         this.chord=chord;
     }
     public Event(Instrument instrument) {
@@ -71,7 +71,7 @@ class Event {
     public boolean hasChord() {
         return chord!=null;
     }
-    public Chord getChord() {
+    public Chord<Player> getChord() {
         return chord;
     }
     public Instrument getInstrument() {

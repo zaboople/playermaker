@@ -13,25 +13,27 @@ import java.util.function.Consumer;
  * FIXME test much overlapping waxing/waning etc.
  *
  */
-public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<Chord>, Notable {
-    private final Player player;
-    private final List<Note> notes=new ArrayList<>();
+public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendContainer<Chord<T>>, Notable<T> {
+    private final T parent;
+    private final List<Note<T>> notes=new ArrayList<>();
     private NoteAttributes attributes;
     private boolean usingParentAttributes=true;
     private List<Bend> bends=null;
 
-    protected Chord(Player player, long duration, int... pitches) {
-        this.player=player;
-        this.attributes=player.getNoteAttributesForRead();
+
+    protected Chord(T parent, NoteAttributes attributes, long duration, int... pitches) {
+        this.parent=parent;
+        this.attributes=attributes;
         addChord(duration, pitches);
     }
+
 
     /**
      * Takes us back to the original Player, for the sake of "fluent"
      * programming.
      */
-    public Player up() {
-        return player;
+    public T up() {
+        return parent;
     }
 
     /**
@@ -43,10 +45,10 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
         Use {@link t(double)} for dotted & triplet notes.
      * @param duration A time period expressed in the typical notation.
      */
-    public Chord t(int duration) {
+    public Chord<T> t(int duration) {
         return t(Divisions.convert(duration));
     }
-    public Chord t(double duration) {
+    public Chord<T> t(double duration) {
         return t(Divisions.convert(duration));
     }
 
@@ -63,13 +65,13 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
      * @param A standard notation integer duration: 4 for a quarter rest, 8
      *        for an eighth rest, etc.
      */
-    public Rest r(int i) {return rest(Divisions.convert(i));}
+    public Rest<T> r(int i) {return rest(Divisions.convert(i));}
 
     /**
      * Does the same as {@link #r(int)} but allowing for triplet &amp; dotted-note
      * values.
      */
-    public Rest r(double d) {return rest(Divisions.convert(d));}
+    public Rest<T> r(double d) {return rest(Divisions.convert(d));}
 
 
     ////////////////////////////////////
@@ -93,19 +95,19 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
     }
 
     /** For internal use, required by Notable */
-    public @Override Chord addChord(long duration, int... pitches) {
+    public @Override Chord<T> addChord(long duration, int... pitches) {
         for (int p: pitches)
             addNote(duration, p);
         return this;
     }
 
     /** For internal use, required by Notable */
-    public @Override Note addNote(long duration, int pitch) {
+    public @Override Note<T> addNote(long duration, int pitch) {
         return addNote(duration, 0, pitch);
     }
 
     /** For internal use, required by BendContainer */
-    public @Override Chord self() {
+    public @Override Chord<T> self() {
         return this;
     }
 
@@ -122,7 +124,7 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
     //            //
     ////////////////
 
-    List<Note> notes() {
+    List<Note<T>> notes() {
         return notes;
     }
     List<Bend> bends() {
@@ -130,17 +132,17 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
     }
 
     /** Exposed for use by Rest, which will supply a non-zero restBefore */
-    Note addNote(long duration, long restBefore, int pitch) {
-        Note n=new Note(this, duration, restBefore, pitch);
+    Note<T> addNote(long duration, long restBefore, int pitch) {
+        Note<T> n=new Note<>(this, duration, restBefore, pitch);
         notes.add(n);
         return n;
     }
 
-    private Rest rest(long duration) {
-        return new Rest(this, duration);
+    private Rest<T> rest(long duration) {
+        return new Rest<>(this, duration);
     }
 
-    private Chord t(long duration) {
+    private Chord<T> t(long duration) {
         for (Note n: notes)
             n.t(duration);
         return this;
@@ -168,12 +170,12 @@ public class Chord extends NoteAttributeHolder<Chord> implements BendContainer<C
     protected @Override NoteAttributes getNoteAttributesForRead(){
         return attributes;
     }
-    protected @Override Chord setVolume(int v) {
+    protected @Override Chord<T> setVolume(int v) {
         passOnToNotes(note-> note.setVolume(v));
         this.attributes.volume=v;
         return this;
     }
-    protected @Override Chord setTranspose(int semitones) {
+    protected @Override Chord<T> setTranspose(int semitones) {
         passOnToNotes(note-> note.setTranspose(semitones));
         this.attributes.transpose=semitones;
         return this;
