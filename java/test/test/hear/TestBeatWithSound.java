@@ -9,14 +9,22 @@ public class TestBeatWithSound implements XTest {
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
-		    .setBeatsPerMinute(120)
+		    .setBeatsPerMinute(60)
 		    .octave(2);
-		int checks=20;
+		int checks=10;
 		for (int i=0; i<checks; i++)
-		    player.c(4, 24+i)
-			    .r(16).n(8, 28+i).up()
-			    .r(8).n(8, 31+i).up()
-			    .r(8.).n(16, 31+i).up().up();
+			if (i%2==0)
+			    player.c(4, 24+i)
+				    .r(16).n(8, 28+i).up()
+				    .r(8).n(8, 31+i).up()
+				    .r(8.).n(16, 31+i).up().up();
+		    else
+			    player.c(4, 24+i)
+				    .r(16).n(8., 28+i).up()
+				    .r(8).n(16.3, 31+i).up()
+				    .r(8).t(16.3).n(16.3, 31+i).up()
+				    .r(8).t(16.3).t(16.3).n(16.3, 33+i).up()
+				    .up();
 	    midi.sequence(player);
 	    doTimerThread(checks);
 	    midi.play(stop);
@@ -25,7 +33,7 @@ public class TestBeatWithSound implements XTest {
 	    new Thread() {
 		    public void run() {
 			    long before=System.currentTimeMillis();
-			    for (int i=0; i<10+2; i++) {
+			    for (int i=0; i<10+1; i++) {
 				    for (int j=0; j<10; j++) {
 					    try {
 						    Thread.sleep(100);
