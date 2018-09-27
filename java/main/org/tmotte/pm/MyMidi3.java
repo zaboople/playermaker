@@ -207,48 +207,59 @@ public class MyMidi3  {
     private long processChordEvent(
             Chord<?> chord, Player player, ChannelAttrs channelAttrs, long currTick
         ) {
-        long soundStart=currTick;
-        int wasChannel=channelIndex;
-        for (Note<?> note: chord.notes()) {
+        long veryEnd=currTick+(chord.totalDuration() * tickX);
+        if (!chord.notes().isEmpty()) {
+            //FIXME remove this part
+            long soundStart=currTick;
+            int wasChannel=channelIndex;
+            for (Note<?> note: chord.notes()) {
 
-            // Local variables for note attributes:
-            int pitch=note.pitch+note.getTranspose(),
-                volume=note.getVolume();
-            long restBefore=note.restBefore * tickX;
-            List<Bend> noteBends=note.bends();
+                // Local variables for note attributes:
+                int pitch=note.pitch+note.getTranspose(),
+                    volume=note.getVolume();
+                long restBefore=note.restBefore * tickX;
+                List<Bend> noteBends=note.bends();
 
-            // Note start time:
-            currTick=soundStart + restBefore;
+                // Note start time:
+                currTick=soundStart + restBefore;
 
-            // Send any bends, and the note start:
-            if (!noteBends.isEmpty()) {
-                channelIndex=reserveChannels.useSpare(channelIndex, player, channelAttrs, currTick);
-                System.out.println("Using spare: "+channelIndex);
-                sendBends(channelIndex, soundStart + restBefore, noteBends);
+                // Send any bends, and the note start:
+                if (!noteBends.isEmpty()) {
+                    channelIndex=reserveChannels.useSpare(channelIndex, player, channelAttrs, currTick);
+                    System.out.println("Using spare: "+channelIndex);
+                    sendBends(channelIndex, soundStart + restBefore, noteBends);
+                }
+                if (pitch<0)
+                    throw new RuntimeException("Invalid pitch "+pitch+" from player "+player);
+                midiTracker.noteOn(channelIndex, pitch, volume, currTick);
+
+                // Finish the note:
+                currTick += note.duration * tickX;
+                midiTracker.noteOff(channelIndex, pitch, currTick);
+                if (!noteBends.isEmpty())
+                    midiTracker.eventBendEnd(channelIndex, currTick);
+
+                // Get back on channel if we had to use a reserve:
+                channelIndex=wasChannel;
             }
-            if (pitch<0)
-                throw new RuntimeException("Invalid pitch "+pitch+" from player "+player);
-            midiTracker.noteOn(channelIndex, pitch, volume, currTick);
+            reserveChannels.clearSpares();
+            // Finish up with the chord bends (if any) and advance the currTick counter:
+            if (!chord.bends().isEmpty()) {
+                sendBends(channelIndex, soundStart, chord.bends());
+                midiTracker.eventBendEnd(channelIndex, veryEnd);
+            }
+        } else {
 
+            long chordEndTick=currTick+ (tickX * chord.duration);
+            for (int p: chord.pitches()) {
+                midiTracker.noteOn(channelIndex, p, chord.volume(), currTick);
+                midiTracker.noteOff(channelIndex, p, chordEndTick);
+            }
 
-            // Finish the note:
-            currTick += note.duration * tickX;
-            midiTracker.noteOff(channelIndex, pitch, currTick);
-            if (!noteBends.isEmpty())
-                midiTracker.eventBendEnd(channelIndex, currTick);
-
-            // Get back on channel if we had to use a reserve:
-            channelIndex=wasChannel;
+            for (Chord<?> subChord: chord.chords()){
+            }
         }
-        reserveChannels.clearSpares();
-
-        // Finish up with the chord bends (if any) and advance the currTick counter:
-        long endTick=soundStart+(chord.totalDuration() * tickX);
-        if (!chord.bends().isEmpty()) {
-            sendBends(channelIndex, soundStart, chord.bends());
-            midiTracker.eventBendEnd(channelIndex, endTick);
-        }
-        return endTick;
+        return veryEnd;
     }
 
 

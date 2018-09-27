@@ -15,16 +15,26 @@ import java.util.function.Consumer;
  */
 public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendContainer<Chord<T>>, Notable<T> {
     private final T parent;
-    private final List<Note<T>> notes=new ArrayList<>();
+    private final List<Note<T>> notes=new ArrayList<>();//FIXME
+    private final List<Integer> pitches=new ArrayList<>();
+    private final long restBefore;
     private NoteAttributes attributes;
     private boolean usingParentAttributes=true;
     private List<Bend> bends=null;
+    private List<Chord<Chord<T>>> subChords=null;
+    long duration;
 
 
     protected Chord(T parent, NoteAttributes attributes, long duration, int... pitches) {
+        this(parent, attributes, 0L, duration, pitches);
+    }
+    private Chord(T parent, NoteAttributes attributes, long restBefore, long duration, int... pitches) {
         this.parent=parent;
         this.attributes=attributes;
-        addChord(duration, pitches);
+        this.restBefore=restBefore;
+        this.duration=duration;
+        for (int p: pitches)
+            addNote(duration, p);
     }
 
 
@@ -86,24 +96,31 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
      */
     public @Override long totalDuration() {
         return
-            notes.stream().map(n ->
-                n.restBefore + n.duration
-            ).reduce(
-                0L,
-                (x,y)-> y>x ?y :x
-            );
+            notes.stream().map(n ->n.restBefore + n.duration)
+                .reduce(
+                    0L,
+                    (x,y)-> y>x ?y :x
+                )
+            + (
+                subChords==null
+                    ?0
+                    :subChords.stream().map(Chord::totalDuration)
+                        .reduce(
+                            0L,
+                            (x,y)-> y>x ?y :x
+                        )
+            )
+            ;
     }
 
-    /** For internal use, required by Notable */
+    /** For internal use, required by Notable, BUT never used*/
     public @Override Chord<T> addChord(long duration, int... pitches) {
-        for (int p: pitches)
-            addNote(duration, p);
-        return this;
+        throw new UnsupportedOperationException("Nope");
     }
 
     /** For internal use, required by Notable */
     public @Override Note<T> addNote(long duration, int pitch) {
-        return addNote(duration, 0, pitch);
+        return addNote(duration, 0L, pitch);
     }
 
     /** For internal use, required by BendContainer */
@@ -124,6 +141,12 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
     //            //
     ////////////////
 
+    List<Integer> pitches() {
+        return pitches;
+    }
+    List<Chord<Chord<T>>> chords() {
+        return subChords==null ?Collections.emptyList() :subChords;
+    }
     List<Note<T>> notes() {
         return notes;
     }
@@ -133,8 +156,15 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
 
     /** Exposed for use by Rest, which will supply a non-zero restBefore */
     Note<T> addNote(long duration, long restBefore, int pitch) {
+        //addChord(duration, restBefore, pitch);
         Note<T> n=new Note<>(this, duration, restBefore, pitch);
         notes.add(n);
+        return n;
+    }
+    /** Exposed for use by Rest, which will supply a non-zero restBefore */
+    Chord<Chord<T>> addChord(long duration, long restBefore, int... pitches) {
+        var n=new Chord<>(this, attributes, duration, restBefore, pitches);
+        subChords.add(n);
         return n;
     }
 
@@ -143,6 +173,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
     }
 
     private Chord<T> t(long duration) {
+        this.duration+=duration;
         for (Note n: notes)
             n.t(duration);
         return this;
@@ -171,12 +202,14 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
         return attributes;
     }
     protected @Override Chord<T> setVolume(int v) {
-        passOnToNotes(note-> note.setVolume(v));
+        passOnToNotes(x-> x.setVolume(v));
+        passOnToChords(x-> x.setVolume(v));
         this.attributes.volume=v;
         return this;
     }
     protected @Override Chord<T> setTranspose(int semitones) {
-        passOnToNotes(note-> note.setTranspose(semitones));
+        passOnToNotes(x-> x.setTranspose(semitones));
+        passOnToChords(x-> x.setTranspose(semitones));
         this.attributes.transpose=semitones;
         return this;
     }
@@ -192,5 +225,20 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
         for (Note note: notes)
             if (note.getNoteAttributesForRead()!=this.attributes)
                 consumer.accept(note);
+    }
+
+    private void passOnToChords(Consumer<Chord<?>> consumer) {
+        if (usingParentAttributes) {
+            usingParentAttributes=false;
+            attributes=new NoteAttributes(attributes);
+            if (subChords!=null)
+                for (Chord<?> ch: subChords)
+                    if (ch.usingParentAttributes)
+                        ch.attributes=attributes;
+        }
+        if (subChords!=null)
+            for (Chord<?> ch: subChords)
+                if (!ch.usingParentAttributes)
+                    consumer.accept(ch);
     }
 }
