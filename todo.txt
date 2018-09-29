@@ -1,3 +1,4 @@
+- Add Chord.up(), Rest.up() which takes notes like c()
 - Test two players doing bends at once, running off channels 0 & 1
 - Player channel should only be set once
 - MyMidi3.ReserveChannels appears to have state problems and is global

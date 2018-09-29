@@ -12,7 +12,7 @@ public class TestBPM implements XTest {
 		    .instrument("Strings - Contrabass")
 		    .channel(0)
 		    .setBendSensitivity(4)
-		    .octave(3)
+		    .octave(4)
 		    .r(4)
 
 
@@ -23,8 +23,8 @@ public class TestBPM implements XTest {
 
 		    .bpm(30)
 		    .c(16, G-12)
-		    .r(16.3)
-			    .c(16.3, C).t(16.3)
+			    .r(16.3)
+				    .c(16.3, C).t(16.3)
 		    .r(16.3).t(16.3)
 			    .c(16.3, D)
 			    .t(2)
@@ -36,14 +36,14 @@ public class TestBPM implements XTest {
 
 		    .bpm(30)
 		    .c(16.3, G)
-		    .r(16.3)
-			    .c(16.3, A)
+			    .r(16.3)
+			    .c(16.3, A).up()
 		    .p(16.3, B_)
 
 		    .bpm(30)
 		    .c(16.3, G)
-		    .r(16.3)
-			    .c(16.3, A)
+			    .r(16.3)
+			    .c(16.3, A).up()
 		    .p(16.3, B_)
 
 		    .bpm(40)

@@ -11,7 +11,6 @@ import java.util.function.Consumer;
  * notes at once and finish them all at once, overlapping/arpeggiating possibilities are
  * allowed via the r() method, which creates a Rest, and then delayed notes can be added.
  * FIXME test much overlapping waxing/waning etc.
- *
  */
 public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendContainer<Chord<T>>, Notable<T> {
     private final T parent;
@@ -113,9 +112,18 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
             ;
     }
 
+
+    public Chord<Chord<T>> c(int duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes);
+    }
+    public Chord<Chord<T>> c(double duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes);
+    }
     /** For internal use, required by Notable, BUT never used*/
-    public @Override Chord<T> addChord(long duration, int... pitches) {
-        throw new UnsupportedOperationException("Nope");
+    private Chord<Chord<T>> addChord(long duration, int... pitches) {
+        var chord=new Chord<>(this, attributes, duration, pitches);
+        subChords.add(chord);
+        return chord;
     }
 
     /** For internal use, required by Notable */
@@ -161,6 +169,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
         notes.add(n);
         return n;
     }
+
     /** Exposed for use by Rest, which will supply a non-zero restBefore */
     Chord<Chord<T>> addChord(long duration, long restBefore, int... pitches) {
         var n=new Chord<>(this, attributes, duration, restBefore, pitches);

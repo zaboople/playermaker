@@ -22,6 +22,18 @@ public class Rest<T> implements Notable<T> {
     public Chord<T> fin(int... pitches) {
         return addChord(chord.totalDuration()-restFor, pitches);
     }
+    public Chord<T> c(int duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes);
+    }
+    public Chord<T> c(double duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes);
+    }
+    private Chord<T> addChord(long duration, int... pitches){
+        for (int n: pitches)
+            addNote(duration, n);
+        return chord;
+    }
+
 
     /**
      * Ties this Rest to another - actually returns itself after extending its duration.
@@ -50,11 +62,5 @@ public class Rest<T> implements Notable<T> {
         return chord.addNote(duration, restFor, pitch);
     }
 
-    /** For internal use, required by Notable */
-    public @Override Chord<T> addChord(long duration, int... pitches){
-        for (int n: pitches)
-            addNote(duration, n);
-        return chord;
-    }
 
 }
