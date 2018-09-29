@@ -22,6 +22,8 @@ import java.util.List;
  * <p>
  * (Note: This is an interface because I want default methods i.e. multiple inheritance. However, some
  * things that shouldn't be public are, because interfaces are that way. And I am a bad person.)
+
+ * FIXME this can at least be abstract, no need for an interface.
  */
 public interface BendContainer<T> {
 
@@ -70,7 +72,7 @@ public interface BendContainer<T> {
      * FIXME test this
      */
     public default T bend(int denominator) {
-        return bend(0L, totalDuration(), denominator);
+        return bend(0L, durationForBend(), denominator);
     }
 
     /**
@@ -120,14 +122,14 @@ public interface BendContainer<T> {
 
 
     public default T vibrato(long frequency, int denominator) {
-        return vibrato(0L, totalDuration(), frequency, denominator);
+        return vibrato(0L, durationForBend(), frequency, denominator);
     }
     public default T vibrato(long duration, long frequency, int denominator) {
         return vibrato(0L, duration, frequency, denominator);
     }
 
     public default T vibrato(int frequency, int denominator) {
-        return vibrato(0L, totalDuration(), Divisions.convert(frequency), denominator);
+        return vibrato(0L, durationForBend(), Divisions.convert(frequency), denominator);
     }
     public default T vibrato(int duration, int frequency, int denominator) {
         return vibrato(0, duration, frequency, denominator);
@@ -142,7 +144,7 @@ public interface BendContainer<T> {
     }
 
     public default T vibrato(double frequency, int denominator) {
-        return vibrato(0L, totalDuration(), Divisions.convert(frequency), denominator);
+        return vibrato(0L, durationForBend(), Divisions.convert(frequency), denominator);
     }
     public default T vibrato(Number duration, Number frequency, int denominator) {
         Long long0=0l;//Avoids java 10 compiler warning
@@ -164,7 +166,7 @@ public interface BendContainer<T> {
     /** Internal use */
     List<Bend> makeBends();
     /* Internal use */
-    long totalDuration();
+    long durationForBend();
     /* Internal use */
     T self();
 }

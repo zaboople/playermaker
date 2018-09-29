@@ -250,7 +250,7 @@ public class MyMidi3  {
             }
         } else {
 
-            long chordEndTick=currTick+ (tickX * chord.duration);
+            long chordEndTick=currTick+ (tickX * chord.duration());
             for (int p: chord.pitches()) {
                 midiTracker.noteOn(channelIndex, p, chord.volume(), currTick);
                 midiTracker.noteOff(channelIndex, p, chordEndTick);

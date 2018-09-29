@@ -3,6 +3,7 @@ import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 
+/** FIXME */
 public class TestBPM implements XTest {
     public static void main(String args[]) throws Exception {
 	    new TestBPM().test(new MyMidi3(), true);

@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  * allowed via the r() method, which creates a Rest, and then delayed notes can be added.
  * FIXME test much overlapping waxing/waning etc.
  */
-public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendContainer<Chord<T>>, Notable<T> {
+public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendContainer<Chord<T>> {
     private final T parent;
     private final List<Note<T>> notes=new ArrayList<>();//FIXME
     private final List<Integer> pitches=new ArrayList<>();
@@ -21,7 +21,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
     private boolean usingParentAttributes=true;
     private List<Bend> bends=null;
     private List<Chord<Chord<T>>> subChords=null;
-    long duration;
+    private long duration;
 
 
     protected Chord(T parent, NoteAttributes attributes, long duration, int... pitches) {
@@ -32,10 +32,15 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
         this.attributes=attributes;
         this.restBefore=restBefore;
         this.duration=duration;
-        for (int p: pitches)
-            addNote(duration, p);
+        for (int p: pitches) {
+            this.pitches.add(p);
+            notes.add(new Note<>(this, duration, restBefore, p));
+        }
     }
 
+    public long duration() {
+        return duration;
+    }
 
     /**
      * Takes us back to the original Player, for the sake of "fluent"
@@ -93,14 +98,20 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
      * Mostly for internal use; obtains the total duration of the Chord by our internal (not midi) tick system,
      * not in the general notation used for Chord/Note input durations.
      */
-    public @Override long totalDuration() {
-        return
-            notes.stream().map(n ->n.restBefore + n.duration)
+    public @Override long durationForBend() {
+        return notes.isEmpty()
+            ? duration
+            : notes.stream().map(n ->n.restBefore + n.duration)
                 .reduce(
                     0L,
                     (x,y)-> y>x ?y :x
                 )
-            + (
+            ;
+    }
+
+    protected long totalDuration() {
+        return notes.isEmpty()
+            ?(
                 subChords==null
                     ?0
                     :subChords.stream().map(Chord::totalDuration)
@@ -109,7 +120,30 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
                             (x,y)-> y>x ?y :x
                         )
             )
+            : notes.stream().map(n ->n.restBefore + n.duration)
+                .reduce(
+                    0L,
+                    (x,y)-> y>x ?y :x
+                )
             ;
+    }
+
+
+    /**
+     * Adds a Chord containing one Note for the specified duration, and returns that Note.
+     * Duration and notes work the same as for @link{#p(int, int...)}
+     */
+    public Note<T> n(int duration, int note) {
+        return addNote(Divisions.convert(duration), 0L, note);
+    }
+    public Note<T> n(double duration, int note) {
+        return addNote(Divisions.convert(duration), 0L, note);
+    }
+    Note<T> addNote(long duration, long restBefore, int pitch) {
+        addChord(duration, restBefore, pitch);
+        Note<T> n=new Note<>(this, duration, restBefore, pitch);
+        notes.add(n);
+        return n;
     }
 
 
@@ -119,17 +153,12 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
     public Chord<Chord<T>> c(double duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
     }
-    /** For internal use, required by Notable, BUT never used*/
     private Chord<Chord<T>> addChord(long duration, int... pitches) {
         var chord=new Chord<>(this, attributes, duration, pitches);
         subChords.add(chord);
         return chord;
     }
 
-    /** For internal use, required by Notable */
-    public @Override Note<T> addNote(long duration, int pitch) {
-        return addNote(duration, 0L, pitch);
-    }
 
     /** For internal use, required by BendContainer */
     public @Override Chord<T> self() {
@@ -162,17 +191,11 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
         return bends==null ?Collections.emptyList() :bends;
     }
 
-    /** Exposed for use by Rest, which will supply a non-zero restBefore */
-    Note<T> addNote(long duration, long restBefore, int pitch) {
-        //addChord(duration, restBefore, pitch);
-        Note<T> n=new Note<>(this, duration, restBefore, pitch);
-        notes.add(n);
-        return n;
-    }
 
     /** Exposed for use by Rest, which will supply a non-zero restBefore */
     Chord<Chord<T>> addChord(long duration, long restBefore, int... pitches) {
         var n=new Chord<>(this, attributes, duration, restBefore, pitches);
+        if (subChords==null) subChords=new ArrayList<>();
         subChords.add(n);
         return n;
     }

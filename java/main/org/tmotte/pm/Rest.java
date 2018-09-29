@@ -6,7 +6,7 @@ package org.tmotte.pm;
  *
  * @see Player#r(int)
  */
-public class Rest<T> implements Notable<T> {
+public class Rest<T> {
     private final Chord<T> chord;
     private long restFor;
 
@@ -22,6 +22,7 @@ public class Rest<T> implements Notable<T> {
     public Chord<T> fin(int... pitches) {
         return addChord(chord.totalDuration()-restFor, pitches);
     }
+
     public Chord<T> c(int duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
     }
@@ -35,6 +36,16 @@ public class Rest<T> implements Notable<T> {
     }
 
 
+    public Note<T> n(int duration, int note) {
+        return addNote(Divisions.convert(duration), note);
+    }
+    public Note<T> n(double duration, int note) {
+        return addNote(Divisions.convert(duration), note);
+    }
+    private Note<T> addNote(long duration, int pitch) {
+        return chord.addNote(duration, restFor, pitch);
+    }
+
     /**
      * Ties this Rest to another - actually returns itself after extending its duration.
      * @param duration A period expressed using the same notation as Player.p(), Chord.c(), etc.
@@ -46,21 +57,11 @@ public class Rest<T> implements Notable<T> {
     public Rest<T> t(double duration) {
         return t(Divisions.convert(duration));
     }
-
     private Rest<T> t(long duration) {
         restFor+=duration;
         return this;
     }
 
-
-    ////////////////
-    // INTERNALS: //
-    ////////////////
-
-    /** For internal use, required by Notable */
-    public @Override Note<T> addNote(long duration, int pitch) {
-        return chord.addNote(duration, restFor, pitch);
-    }
 
 
 }

@@ -35,19 +35,7 @@ public interface Notable<T> {
 
 
 
-    /**
-     * Adds a Chord containing one Note for the specified duration, and returns that Note.
-     * Duration and notes work the same as for @link{#p(int, int...)}
-     */
-    public default Note<T> n(int duration, int note) {
-        return addNote(Divisions.convert(duration), note);
-    }
-    public default Note<T> n(double duration, int note) {
-        return addNote(Divisions.convert(duration), note);
-    }
 
 
-    /** Internal use */
-    Note<T> addNote(long duration, int note);
 
 }

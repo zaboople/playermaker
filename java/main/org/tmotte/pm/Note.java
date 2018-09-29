@@ -54,7 +54,7 @@ public class Note<T> extends NoteAttributeHolder<Note<T>> implements BendContain
         return this;
     }
     /** For internal use */
-    public @Override long totalDuration(){
+    public @Override long durationForBend(){
         return duration;
     }
 

@@ -195,7 +195,7 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
         return timeTracker.timeUpToIndex + last;
     }
     private long getDuration(int index) {
-        Chord<Player> chord=events.get(index).getChord();
+        Chord<?> chord=events.get(index).getChord();
         return chord==null ?0L :chord.totalDuration();
     }
 
@@ -242,6 +242,11 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     public Chord<Player> c(double duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
     }
+    private Chord<Player> addChord(long duration, int... pitches) {
+        var chord=new Chord<>(this, attributes, duration, pitches);
+        events.add(new Event(chord));
+        return chord;
+    }
 
 
     /**
@@ -265,15 +270,16 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     }
 
 
-    /** For internal use, required by Notable */
-    public @Override Note<Player> addNote(long duration, int pitch) {
+    public Note<Player> n(int duration, int note) {
+        return addNote(Divisions.convert(duration), note);
+    }
+    public Note<Player> n(double duration, int note) {
+        return addNote(Divisions.convert(duration), note);
+    }
+    private Note<Player> addNote(long duration, int pitch) {
         return addChord(duration, pitch).notes().get(0);
     }
-    private Chord<Player> addChord(long duration, int... pitches) {
-        var chord=new Chord<>(this, attributes, duration, pitches);
-        events.add(new Event(chord));
-        return chord;
-    }
+
 
     //////////////////////
     // EVENT INTERNALS: //
