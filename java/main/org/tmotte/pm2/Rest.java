@@ -23,6 +23,16 @@ public class Rest<T> {
         return addChord(chord.duration()-restFor, pitches);
     }
 
+    /**
+     * Does the same as Player.c(), but in this case a "sub-chord" is returned, since the original Rest
+     * was against a Chord to begin with. The new chord will play after the start of the original chord
+     * but (usually) before the end of the same original chord.
+     * <br>
+     * You can use .bend(), .vibrato(), .volume() and even .r() against the new Chord like any other.
+     * So yes, you can nest chords within others as far as you want to go, e.g. Chord<Chord<Chord...<T>>>>.
+     * <br>
+     * Use .up() to get back to the parent chord, or use up(int, int...) as a shortcut instead of .c().
+     */
     public Chord<Chord<T>> c(int duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
     }
@@ -33,9 +43,11 @@ public class Rest<T> {
         return chord.addChord(restFor, duration, pitches);
     }
 
+    /** A shortcut to c(int, int...).up() */
     public Chord<T> up(int duration, int... notes) {
         return addChord(Divisions.convert(duration), notes).up();
     }
+    /** A shortcut to c(double, int...).up() */
     public Chord<T> up(double duration, int... notes) {
         return addChord(Divisions.convert(duration), notes).up();
     }
