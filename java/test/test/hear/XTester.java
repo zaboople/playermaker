@@ -17,7 +17,7 @@ public class XTester {
             );
         else
             test(midi,
-                new Test7Slash16Time(),
+                //new Test7Slash16Time(),
                 new TestArpeggio(),
                 new TestBeatWithSound(),
                 new TestBends(),

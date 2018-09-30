@@ -11,10 +11,8 @@ import javax.sound.midi.Instrument;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Soundbank;
 import org.tmotte.common.midi.SequencerUtils;
-import org.tmotte.pm.Divisions;
-import org.tmotte.pm.MyMidi3;
-import org.tmotte.pm.Player;
-import test.hear.Test7Slash16Time;
+import org.tmotte.pm2.MyMidi3;
+import test.hear2.Test7Slash16Time;
 import static org.tmotte.pm.Pitches.*;
 
 /**

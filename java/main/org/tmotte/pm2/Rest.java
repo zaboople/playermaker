@@ -33,6 +33,13 @@ public class Rest<T> {
         return chord.addChord(restFor, duration, pitches);
     }
 
+    public Chord<T> up(int duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes).up();
+    }
+    public Chord<T> up(double duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes).up();
+    }
+
 
     /**
      * Ties this Rest to another - actually returns itself after extending its duration.
