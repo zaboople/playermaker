@@ -1,4 +1,4 @@
-package test.hear;
+package test.hear2;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,10 +11,10 @@ import javax.sound.midi.Instrument;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Soundbank;
 import org.tmotte.common.midi.SequencerUtils;
-import org.tmotte.pm.Divisions;
-import org.tmotte.pm.MyMidi3;
-import org.tmotte.pm.Player;
-import static org.tmotte.pm.Pitches.*;
+import org.tmotte.pm2.Divisions;
+import org.tmotte.pm2.MyMidi3;
+import org.tmotte.pm2.Player;
+import static org.tmotte.pm2.Pitches.*;
 
 /**
  * In other words, 7/16 time, seven beats per measure, 16th note gets a beat.
@@ -61,8 +61,8 @@ public class Test7Slash16Time  implements XTest {
 				// 1
 					.t(4)
 					.r(16)
-					.c(4, F, B_+12, C+24, E+24)
-					.up()
+						.c(4, F, B_+12, C+24, E+24)
+						.up().up()
 				.p(8., G+24)
 
 				// 2
@@ -73,14 +73,16 @@ public class Test7Slash16Time  implements XTest {
 				// 3
 					.t(4)
 					.r(8)
-					.c(4, A+12, C+24, E+24)
+						.c(4, A+12, C+24, E+24)
+						.up()
 					.up()
 				.c(8., F, A+24)
 
 				// 4
 					.t(4)
 					.r(8.)
-					.c(4, F, B_, F+12, A+12, C+12)
+						.c(4, F, B_, F+12, A+12, C+12) //FIXME make a c() that does up()
+						.up()
 					.up()
 				.p(8, E+24)
 				.p(16, F+24)
