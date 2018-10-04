@@ -1,23 +1,21 @@
-package test.hear;
-import org.tmotte.pm.MyMidi3;
-import org.tmotte.pm.Player;
-import static org.tmotte.pm.Pitches.*;
+package test.hear2;
+import org.tmotte.pm2.MyMidi3;
+import org.tmotte.pm2.Player;
+import static org.tmotte.pm2.Pitches.*;
 
 public class TestBends implements XTest {
     public static void main(String args[]) throws Exception {
 	    new TestBends().test(new MyMidi3(), true);
     }
     public void test(MyMidi3 midi, boolean stop)  {
-	    //Organ 1:
-		int base=10;
 	    Player player=new Player()
 		    .setBeatsPerMinute(90)
-		    .instrument(16)
+		    .instrument("60's Organ 1")
 		    .octave(6)
 		    .r(4)
 
 		    .p(8, C)
-		    .c(4, D_).bend(16, 2).up()
+		    .c(4, D_).bend(8, 2).vibrato(8, 64., 8).up()
 
 		    .p(8, B)
 		    .octave(5)

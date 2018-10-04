@@ -20,7 +20,7 @@ public class XTester {
                 //new Test7Slash16Time(),
                 //new TestArpeggio(),
                 new TestBeatWithSound(),
-                new TestBends(),
+                //new TestBends(),
                 new TestBends2(),
                 new TestBendsPartial(),
                 new TestBendTo(),
