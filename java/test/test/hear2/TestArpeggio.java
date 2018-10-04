@@ -1,7 +1,7 @@
-package test.hear;
-import org.tmotte.pm.MyMidi3;
-import org.tmotte.pm.Player;
-import static org.tmotte.pm.Pitches.*;
+package test.hear2;
+import org.tmotte.pm2.MyMidi3;
+import org.tmotte.pm2.Player;
+import static org.tmotte.pm2.Pitches.*;
 
 
 public class TestArpeggio implements XTest {
@@ -9,7 +9,6 @@ public class TestArpeggio implements XTest {
 	    new TestArpeggio().test(new MyMidi3(), true);
     }
     public void test(MyMidi3 midi, boolean stop)  {
-	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
 		    .setBeatsPerMinute(80)
 		    .instrument(1)
@@ -17,22 +16,29 @@ public class TestArpeggio implements XTest {
 		    .r(8)
 		    .octave(2)
 		    .c(1, A)
-			    .r(4).c(2., C)
-			    .r(2).c(2, G)
-			    .r(2.).c(4, F)
+			    .r(4).up(2., C)
+			    .r(2).up(2, G)
+			    .r(2.).up(4, F)
 			    .up()
+
+		    // This is doing the same as the other two but maybe not "the right way".
+			// Also, unrelated, but I am getting vibrato on each by "bendWithParent()".
 		    .octave(3)
 		    .c(1, A)
-			    .r(4).c(2., C)
-			    .r(2).c(2, G)
-			    .r(2.).c(4, A-12, C-12, G-12, F)
+			    .r(4).c(2., C).bendWithParent()
+				    .r(4).c(2, G).bendWithParent()
+					    .r(4).c(4, A-12, C-12, G-12, F).bendWithParent()
+						    .up()
+					    .up()
+				    .up()
 			    .vibrato(32, 16)
 			    .up()
+
 		    .octave(4)
 		    .c(1, A, A-12, C-12, G-12, F-12)
-			    .r(4).c(2., C)
-			    .r(2).c(2, G)
-			    .r(2.).c(4, G-12, F+12)
+			    .r(4).up(2., C)
+			    .r(2).up(2, G)
+			    .r(2.).up(4, G-12, F+12)
 			    .up()
 			.p(16.3, F, A, C, G)
 			.p(16.3, F, A, C, G)
@@ -40,8 +46,6 @@ public class TestArpeggio implements XTest {
 			.octave(6)
 			.c(2., F).vibrato(32, 16).up()
 
-
-			//1
 			.r(2)
 			;
 	    midi.play(stop, player);
