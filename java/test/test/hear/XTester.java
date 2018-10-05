@@ -10,7 +10,7 @@ public class XTester {
         MyMidi3 midi=new MyMidi3();
         if (args.length>0 && args[0].startsWith("-b"))
             test(midi,
-                new TestBends(),
+                //new TestBends(),
                 new TestBends2(),
                 new TestBendsPartial(),
                 new TestBendTo()
@@ -25,7 +25,7 @@ public class XTester {
                 new TestBendsPartial(),
                 new TestBendTo(),
                 //new TestBPM(), FIXME
-                new TestChannelTrack(),
+                //new TestChannelTrack(),
                 new TestChords(),
                 new TestFinish(),
                 new TestPlayAfter(),
