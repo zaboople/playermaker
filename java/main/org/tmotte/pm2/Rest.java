@@ -15,13 +15,24 @@ public class Rest<T> {
         this.restFor=restFor;
     }
 
+
+
     /**
-     * Indicates that we should "finish", i.e. play the pitches for the remaining duration of the original Chord.
-     * @return The original Chord.
+     * Ties this Rest to another - actually returns itself after extending its duration.
+     * @param duration A period expressed using the same notation as Player.p(), Chord.c(), etc.
      */
-    public Chord<Chord<T>> fin(int... pitches) {
-        return addChord(chord.duration()-restFor, pitches);
+    public Rest<T> t(int duration) {
+        return t(Divisions.convert(duration));
     }
+    /** A double version of t(int) for use with dotted & triplet notes.*/
+    public Rest<T> t(double duration) {
+        return t(Divisions.convert(duration));
+    }
+    private Rest<T> t(long duration) {
+        restFor+=duration;
+        return this;
+    }
+
 
     /**
      * Does the same as Player.c(), but in this case a "sub-chord" is returned, since the original Rest
@@ -43,6 +54,27 @@ public class Rest<T> {
         return chord.addChord(restFor, duration, pitches);
     }
 
+    /**
+     * Indicates that we should "finish", i.e. play the pitches for the remaining duration of the original Chord.
+     * @return The original Chord.
+     */
+    public Chord<Chord<T>> fin(int... pitches) {
+        return addChord(chord.duration()-restFor, pitches);
+    }
+    /**
+     * A shortcut to fin(int...).up()
+     */
+    public Chord<T> finup(int... pitches) {
+        return addChord(chord.duration()-restFor, pitches).up();
+    }
+    /**
+     * A shortcut to fin(int...).bendWithParent()
+     */
+    public Chord<Chord<T>> finb(int... pitches) {
+        return addChord(chord.duration()-restFor, pitches).bendWithParent();
+    }
+
+
     /** A shortcut to c(int, int...).up() */
     public Chord<T> up(int duration, int... notes) {
         return addChord(Divisions.convert(duration), notes).up();
@@ -52,23 +84,14 @@ public class Rest<T> {
         return addChord(Divisions.convert(duration), notes).up();
     }
 
-
-    /**
-     * Ties this Rest to another - actually returns itself after extending its duration.
-     * @param duration A period expressed using the same notation as Player.p(), Chord.c(), etc.
-     */
-    public Rest<T> t(int duration) {
-        return t(Divisions.convert(duration));
+    /** A shortcut to c(int, int...).bendWithParent() */
+    public Chord<Chord<T>> b(int duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes).bendWithParent();
     }
-    /** A double version of t(int) for use with dotted & triplet notes.*/
-    public Rest<T> t(double duration) {
-        return t(Divisions.convert(duration));
+    /** A shortcut to c(double, int...).bendWithParent() */
+    public Chord<Chord<T>> b(double duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes).bendWithParent();
     }
-    private Rest<T> t(long duration) {
-        restFor+=duration;
-        return this;
-    }
-
 
 
 }

@@ -1,7 +1,7 @@
-package test.hear;
-import org.tmotte.pm.MyMidi3;
-import org.tmotte.pm.Player;
-import static org.tmotte.pm.Pitches.*;
+package test.hear2;
+import org.tmotte.pm2.MyMidi3;
+import org.tmotte.pm2.Player;
+import static org.tmotte.pm2.Pitches.*;
 
 public class TestBendTo implements XTest {
     public static void main(String args[]) throws Exception {
@@ -10,7 +10,8 @@ public class TestBendTo implements XTest {
     public void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .setBeatsPerMinute(60)
-		    .instrumentChannel(41, 3)
+		    .instrument("Strings - Viola")
+		    .channel(3)
 		    .setBendSensitivity(4)
 		    .r(4)
 
@@ -24,16 +25,18 @@ public class TestBendTo implements XTest {
 		    .p(16.3, C+12)
 		    .p(16.3, D_+12)
 		    .p(16.3, D+12)
-			.n(4., G).bend(8, 2).up()
-				.r(4).n(8, E+12).upup()
+			.c(4., G).bend(8, 2)
+				.r(4).c(8, E+12).up()
+				.up()
 
 			// 4
 			.c(4, F+12).bend(8, 2).up()
 
 			// 5 - And again the tricky bend:
-			.n(4, G).bend(8, 2).up()
-				.r(8)
-				.n(8, D+12).upup()
+			.c(4, G).bend(8, 2)
+				.r(8).c(8, D+12).up()
+				.up()
+
 			// 6
 			.c(4, E+12+2, G+12+2)
 				.bend(8, -2).up()
@@ -48,8 +51,7 @@ public class TestBendTo implements XTest {
 			.p(16.3, D, B_)
 			.p(4., A, A-12, A+12)
 		    .r(4);
-	    midi
-		    .play(stop, player);
+	    midi.play(stop, player);
     }
 
 }

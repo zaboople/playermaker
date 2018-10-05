@@ -1,6 +1,6 @@
-package test.hear;
-import org.tmotte.pm.MyMidi3;
-import org.tmotte.pm.Player;
+package test.hear2;
+import org.tmotte.pm2.MyMidi3;
+import org.tmotte.pm2.Player;
 
 /** This should play 2 rolls per second. */
 public class TestBeatWithSound implements XTest {
@@ -14,9 +14,9 @@ public class TestBeatWithSound implements XTest {
 		int checks=20;
 		for (int i=0; i<checks; i++)
 		    player.c(4, 24+i)
-			    .r(16).n(8, 28+i).up()
-			    .r(8).n(8, 31+i).up()
-			    .r(8.).n(16, 31+i).up().up();
+			    .r(16).c(8, 28+i).up()
+			    .r(8).c(16, 31+i).up()
+			    .r(8.).c(16, 31+i);
 	    midi.sequence(player);
 	    doTimerThread(checks);
 	    midi.play(stop);

@@ -12,18 +12,18 @@ public class XTester {
             test(midi,
                 //new TestBends(),
                 new TestBends2(),
-                new TestBendsPartial(),
-                new TestBendTo()
+                new TestBendsPartial()
+                //new TestBendTo()
             );
         else
             test(midi,
                 //new Test7Slash16Time(),
                 //new TestArpeggio(),
-                new TestBeatWithSound(),
+                //new TestBeatWithSound(),
                 //new TestBends(),
                 new TestBends2(),
                 new TestBendsPartial(),
-                new TestBendTo(),
+                //new TestBendTo(),
                 //new TestBPM(), FIXME
                 //new TestChannelTrack(),
                 new TestChords(),
