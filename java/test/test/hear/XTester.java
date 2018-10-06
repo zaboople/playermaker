@@ -9,14 +9,15 @@ public class XTester {
     public static void main(String[] args){
         MyMidi3 midi=new MyMidi3();
         if (args.length>0 && args[0].startsWith("-b"))
-            /*
-            test(midi,
-                new TestBends(),
-                new TestBends2(),
-                new TestBendsPartial()
-                new TestBendTo()
+            test(
+                midi
+                /*
+                ,new TestBends()
+                ,new TestBends2()
+                ,new TestBendsPartial()
+                ,new TestBendTo()
+                */
             );
-            */
         else
             test(midi,
                 //new Test7Slash16Time(),

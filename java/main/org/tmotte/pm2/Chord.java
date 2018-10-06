@@ -13,6 +13,8 @@ import java.util.function.Consumer;
  * FIXME test much overlapping waxing/waning etc.
  */
 public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendContainer<Chord<T>> {
+
+
     private final T parent;
     private final List<Integer> pitches=new ArrayList<>();
     private final long restBefore;
@@ -34,7 +36,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
         this.duration=duration;
         for (int p: pitches)
             this.pitches.add(p);
-        System.out.println("Parent "+parent+" "+this.pitches+" restBefore "+restBefore+" duration "+duration);
+        Log.log("Chord", "Parent {} pitches {} restBefore {} duration {}", parent, this.pitches, restBefore, duration);
     }
 
 
