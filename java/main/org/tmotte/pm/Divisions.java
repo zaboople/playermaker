@@ -1,7 +1,7 @@
 package org.tmotte.pm;
 
 /** For internal use only. This is exposed only for unit tests. */
-public class Divisions {
+class Divisions {
     public final static int triplet128=2;
     public final static int triplet64=triplet128 * 2;
     public final static int triplet32=triplet64  * 2;
