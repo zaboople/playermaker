@@ -219,6 +219,11 @@ public class MyMidi3  {
     private long processChordEvent(
             Chord<?> chord, Player player, ChannelAttrs channelAttrs, long currTick, ParentState parentState
         ) {
+
+        ////////////////
+        // 1. SETUP:  //
+        ////////////////
+
         final long chordTick   =currTick  + (tickX * chord.restBefore());
         final long chordEndTick=chordTick + (tickX * chord.duration());
         final boolean hasBends=!chord.bends().isEmpty(),
@@ -248,8 +253,14 @@ public class MyMidi3  {
         else
             channelIndex=channelAttrs.mainChannel;
 
-        System.out.println("FIXME restBefore "+chord.restBefore()+" duration "+chord.duration());
-        System.out.println("FIXME channel "+channelIndex+" pitches "+chord.pitches()+" start "+chordTick+" end "+chordEndTick);
+        System.out.println(
+            "Chord setup: Channel: "+channelIndex+" restBefore: "+chord.restBefore()+" duration: "+chord.duration()
+           +" pitches: "+chord.pitches()+" start tick: "+chordTick+" end tick: "+chordEndTick
+        );
+
+        //////////////////
+        // 2. EXECUTE:  //
+        //////////////////
 
         for (int p: chord.pitches()) {
             p+=chord.getTranspose();
@@ -262,7 +273,7 @@ public class MyMidi3  {
         }
         long realEndTick=chordEndTick;
         if (hasChords) {
-            System.out.println("Nested "+realEndTick+"...");
+            System.out.println("Chord nesting... ");
             ParentState ps=new ParentState(true, hasBends, channelIndex);
             realEndTick=
                 chord.chords().stream().map(sub ->
@@ -274,7 +285,7 @@ public class MyMidi3  {
         }
         if (!parentState.exists)
             reserveChannels.clearSpares();
-        System.out.println("RETURNING "+realEndTick);
+        System.out.println("Chord complete, end tick: "+realEndTick);
         return realEndTick;
     }
 
@@ -307,7 +318,7 @@ public class MyMidi3  {
                 if (reservedAll[ch])
                     break; //Because we don't go beyond the gap
                 if (!currSpares.contains(ch)) {
-                    System.out.println("Selected spare: "+ch);
+                    //System.out.println("Selected spare: "+ch);
                     currSpares.add(ch);
                     setupChannelForPlayer(ch, channelAttrs, tick);
                     return ch;
@@ -330,11 +341,11 @@ public class MyMidi3  {
     }
 
     private void sendBends(int channel, long soundStart, List<Bend> bends) {
-        //System.out.println("MyMidi3: Bends "+bends.size());
+        System.out.println("MyMidi3: Bends "+bends.size());
         long t=soundStart;
         int pitch=NO_BEND;
         for (Bend bend: bends) {
-            //System.out.println("Bend delay "+delay+" duration "+duration+" denominator "+denominator);
+            System.out.println("Bend delay "+bend.delay+" duration "+bend.duration+" denominator "+bend.denominator);
             t+=(bend.delay * tickX);
             int change = NO_BEND / bend.denominator;
             int perTicky = change / (int)bend.duration;
@@ -348,6 +359,8 @@ public class MyMidi3  {
                 }
                 pitch+=thisAmount;
                 if (pitch==16384) pitch=16383;
+                if (pitch > 16383 || pitch < 0)
+                    throw new RuntimeException("You bent too far, probably by doing multiple bends");
                 //System.out.println("Sending bend "+pitch+" at "+t);
                 midiTracker.eventBend(channel, pitch, t);
                 t+=tickX;

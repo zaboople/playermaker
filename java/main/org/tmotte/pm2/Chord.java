@@ -97,10 +97,19 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
     }
 
     public Chord<Chord<T>> c(int duration, int... notes) {
-        return addChord(Divisions.convert(duration), 0L, notes);
+        return addChord(0L, Divisions.convert(duration), notes);
     }
     public Chord<Chord<T>> c(double duration, int... notes) {
-        return addChord(Divisions.convert(duration), 0L, notes);
+        return addChord(0L, Divisions.convert(duration), notes);
+    }
+
+    /** A shortcut to c(int, int...).up() */
+    public Chord<T> up(int duration, int... notes) {
+        return c(duration, notes).up();
+    }
+    /** A shortcut to c(double, int...).up() */
+    public Chord<T> up(double duration, int... notes) {
+        return c(duration, notes).up();
     }
     /** Exposed for use by Rest, which will supply a non-zero restBefore */
     protected Chord<Chord<T>> addChord(long restBefore, long duration, int... pitches) {

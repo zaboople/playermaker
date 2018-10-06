@@ -137,6 +137,11 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     }
 
     /** Note: Reverb can only be set once, because it is not event-based like most other attributes. */
+    public Player reverb(int reverb) {
+        return setReverb(reverb);
+    }
+
+    /** Note: Reverb can only be set once, because it is not event-based like most other attributes. */
     public Player setReverb(int reverb) {
         if (reverbSetOnce)
             throw new RuntimeException("There is no point in setting the reverb more than once.");

@@ -77,20 +77,20 @@ public class Rest<T> {
 
     /** A shortcut to c(int, int...).up() */
     public Chord<T> up(int duration, int... notes) {
-        return addChord(Divisions.convert(duration), notes).up();
+        return c(duration, notes).up();
     }
     /** A shortcut to c(double, int...).up() */
     public Chord<T> up(double duration, int... notes) {
-        return addChord(Divisions.convert(duration), notes).up();
+        return c(duration, notes).up();
     }
 
     /** A shortcut to c(int, int...).bendWithParent() */
     public Chord<Chord<T>> b(int duration, int... notes) {
-        return addChord(Divisions.convert(duration), notes).bendWithParent();
+        return c(duration, notes).bendWithParent();
     }
     /** A shortcut to c(double, int...).bendWithParent() */
     public Chord<Chord<T>> b(double duration, int... notes) {
-        return addChord(Divisions.convert(duration), notes).bendWithParent();
+        return c(duration, notes).bendWithParent();
     }
 
 
