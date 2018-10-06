@@ -1,4 +1,4 @@
-package org.tmotte.pm;
+package org.tmotte.pm2;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +29,10 @@ final class Bend {
         if (denominator % 2 != 0)
             throw new RuntimeException("Denominator should be divisible by 2; value was "+denominator);
         long count=duration/frequency;
-        System.out.println("Long, Frequency: "+frequency+" Duration: "+duration+" Count: "+count+" Denom:"+denominator);
+        Log.log(
+            "Bend", "Frequency: {} Duration: {} Count: {} Denom: {}",
+            frequency, duration, count, denominator
+        );
         int flipper=1;
         for (long i=0; i<count; i++) {
             bends.add(new Bend(delay, frequency, denominator * (flipper*=-1))); //FIXME don't need bends=add(, just add(

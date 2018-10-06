@@ -16,7 +16,7 @@
  *       triplet are also the same duration as a quarter note.
  * </ul>
  */
-package org.tmotte.pm2;
+package org.tmotte.pm;
 
 
 

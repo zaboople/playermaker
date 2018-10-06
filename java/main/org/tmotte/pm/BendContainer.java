@@ -1,4 +1,4 @@
-package org.tmotte.pm;
+package org.tmotte.pm2;
 import java.util.List;
 
 /**
@@ -31,7 +31,6 @@ public interface BendContainer<T> {
     //    0     bend all the way down
     //    8192  no bend at all
     //    16383 bend all the way up
-
 
     ///////////
     // BEND: //
@@ -153,8 +152,8 @@ public interface BendContainer<T> {
 
 
     public default T vibrato(Number delay, Number duration, Number frequency, int denominator) {
-        //System.out.println("BendContainer.vibrato(Number, Number, Number, int)");
-        //System.out.println("BendContainer.vibrato("+delay+", "+duration+", "+frequency+", "+denominator+")");
+        //log("vibrato(Number, Number, Number, int)");
+        //log("vibrato("+delay+", "+duration+", "+frequency+", "+denominator+")");
         return vibrato(
             Divisions.convert(delay),
             Divisions.convert(duration),

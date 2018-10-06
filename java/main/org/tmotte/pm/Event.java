@@ -1,4 +1,4 @@
-package org.tmotte.pm;
+package org.tmotte.pm2;
 import javax.sound.midi.Instrument;
 import java.util.function.Function;
 

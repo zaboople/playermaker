@@ -1,4 +1,4 @@
-package org.tmotte.pm;
+package org.tmotte.pm2;
 
 /**
  * This is extended by Chord, Note & Player. Player passes its attributes on to the Chord (when created, for example, by Player#c()),

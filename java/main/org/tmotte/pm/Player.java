@@ -1,4 +1,4 @@
-package org.tmotte.pm;
+package org.tmotte.pm2;
 
 import java.util.Map;
 import java.util.List;
@@ -7,8 +7,6 @@ import java.util.Collection;
 import javax.sound.midi.Instrument;
 
 /**
- * FIXME Player needs to set channel in the constructor.
- *
  * A Player is roughly analagous to a human musician, and thereby to a Midi Channel.
  * It can play any instrument, but only one instrument at any given time. A composition
  * can be made of many Players. Notes are added to a Player using methods inherited from
@@ -32,7 +30,6 @@ import javax.sound.midi.Instrument;
  *    <li>Channel: While this can be set more than once, it generally isn't useful to change its initial
  *        setting (arguably channel should be a constructor parameter for Player()).
  * </ul>
- * FIXME talk about volume & transpose.
  * <br>
  * And then we have: Reverb. For whatever reasons, the Java Sequencer ignores reverb events, so we apply
  * reverb directly to the synthesizer at the very beginning of playback, once and only once. This means
@@ -134,6 +131,11 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     public Player setPressure(int pressure) {
         event(new Event().setPressure(pressure));
         return this;
+    }
+
+    /** Note: Reverb can only be set once, because it is not event-based like most other attributes. */
+    public Player reverb(int reverb) {
+        return setReverb(reverb);
     }
 
     /** Note: Reverb can only be set once, because it is not event-based like most other attributes. */
@@ -269,16 +271,6 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
         return c(duration, notes).up();
     }
 
-
-    public Note<Player> n(int duration, int note) {
-        return addNote(Divisions.convert(duration), note);
-    }
-    public Note<Player> n(double duration, int note) {
-        return addNote(Divisions.convert(duration), note);
-    }
-    private Note<Player> addNote(long duration, int pitch) {
-        return addChord(duration, pitch).notes().get(0);
-    }
 
 
     //////////////////////

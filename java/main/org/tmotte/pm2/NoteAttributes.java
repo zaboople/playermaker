@@ -1,4 +1,4 @@
-package org.tmotte.pm2;
+package org.tmotte.pm;
 
 /**
  * This is only used by NoteAttributeHolder, and only contains

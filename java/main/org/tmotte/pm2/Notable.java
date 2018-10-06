@@ -1,4 +1,4 @@
-package org.tmotte.pm2;
+package org.tmotte.pm;
 
 /**
  * This is shared by Player, Chord, & Rest.

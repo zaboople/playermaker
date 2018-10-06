@@ -5,6 +5,7 @@
     - Also, you can skip parentheses but you have to keep commas
 - Need to be able to taper volume up or down!
 - Divisions.* can be hidden since we can share packages with test
+- Player setVolume() and setTranspose() need to be documented... and should they be event-based too?
 
 - Keyboard
     Label keys C1 - G8 or whatever

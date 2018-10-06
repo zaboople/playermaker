@@ -1,4 +1,4 @@
-package org.tmotte.pm;
+package org.tmotte.pm2;
 
 /**
  * Rest acts as a temporary placeholder, only used by Chord (not Player); the intention is that you
@@ -15,36 +15,7 @@ public class Rest<T> {
         this.restFor=restFor;
     }
 
-    /**
-     * Indicates that we should "finish", i.e. play the pitches for the remaining duration of the original Chord.
-     * @return The original Chord.
-     */
-    public Chord<T> fin(int... pitches) {
-        return addChord(chord.totalDuration()-restFor, pitches);
-    }
 
-    public Chord<T> c(int duration, int... notes) {
-        return addChord(Divisions.convert(duration), notes);
-    }
-    public Chord<T> c(double duration, int... notes) {
-        return addChord(Divisions.convert(duration), notes);
-    }
-    private Chord<T> addChord(long duration, int... pitches){
-        for (int n: pitches)
-            addNote(duration, n);
-        return chord;
-    }
-
-
-    public Note<T> n(int duration, int note) {
-        return addNote(Divisions.convert(duration), note);
-    }
-    public Note<T> n(double duration, int note) {
-        return addNote(Divisions.convert(duration), note);
-    }
-    private Note<T> addNote(long duration, int pitch) {
-        return chord.addNote(duration, restFor, pitch);
-    }
 
     /**
      * Ties this Rest to another - actually returns itself after extending its duration.
@@ -62,6 +33,65 @@ public class Rest<T> {
         return this;
     }
 
+
+    /**
+     * Does the same as Player.c(), but in this case a "sub-chord" is returned, since the original Rest
+     * was against a Chord to begin with. The new chord will play after the start of the original chord
+     * but (usually) before the end of the same original chord.
+     * <br>
+     * You can use .bend(), .vibrato(), .volume() and even .r() against the new Chord like any other.
+     * So yes, you can nest chords within others as far as you want to go, e.g. Chord<Chord<Chord...<T>>>>.
+     * <br>
+     * Use .up() to get back to the parent chord, or use up(int, int...) as a shortcut instead of .c().
+     */
+    public Chord<Chord<T>> c(int duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes);
+    }
+    public Chord<Chord<T>> c(double duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes);
+    }
+    private Chord<Chord<T>> addChord(long duration, int... pitches){
+        return chord.addChord(restFor, duration, pitches);
+    }
+
+    /**
+     * Indicates that we should "finish", i.e. play the pitches for the remaining duration of the original Chord.
+     * @return The original Chord.
+     */
+    public Chord<Chord<T>> fin(int... pitches) {
+        return addChord(chord.duration()-restFor, pitches);
+    }
+    /**
+     * A shortcut to fin(int...).up()
+     */
+    public Chord<T> finup(int... pitches) {
+        return addChord(chord.duration()-restFor, pitches).up();
+    }
+    /**
+     * A shortcut to fin(int...).bendWithParent()
+     */
+    public Chord<Chord<T>> finb(int... pitches) {
+        return addChord(chord.duration()-restFor, pitches).bendWithParent();
+    }
+
+
+    /** A shortcut to c(int, int...).up() */
+    public Chord<T> up(int duration, int... notes) {
+        return c(duration, notes).up();
+    }
+    /** A shortcut to c(double, int...).up() */
+    public Chord<T> up(double duration, int... notes) {
+        return c(duration, notes).up();
+    }
+
+    /** A shortcut to c(int, int...).bendWithParent() */
+    public Chord<Chord<T>> b(int duration, int... notes) {
+        return c(duration, notes).bendWithParent();
+    }
+    /** A shortcut to c(double, int...).bendWithParent() */
+    public Chord<Chord<T>> b(double duration, int... notes) {
+        return c(duration, notes).bendWithParent();
+    }
 
 
 }

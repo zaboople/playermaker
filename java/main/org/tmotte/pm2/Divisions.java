@@ -1,4 +1,4 @@
-package org.tmotte.pm2;
+package org.tmotte.pm;
 
 /** For internal use only. This is exposed only for unit tests. */
 class Divisions {
@@ -58,6 +58,25 @@ class Divisions {
             return convert(((Float)number).doubleValue());
         else
             throw new RuntimeException("Can't handle number: "+number);
+    }
+
+    static long convert(double... ds) {
+        long result=0;
+        for (double dd: ds)
+            result+=convert(dd);
+        return result;
+    }
+    static long convert(int... ds) {
+        long result=0;
+        for (int dd: ds)
+            result+=convert(dd);
+        return result;
+    }
+    static long convert(Number... ds) {
+        long result=0;
+        for (Number dd: ds)
+            result+=convert(dd);
+        return result;
     }
 
 }

@@ -11,34 +11,32 @@ public class XTester {
         if (args.length>0 && args[0].startsWith("-b"))
             test(
                 midi
-                /*
                 ,new TestBends()
                 ,new TestBends2()
                 ,new TestBendsPartial()
                 ,new TestBendTo()
-                */
             );
         else
             test(midi,
-                //new Test7Slash16Time(),
-                //new TestArpeggio(),
-                //new TestBeatWithSound(),
-                //new TestBends(),
-                //new TestBends2(),
-                //new TestBendsPartial(),
-                //new TestBendTo(),
+                new Test7Slash16Time(),
+                new TestArpeggio(),
+                new TestBeatWithSound(),
+                new TestBends(),
+                new TestBends2(),
+                new TestBendsPartial(),
+                new TestBendTo(),
                 //new TestBPM(), FIXME
-                //new TestChannelTrack(),
+                new TestChannelTrack(),
                 new TestChords(),
-                //new TestFinish(),
-                //new TestPlayAfter(),
+                new TestFinish(),
+                new TestPlayAfter(),
                 new TestReverb(),
-                //new TestTies(),
+                new TestTies(),
                 new TestVibrato(),
                 new TestVibratoChanging(),
-                //new TestVibratoSpeed(),
+                new TestVibratoSpeed(),
                 new TestVibratoTriplet()
-                //,new TestVolume()
+                ,new TestVolume()
             );
         System.out.println("ALL TESTS COMPLETE.");
     }

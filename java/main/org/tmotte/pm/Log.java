@@ -1,4 +1,4 @@
-package org.tmotte.pm;
+package org.tmotte.pm2;
 import java.util.Set;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -7,9 +7,9 @@ public class Log {
     private static boolean enabled=true;
     private static Set<String> types=new HashSet<>(
         Arrays.asList(
-            "Chord"
-            ,
-            "MyMidi3"
+            //"Chord"
+            //,
+            //"MyMidi3"
         )
     );
 
