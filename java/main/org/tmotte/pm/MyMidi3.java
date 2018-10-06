@@ -1,4 +1,4 @@
-package org.tmotte.pm2;
+package org.tmotte.pm;
 import javax.sound.midi.*;
 import java.util.ArrayList;
 import java.util.HashMap;

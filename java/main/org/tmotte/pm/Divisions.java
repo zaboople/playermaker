@@ -1,4 +1,4 @@
-package org.tmotte.pm2;
+package org.tmotte.pm;
 
 /** For internal use only. This is exposed only for unit tests. */
 class Divisions {

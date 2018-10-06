@@ -1,4 +1,4 @@
-package org.tmotte.pm2;
+package org.tmotte.pm;
 
 /**
  * Rest acts as a temporary placeholder, only used by Chord (not Player); the intention is that you

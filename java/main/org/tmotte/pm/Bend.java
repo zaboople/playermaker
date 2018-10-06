@@ -1,4 +1,4 @@
-package org.tmotte.pm2;
+package org.tmotte.pm;
 import java.util.ArrayList;
 import java.util.List;
 

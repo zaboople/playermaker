@@ -1,4 +1,4 @@
-package org.tmotte.pm2;
+package org.tmotte.pm;
 import java.util.Set;
 import java.util.Arrays;
 import java.util.HashSet;
