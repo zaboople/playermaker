@@ -33,12 +33,12 @@ public class XTester {
                 new TestFinish(),
                 new TestPlayAfter(),
                 new TestReverb(),
-                new TestTies(),
+                //new TestTies(),
                 new TestVibrato(),
                 new TestVibratoChanging(),
-                new TestVibratoSpeed(),
-                new TestVibratoTriplet(),
-                new TestVolume()
+                //new TestVibratoSpeed(),
+                new TestVibratoTriplet()
+                //,new TestVolume()
             );
         System.out.println("ALL TESTS COMPLETE.");
     }

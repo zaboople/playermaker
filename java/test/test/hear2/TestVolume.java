@@ -1,7 +1,7 @@
-package test.hear;
-import org.tmotte.pm.MyMidi3;
-import org.tmotte.pm.Player;
-import static org.tmotte.pm.Pitches.*;
+package test.hear2;
+import org.tmotte.pm2.MyMidi3;
+import org.tmotte.pm2.Player;
+import static org.tmotte.pm2.Pitches.*;
 
 public class TestVolume implements XTest {
     public static void main(String args[]) throws Exception {
@@ -35,22 +35,20 @@ public class TestVolume implements XTest {
 				// even though the notes are the same; it's just
 				// that I'm using different volumes:
 			    .c(4)
-				    .n(4, F).volume(20).up()
-				    .n(4, G).volume(48).up()
+				    .c(4, F).volume(20).up()
+				    .c(4, G).volume(48).up()
 				    .up()
 			    .c(4)
-				    .n(4, F).volume(48).up()
-				    .n(4, G).volume(20).up()
+				    .c(4, F).volume(48).up()
+				    .c(4, G).volume(20).up()
 				    .up()
 			    .c(4, D)
 				    .volume(48)
-				    .n(2, E-12).volume(28).up()
-				    .n(2, E-24).volume(28).up()
-				    .n(2, E-36).volume(28).up()
-				    .n(2, E+12).volume(28).up()
-				    .r(4).c(4, D_)
+				    .c(2, E-12, E-24, E-36, E+12).volume(28).up()
+				    .r(4).c(4, D_).up()
 				    .up()
-			    .c(2, C, E-12, D_-24).volume(30).up()
+			    .c(2, C, E-12, D_-24).volume(30)
+				    .up()
 			    .r(4)
 	    );
     }
