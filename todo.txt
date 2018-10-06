@@ -1,8 +1,9 @@
+- public void test needs an @Override
+- Player channel should only be set once
+    - MyMidi3.ReserveChannels appears to have state problems and is global
 - Let's do named arguments in groovy; really need it for bends
     - Also, you can skip parentheses but you have to keep commas
-- Add Chord.up(), Rest.up() which takes notes like c()
-- Player channel should only be set once
-- MyMidi3.ReserveChannels appears to have state problems and is global
+- Need to be able to taper volume up or down!
 - Divisions.* can be hidden since we can share packages with test
 
 - Keyboard

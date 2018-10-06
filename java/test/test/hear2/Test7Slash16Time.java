@@ -1,17 +1,5 @@
 package test.hear2;
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.sound.midi.Instrument;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Soundbank;
-import org.tmotte.common.midi.SequencerUtils;
-import org.tmotte.pm2.Divisions;
 import org.tmotte.pm2.MyMidi3;
 import org.tmotte.pm2.Player;
 import static org.tmotte.pm2.Pitches.*;
@@ -80,7 +68,7 @@ public class Test7Slash16Time  implements XTest {
 				// 4
 					.t(4)
 					.r(8.)
-						.up(4, F, B_, F+12, A+12, C+12) //FIXME make a c() that does up()
+						.up(4, F, B_, F+12, A+12, C+12)
 					.up()
 				.p(8, E+24)
 				.p(16, F+24)

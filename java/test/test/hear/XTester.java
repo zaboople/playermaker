@@ -30,8 +30,8 @@ public class XTester {
                 //new TestBPM(), FIXME
                 //new TestChannelTrack(),
                 new TestChords(),
-                new TestFinish(),
-                new TestPlayAfter(),
+                //new TestFinish(),
+                //new TestPlayAfter(),
                 new TestReverb(),
                 //new TestTies(),
                 new TestVibrato(),
