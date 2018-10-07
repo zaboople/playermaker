@@ -6,7 +6,7 @@ public class TestChords implements XTest {
     public static void main(String args[]) throws Exception {
 	    new TestChords().test(new MyMidi3(), true);
     }
-    public void test(MyMidi3 midi, boolean stop)  {
+    public @Override void test(MyMidi3 midi, boolean stop)  {
 		int checks=15;
 	    Player player=new Player()
 		    .setBPM(90)

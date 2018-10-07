@@ -8,7 +8,7 @@ public class TestVibratoSpeed implements XTest {
     public static void main(String args[]) throws Exception {
 	    new TestVibratoSpeed().test(new MyMidi3(), true);
     }
-    public void test(MyMidi3 midi, boolean stop)  {
+    public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 			.setBeatsPerMinute(100)
 		    .instrumentChannel(23, 0)

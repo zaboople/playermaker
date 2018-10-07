@@ -23,7 +23,7 @@ public class TestBeatWithSound implements XTest {
     }
     private static void doTimerThread(int checks) {
 	    new Thread() {
-		    public void run() {
+		    public @Override void run() {
 			    long before=System.currentTimeMillis();
 			    for (int i=0; i<10+2; i++) {
 				    for (int j=0; j<10; j++) {

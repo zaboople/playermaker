@@ -7,7 +7,7 @@ public class TestVolume implements XTest {
     public static void main(String args[]) throws Exception {
 	    new TestVolume().test(new MyMidi3(), true);
     }
-    public void test(MyMidi3 midi, boolean stop)  {
+    public @Override void test(MyMidi3 midi, boolean stop)  {
 	    var bv=20;
 	    midi.play(
 		    stop,

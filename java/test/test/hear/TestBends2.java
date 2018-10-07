@@ -7,7 +7,7 @@ public class TestBends2 implements XTest {
     public static void main(String args[]) throws Exception {
 	    new TestBends2().test(new MyMidi3(), true);
     }
-    public void test(MyMidi3 midi, boolean stop)  {
+    public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .setBeatsPerMinute(60)
 		    .setBendSensitivity(4)

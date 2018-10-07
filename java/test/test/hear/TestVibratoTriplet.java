@@ -7,7 +7,7 @@ public class TestVibratoTriplet implements XTest {
     public static void main(String args[]) throws Exception {
 	    new TestVibratoTriplet().test(new MyMidi3(), true);
     }
-    public void test(MyMidi3 midi, boolean stop)  {
+    public @Override void test(MyMidi3 midi, boolean stop)  {
 	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
 		    .setBeatsPerMinute(60)
