@@ -104,10 +104,10 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
      * FIXME test BPM changes in mid-flight!
      * BPM means "beats per minute". This setting is event-based, so it affects only the notes added after BPM is changed.
      * <br>
-     * However: BPM is really a function of the MyMidi pseudo-sequencer; when it changes, all Players are affected. So if Player A sets BPM
-     * to 60 and plays a quarter note, and Player B also plays a quarter note, both notes will play for one second. Thus it's easiest
-     * think of Player A as a "lead" that the others will automatically follow when they slow down or speed up, which is fairly
-     * similar to real-world situations. Thus it's also important to pass Player A as the first Player argument to
+     * However: BPM is really a function of the MyMidi pseudo-sequencer; when it changes, all Players are affected. So if Player A
+     * sets BPM to 60 and plays a quarter note, and Player B also plays a quarter note, both notes will play for one second.
+     * Thus it's easiest think of Player A as a "lead" that the others will automatically follow when they slow down or speed up,
+     * which is similar to real-world situations. Thus it's also important to pass Player A as the first Player argument to
      * MyMidi.play(playerA, playerB...).
      */
     public Player bpm(int bpm) {
@@ -120,10 +120,16 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
         return setBeatsPerMinute(bpm);
     }
 
+    /**
+     * In Midi a bend can go a "whole step" by default, which is to say, two notes up or down.
+     * However, you can change the "Bend sensitivity" to increase the range from a whole step to many more
+     * steps. Refer to FIXME for actual bend methods.
+     */
     public Player setBendSensitivity(int sensitivity) {
         event(new Event().setBendSensitivity(sensitivity));
         return this;
     }
+    /** A shortcut to setBendSensitivity(int) */
     public Player bendSense(int sensitivity) {
         return setBendSensitivity(sensitivity);
     }
@@ -131,6 +137,9 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     public Player setPressure(int pressure) {
         event(new Event().setPressure(pressure));
         return this;
+    }
+    public Player pressure(int pressure) {
+        return setPressure(pressure);
     }
 
     /** Note: Reverb can only be set once, because it is not event-based like most other attributes. */

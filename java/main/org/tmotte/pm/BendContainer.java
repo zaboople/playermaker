@@ -2,9 +2,6 @@ package org.tmotte.pm;
 import java.util.List;
 
 /**
- * Background: In Midi a bend can go a "whole step" by default, which is to say, two notes up or down.
- * However, you can change the "Bend sensitivity" to increase the range from a whole step to many more
- * steps. Refer to {@link Player#setBendSensitivity(int} for this setting.
  * <br>
  * Also in Midi, bends apply to the whole channel. This is rather inflexible, so internally we make use of "spare"
  * channels when bends are applied differently to simultaneous Notes (refer to Chord#n(int, int...)).
