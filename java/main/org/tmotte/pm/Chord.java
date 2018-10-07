@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  * allowed via the r() method, which creates a Rest, and then delayed notes can be added.
  * FIXME test much overlapping waxing/waning etc.
  */
-public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendContainer<Chord<T>> {
+public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
 
     private final T parent;
@@ -121,32 +121,136 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
         return n;
     }
 
+    ////////////
+    // BENDS: //
+    ////////////
 
-    ////////////////////////////////////
-    // PUBLIC BUT INTERNAL OVERRIDES: //
-    // ALL FOR BEND CONTAINER FIXME   //
-    ////////////////////////////////////
-
-
-    /** For internal use, required by BendContainer */
-    public @Override Chord<T> self() {
-        return this;
+    /**
+     * @param delay A period to wait before the bend; this can be expressed as
+     *        2/4/8/16/32/64 etc to indicate a period corresponding to half/quarter/eighth/etc
+     *        notes, or 8.3 for triplet and 8. for dotted notes.
+     * @param duration The time over which the bend takes place, expressed in the same notation
+     *        as delay; if this is shorter than the length
+     *        of the given Note/Chord, the pitch remains constant for the rest of the Note/Chord's duration.
+     * @param denominator Can be negative or positive. Indicates the 1/denominator of our bend range to go
+     *        up or down. So, if our bend sensitivity is set to the default of one whole step (which is to say,
+     *        2 semitones):
+       <ul>
+           <li>1 is a whole step, e.g. C to D
+           <li>2 is a half step, e.g. C to C#
+           <li>4 is a quarter step (obviously off key but it's jazzy that way)
+       </ul>
+     * ... and so forth.
+     * <br>
+     * The denominator must be divisible by 2.
+     */
+    public Chord<T> bend(Number delay, Number duration, int denominator) {
+       return bend(Divisions.convert(delay), Divisions.convert(duration), denominator);
     }
 
-    /** For internal use, required by BendContainer */
-    public @Override List<Bend> makeBends() {
+    public Chord<T> bend(int delay, int duration, int denominator) {
+       Bend.add(makeBends(), delay, duration, denominator);
+       return this;
+    }
+    /**
+     * A shortcut to bend(0, duration, denominator) (that is, 0 delay).
+     */
+    public Chord<T> bend(int duration, int denominator) {
+        return bend(0, duration, denominator);
+    }
+    /**
+     * A shortcut for a bend spread across the entire duration of the note with no delay,
+     * i.e. bend(0, <duration>, denominator.
+     * FIXME test this
+     */
+    public Chord<T> bend(int denominator) {
+        return bend(0L, duration, denominator);
+    }
+
+    /** FIXME test and verify we need the doubles, probably don't */
+    public Chord<T> bend(double delay, double duration, int denominator) {
+        Bend.add(makeBends(), delay, duration, denominator);
+        return this;
+    }
+    public Chord<T> bend(double duration, int denominator) {
+        return bend(0D, duration, denominator);
+    }
+
+    private Chord<T> bend(long delay, long duration, int denominator) {
+        Bend.add(makeBends(), delay, duration, denominator);
+        return this;
+    }
+    private Chord<T> bend(long duration, int denominator) {
+        return bend(0L, duration, denominator);
+    }
+
+    //////////////
+    // VIBRATO: //
+    //////////////
+
+    /**
+     * Aside from using Player.setPressure(), this gives a more fine-tuned variation.
+     * Note that for delay/duration/frequency, you can use other overloads that allow
+     * you to provide a decimal value for dotted notes &amp; triplets as usual, (e.g. 8., 8.3).
+     *
+     * @param delay Time to wait before delay
+     * @param duration The period of duration for the vibrato
+     * @param frequency The speed of the vibrato, expressed as a duration (larger numbers are faster).
+     * @param denominator The pitch variation of the vibrato, which works the same as for bends: lower
+     *    gives more variation, as determined by <code>variation=bend_sensitivy/denominator</code>.
+     */
+    public Chord<T> vibrato(Number delay, Number duration, Number frequency, int denominator) {
+        //log("vibrato(Number, Number, Number, int)");
+        //log("vibrato("+delay+", "+duration+", "+frequency+", "+denominator+")");
+        return vibrato(
+            Divisions.convert(delay),
+            Divisions.convert(duration),
+            Divisions.convert(frequency),
+            denominator
+        );
+    }
+
+    public Chord<T> vibrato(int frequency, int denominator) {
+        return vibrato(0L, duration, Divisions.convert(frequency), denominator);
+    }
+    public Chord<T> vibrato(int duration, int frequency, int denominator) {
+        return vibrato(0, duration, frequency, denominator);
+    }
+    public Chord<T> vibrato(int delay, int duration, int frequency, int denominator) {
+        return vibrato(
+            Divisions.convert(delay),
+            Divisions.convert(duration),
+            Divisions.convert(frequency),
+            denominator
+        );
+    }
+
+    public Chord<T> vibrato(double frequency, int denominator) {
+        return vibrato(0L, duration, Divisions.convert(frequency), denominator);
+    }
+    public Chord<T> vibrato(Number duration, Number frequency, int denominator) {
+        Long long0=0l;//Avoids java 10 compiler warning
+        return vibrato(long0, duration, frequency, denominator);
+    }
+
+
+    private Chord<T> vibrato(long delay, long duration, long frequency, int denominator) {
+        Bend.vibrato(makeBends(), delay, duration, frequency, denominator);
+        return this;
+    }
+    private Chord<T> vibrato(long frequency, int denominator) {
+        return vibrato(0L, duration, frequency, denominator);
+    }
+    private Chord<T> vibrato(long duration, long frequency, int denominator) {
+        return vibrato(0L, duration, frequency, denominator);
+    }
+
+    private List<Bend> makeBends() {
         if (bends==null)
             bends=new ArrayList<>();
         return bends;
     }
 
-    /**
-     * Mostly for internal use; obtains the total duration of the Chord by our internal (not midi) tick system,
-     * not in the general notation used for Chord/Note input durations.
-     */
-    public @Override long durationForBend() {
-        return duration;
-    }
 
     ////////////////
     //            //
@@ -212,7 +316,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
           their Attributes object alone, but still pass on the individual
           attribute value to them and tell them to accept it.
     */
-
     protected @Override NoteAttributes getNoteAttributesForRead(){
         return attributes;
     }
@@ -241,4 +344,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> implements BendConta
                 if (!ch.usingParentAttributes)
                     consumer.accept(ch);
     }
+
+
 }
