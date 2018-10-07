@@ -2,7 +2,6 @@ package org.tmotte.pm;
 import java.util.List;
 
 /**
- * <br>
  * Also in Midi, bends apply to the whole channel. This is rather inflexible, so internally we make use of "spare"
  * channels when bends are applied differently to simultaneous Notes (refer to Chord#n(int, int...)).
  * When using multiple Players and bending notes, you should assign the Players channels with gaps
@@ -103,13 +102,13 @@ public interface BendContainer<T> {
     /**
      * Aside from using Player.setPressure(), this gives a more fine-tuned variation.
      * Note that for delay/duration/frequency, you can use other overloads that allow
-     * you to provide a decimal value as usual, (e.g. 8., 8.3).
+     * you to provide a decimal value for dotted notes &amp; triplets as usual, (e.g. 8., 8.3).
      *
      * @param delay Time to wait before delay
      * @param duration The period of duration for the vibrato
      * @param frequency The speed of the vibrato, expressed as a duration (larger numbers are faster).
-     * @param denominator The pitch variation of the vibrato; lower gives more variation,
-     *    as determined by <code>variation=pitch_sensitivy/denominator</code>
+     * @param denominator The pitch variation of the vibrato, which works the same as for bends: lower
+     *    gives more variation, as determined by <code>variation=bend_sensitivy/denominator</code>.
      */
     public default T vibrato(long delay, long duration, long frequency, int denominator) {
         Bend.vibrato(makeBends(), delay, duration, frequency, denominator);
