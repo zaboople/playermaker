@@ -244,23 +244,6 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     /////////////
 
     /**
-     * Adds a Chord made of the given notes for the specified duration, and returns that Chord, which can be further modified.
-     * Duration and notes work the same as for @link{#p(int, int...)}
-     */
-    public Chord<Player> c(int duration, int... notes) {
-        return addChord(Divisions.convert(duration), notes);
-    }
-    public Chord<Player> c(double duration, int... notes) {
-        return addChord(Divisions.convert(duration), notes);
-    }
-    private Chord<Player> addChord(long duration, int... pitches) {
-        var chord=new Chord<>(this, attributes, duration, pitches);
-        events.add(new Event(chord));
-        return chord;
-    }
-
-
-    /**
      * Adds a Chord made of the given notes for the specified duration, and returns the original Player object.
      * @param duration Use 1 for a whole note, 2 for a half note, 4 for a quarter, and so on. For dotted notes
      *       and triplets, use {@link #p(double, int...)}
@@ -280,6 +263,21 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
         return c(duration, notes).up();
     }
 
+    /**
+     * Adds a Chord made of the given notes for the specified duration, and returns that Chord, which can be further modified.
+     * Duration and notes work the same as for @link{#p(int, int...)}
+     */
+    public Chord<Player> c(int duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes);
+    }
+    public Chord<Player> c(double duration, int... notes) {
+        return addChord(Divisions.convert(duration), notes);
+    }
+    private Chord<Player> addChord(long duration, int... pitches) {
+        var chord=new Chord<>(this, attributes, duration, pitches);
+        events.add(new Event(chord));
+        return chord;
+    }
 
 
     //////////////////////
