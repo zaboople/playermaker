@@ -47,8 +47,9 @@
   <!--***********************-->
   <!--TARGETS: COMPILE & JAR -->
   <!--***********************-->
+  <target name="compile" description="Compile all" depends="compile.main,compile.test"/>
 
-  <target name="compile" description="Compile">
+  <target name="compile.main" description="Compile main">
     <mkdir dir="${build.dir}"/>
     <javac
       destdir="${build.dir}"
@@ -58,12 +59,24 @@
       >
       <compilerarg value="-Xlint:unchecked"/>
       <src path="${src.dir}/main"/>
+      <!--classpath><fileset dir="${lib.dir}" includes="*.jar"/></classpath-->
+    </javac>
+  </target>
+  <target name="compile.test" description="Compile tests">
+    <mkdir dir="${build.dir}"/>
+    <javac
+      destdir="${build.dir}"
+      debug="true"
+      deprecation="true"
+      failonerror="true"
+      >
+      <compilerarg value="-Xlint:unchecked"/>
       <src path="${src.dir}/test"/>
       <!--classpath><fileset dir="${lib.dir}" includes="*.jar"/></classpath-->
     </javac>
   </target>
 
-  <target name="jar" depends="compile">
+  <target name="jar" depends="clean,compile.main">
     <mkdir dir="${dist.dir}"/>
     <mkdir dir="${dist.dir}/bin"/>
     <jar destfile="${dist.dir}/bin/${ant.project.name}-${VERSION}.jar">
