@@ -9,7 +9,7 @@ public class Log {
         Arrays.asList(
             //"Chord"
             //,
-            //"MyMidi3"
+            "MyMidi3"
         )
     );
 

@@ -85,11 +85,11 @@ public class Rest<T> {
     }
 
     /** A shortcut to c(int, int...).bendWithParent() */
-    public Chord<Chord<T>> b(int duration, int... notes) {
+    public Chord<Chord<T>> bwp(int duration, int... notes) {
         return c(duration, notes).bendWithParent();
     }
     /** A shortcut to c(double, int...).bendWithParent() */
-    public Chord<Chord<T>> b(double duration, int... notes) {
+    public Chord<Chord<T>> bwp(double duration, int... notes) {
         return c(duration, notes).bendWithParent();
     }
 

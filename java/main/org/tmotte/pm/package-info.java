@@ -36,7 +36,6 @@
  * which can only play drums). Refer to {@link Player#channel(int)}.
  */
 
- */
 package org.tmotte.pm;
 
 

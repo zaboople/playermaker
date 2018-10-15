@@ -320,29 +320,20 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         return attributes;
     }
     protected @Override Chord<T> setVolume(int v) {
-        passOnToChords(x-> x.setVolume(v));
-        this.attributes.volume=v;
+        getAttributesForWrite().volume=v;
         return this;
     }
     protected @Override Chord<T> setTranspose(int semitones) {
-        passOnToChords(x-> x.setTranspose(semitones));
-        this.attributes.transpose=semitones;
+        getAttributesForWrite().transpose=semitones;
         return this;
     }
 
-    private void passOnToChords(Consumer<Chord<?>> consumer) {
+    private NoteAttributes getAttributesForWrite() {
         if (usingParentAttributes) {
             usingParentAttributes=false;
             attributes=new NoteAttributes(attributes);
-            if (subChords!=null)
-                for (Chord<?> ch: subChords)
-                    if (ch.usingParentAttributes)
-                        ch.attributes=attributes;
         }
-        if (subChords!=null)
-            for (Chord<?> ch: subChords)
-                if (!ch.usingParentAttributes)
-                    consumer.accept(ch);
+        return attributes;
     }
 
 

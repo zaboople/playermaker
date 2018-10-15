@@ -87,6 +87,9 @@ public class MidiTracker  {
 	    event(channel, ShortMessage.CHANNEL_PRESSURE, amount, 0, tick);
     }
 
+    public void sendExpression(int channel, int amount, long tick) {
+	    sendControlChange(channel, 11, amount,  tick);
+    }
 
     public void sendControlChange(int channel, int data1, int data2, long tick)  {
 	    Except.run(()->

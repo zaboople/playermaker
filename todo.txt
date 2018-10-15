@@ -1,3 +1,4 @@
+- We can make bends more accurate by not using tickx and using the true duration
 - public void test needs an @Override
 - Player channel should only be set once
     - MyMidi3.ReserveChannels appears to have state problems and is global

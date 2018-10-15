@@ -263,10 +263,12 @@ public class MyMidi3  {
         // 2. EXECUTE:  //
         //////////////////
 
-        for (int p: chord.pitches()) {
-            p+=chord.getTranspose();
-            midiTracker.noteOn(channelIndex, p, chord.volume(), chordTick);
-            midiTracker.noteOff(channelIndex, p, chordEndTick);
+        for (int pitch: chord.pitches()) {
+            pitch+=chord.getTranspose();
+            midiTracker.noteOn(channelIndex, pitch, chord.volume(), chordTick);
+            if (chord.volume()>0 && false)
+                doSwell(channelIndex, chordTick, chordEndTick-chordTick, pitch, 0, 127);
+            midiTracker.noteOff(channelIndex, pitch, chordEndTick);
         }
         if (hasBends) {
             sendBends(channelIndex, chordTick, chord.bends());
@@ -346,12 +348,13 @@ public class MyMidi3  {
         long t=soundStart;
         int pitch=NO_BEND;
         for (Bend bend: bends) {
-            //Log.log("MyMidi3", "Bend delay "+bend.delay+" duration "+bend.duration+" denominator "+bend.denominator);
+            Log.log("MyMidi3", "Bend delay {} duration {} denominator {} ", bend.delay, bend.duration, bend.denominator);
             t+=(bend.delay * tickX);
             int change = NO_BEND / bend.denominator;
             int perTicky = change / (int)bend.duration;
             int leftover = change % (int)bend.duration;
             int leftoverIncr=leftover>0 ?1 :-1;
+            Log.log("MyMidi3", " change: {} perTicky {} leftover {}", change, perTicky, leftover);
             for (int i=0; i<bend.duration; i++) {
                 int thisAmount = perTicky;
                 if (leftover!=0) {
@@ -362,10 +365,23 @@ public class MyMidi3  {
                 if (pitch==16384) pitch=16383;
                 if (pitch > 16383 || pitch < 0)
                     throw new RuntimeException("You bent too far, probably by doing multiple bends");
-                //Log.log("MyMidi3", "Sending bend "+pitch+" at "+t);
+                Log.log("MyMidi3", "Sending bend "+pitch+" at "+t);
                 midiTracker.eventBend(channel, pitch, t);
                 t+=tickX;
             }
+        }
+    }
+
+    private void doSwell(int channel, long soundStart, long duration, int pitch, int startVolume, int change) {
+        int volume=startVolume;
+        long t=soundStart;
+        double ticksPer = (double) duration / (double) change;
+        int increment=change > 0 ?1 :-1;
+        for (long i=0; i<change; i++) {
+            t+=ticksPer;
+            volume+=increment;
+            Log.log("MyMidi3", "volume {} time {}", volume, t);
+            midiTracker.sendExpression(channel, volume, t);
         }
     }
 
