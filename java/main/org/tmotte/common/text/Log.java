@@ -1,17 +1,26 @@
-package org.tmotte.pm;
+package org.tmotte.common.text;
 import java.util.Set;
 import java.util.Arrays;
 import java.util.HashSet;
 
 public class Log {
     private static boolean enabled=true;
-    private static Set<String> types=new HashSet<>(
-        Arrays.asList(
-            //"Chord"
-            //,
-            "MyMidi3"
-        )
+    public static Set<String> types=new HashSet<>(
     );
+    public static void add(String... toAdd) {
+        for (String s: toAdd) types.add(s);
+    }
+    public static void remove(String... toAdd) {
+        for (String s: toAdd) types.remove(s);
+    }
+    public static void with(Runnable r, String... toAdd) {
+        add(toAdd);
+        try {
+            r.run();
+        } finally {
+            remove(toAdd);
+        }
+    }
 
     public static void log(String msgType, String message, Object... params) {
         if (!enabled || !types.contains(msgType))

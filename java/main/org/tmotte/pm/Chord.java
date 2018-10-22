@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.function.Consumer;
+import org.tmotte.common.text.Log;
 
 /**
  * Represents a chord, be it one note or many. While a chord will often sound all of its
@@ -20,6 +21,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     private final long restBefore;
     private NoteAttributes attributes;
     private boolean usingParentAttributes=true;
+    private List<Swell> swells=null;
     private List<Bend> bends=null;
     private List<Chord<Chord<T>>> subChords=null;
     private long duration;
@@ -119,6 +121,43 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         if (subChords==null) subChords=new ArrayList<>();
         subChords.add(n);
         return n;
+    }
+
+    /////////////
+    // SWELLS: //
+    /////////////
+
+    public Chord<T> swell(int toVolume) {
+        return swell(0L, duration, toVolume);
+    }
+    public Chord<T> swell(int duration, int toVolume) {
+        return swell(0, duration, toVolume);
+    }
+    public Chord<T> swell(double duration, int toVolume) {
+        return swell(0, duration, toVolume);
+    }
+    public Chord<T> swell(int delay, int duration, int toVolume) {
+        return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
+    }
+    public Chord<T> swell(double delay, double duration, int toVolume) {
+        return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
+    }
+    public Chord<T> swell(double delay, int duration, int toVolume) {
+        return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
+    }
+    public Chord<T> swell(int delay, double duration, int toVolume) {
+        return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
+    }
+
+    private Chord<T> swell(long delay, long duration, int toVolume) {
+        makeSwells().add(new Swell(delay, duration, toVolume));
+        return this;
+    }
+
+    private List<Swell> makeSwells() {
+        return swells==null
+            ?swells=new ArrayList<>()
+            :swells;
     }
 
     ////////////
@@ -246,9 +285,9 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     }
 
     private List<Bend> makeBends() {
-        if (bends==null)
-            bends=new ArrayList<>();
-        return bends;
+        return bends==null
+            ?bends=new ArrayList<>()
+            :bends;
     }
 
 
@@ -278,6 +317,9 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     }
     protected List<Bend> bends() {
         return bends==null ?Collections.emptyList() :bends;
+    }
+    protected List<Swell> swells() {
+        return swells==null ?Collections.emptyList() :swells;
     }
 
 

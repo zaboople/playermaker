@@ -11,6 +11,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.Optional;
 
 import org.tmotte.common.function.Except;
+import org.tmotte.common.text.Log;
 import javax.sound.midi.*;
 
 
@@ -28,12 +29,13 @@ public class MidiTracker  {
 	    return this;
     }
 
-	public void noteOn(int channel, int pitch, int volume, long currTick) {
-        event(channel, ShortMessage.NOTE_ON, pitch, volume, currTick);
+	public void noteOn(int channel, int pitch, int volume, long tick) {
+		Log.log("MidiTracker", "noteOn() tick {} pitch {} volume {}", tick, pitch, volume);
+        event(channel, ShortMessage.NOTE_ON, pitch, volume, tick);
     }
 
-	public void noteOff(int channel, int pitch, long currTick) { //FIXME why do I need to send pitch & volume?
-        event(channel, ShortMessage.NOTE_OFF, pitch, 0, currTick);
+	public void noteOff(int channel, int pitch, long tick) { //FIXME why do I need to send pitch & volume?
+        event(channel, ShortMessage.NOTE_OFF, pitch, 0, tick);
     }
 
 
@@ -87,11 +89,12 @@ public class MidiTracker  {
 	    event(channel, ShortMessage.CHANNEL_PRESSURE, amount, 0, tick);
     }
 
-    public void sendExpression(int channel, int amount, long tick) {
-	    sendControlChange(channel, 11, amount,  tick);
+    public void sendExpression(int channel, int volume, long tick) {
+		Log.log("MidiTracker", "sendExpression() tick {} volume {}", tick, volume);
+	    sendControlChange(channel, 11, volume,  tick);
     }
 
-    public void sendControlChange(int channel, int data1, int data2, long tick)  {
+    private void sendControlChange(int channel, int data1, int data2, long tick)  {
 	    Except.run(()->
 	        sendMessage(
 	            new ShortMessage(
@@ -102,7 +105,7 @@ public class MidiTracker  {
         );
 	}
 
-    public void event(int channel, int type, int data1, int data2, long tick) {
+    private void event(int channel, int type, int data1, int data2, long tick) {
         Except.run(()-> {
             ShortMessage message = new ShortMessage();
             message.setMessage(type + channel, data1, data2);
@@ -110,7 +113,7 @@ public class MidiTracker  {
         });
     }
 
-    public void sendMessage(ShortMessage msg, long tick) {
+    private void sendMessage(ShortMessage msg, long tick) {
         currTrack.add(new MidiEvent(msg, tick));
     }
 

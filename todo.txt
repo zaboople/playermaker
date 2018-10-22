@@ -1,3 +1,6 @@
+- Tag chords
+- Make bend tester and separate bend class like swell()
+- Allow swells & bends to either tie, or finish a note by specifying zero delay & duration
 - We can make bends more accurate by not using tickx and using the true duration
 - public void test needs an @Override
 - Player channel should only be set once

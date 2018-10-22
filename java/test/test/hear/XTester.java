@@ -37,6 +37,7 @@ public class XTester {
                 new TestVibratoSpeed(),
                 new TestVibratoTriplet()
                 ,new TestVolume()
+                ,new TestVolumeSwell()
             );
         System.out.println("ALL TESTS COMPLETE.");
     }

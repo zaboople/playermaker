@@ -1,11 +1,8 @@
 package org.tmotte.pm;
 import java.util.ArrayList;
 import java.util.List;
+import org.tmotte.common.text.Log;
 
-/**
- *
- * @see BendContainer
- */
 final class Bend {
 
     /////////////////////

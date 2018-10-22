@@ -14,6 +14,7 @@ import org.tmotte.common.midi.MetaInstrument;
 import org.tmotte.common.midi.MidiTracker;
 import org.tmotte.common.midi.SequencerUtils;
 import org.tmotte.common.midi.SequencerWatcher;
+import org.tmotte.common.text.Log;
 
 
 /**
@@ -55,6 +56,7 @@ public class MyMidi3  {
     }
 
 
+    private final MidiTracker midiTracker=new MidiTracker();
     private Sequencer sequencer;
     private Synthesizer synth;
     private MidiChannel[] midiChannels;
@@ -64,10 +66,10 @@ public class MyMidi3  {
 
     private boolean waitForSequencerToStopPlaying=true;
 
-    private MidiTracker midiTracker=new MidiTracker();
     private Sequence sequence;
     private ReserveChannels reserveChannels=new ReserveChannels();
     public long tickX=0;
+    private SwellGen swellGen=new SwellGen(()->tickX, midiTracker::sendExpression);
 
     public MyMidi3() {
         this(Optional.empty());
@@ -227,9 +229,8 @@ public class MyMidi3  {
         final long chordTick   =currTick  + (tickX * chord.restBefore());
         final long chordEndTick=chordTick + (tickX * chord.duration());
         final boolean hasBends=!chord.bends().isEmpty(),
-                    hasChords=!chord.chords().isEmpty();
-
-
+                    hasChords=!chord.chords().isEmpty(),
+                    hasSwells=!chord.swells().isEmpty();
         /*
             We only use a spare channel IF this chord has bends, AND:
                 A. For a top-level chord, we only need a spare if there are sub-chords
@@ -252,7 +253,6 @@ public class MyMidi3  {
             channelIndex=reserveChannels.useSpare(player, channelAttrs, chordTick);
         else
             channelIndex=channelAttrs.mainChannel;
-
         Log.log(
             "MyMidi3",
             "Chord setup: Channel: {} restBefore: {} duration: {} pitches: {} start tick: {} end tick: {}",
@@ -263,17 +263,31 @@ public class MyMidi3  {
         // 2. EXECUTE:  //
         //////////////////
 
+        // Send each note-on/off
         for (int pitch: chord.pitches()) {
             pitch+=chord.getTranspose();
-            midiTracker.noteOn(channelIndex, pitch, chord.volume(), chordTick);
-            if (chord.volume()>0 && false)
-                doSwell(channelIndex, chordTick, chordEndTick-chordTick, pitch, 0, 127);
+            int volume=chord.volume();
+            midiTracker.noteOn(channelIndex, pitch, (hasSwells ?127 :chord.volume()), chordTick);
             midiTracker.noteOff(channelIndex, pitch, chordEndTick);
         }
+
+        // And swells:  n addition to SwellGen, when not doing swells, we send 0 if we detect
+        // a top-level rest, and 127 (max) for regular notes.
+        if (hasSwells)
+            swellGen.handle(channelIndex, chordTick, chord.volume(), chord.swells());
+        else
+        if (chord.volume()==0 && !parentState.exists)
+            midiTracker.sendExpression(channelIndex, 0, chordTick);
+        else
+            midiTracker.sendExpression(channelIndex, 127, chordTick);
+
+        // And bends:
         if (hasBends) {
             sendBends(channelIndex, chordTick, chord.bends());
             midiTracker.eventBendEnd(channelIndex, chordEndTick);
         }
+
+        // And finally, sub-chords
         long realEndTick=chordEndTick;
         if (hasChords) {
             Log.log("MyMidi3", "Chord nesting... ");
@@ -289,7 +303,7 @@ public class MyMidi3  {
         if (!parentState.exists)
             reserveChannels.clearSpares();
         Log.log("MyMidi3", "Chord complete, end tick: "+realEndTick);
-        return realEndTick;
+        return realEndTick+1;
     }
 
 
@@ -369,19 +383,6 @@ public class MyMidi3  {
                 midiTracker.eventBend(channel, pitch, t);
                 t+=tickX;
             }
-        }
-    }
-
-    private void doSwell(int channel, long soundStart, long duration, int pitch, int startVolume, int change) {
-        int volume=startVolume;
-        long t=soundStart;
-        double ticksPer = (double) duration / (double) change;
-        int increment=change > 0 ?1 :-1;
-        for (long i=0; i<change; i++) {
-            t+=ticksPer;
-            volume+=increment;
-            Log.log("MyMidi3", "volume {} time {}", volume, t);
-            midiTracker.sendExpression(channel, volume, t);
         }
     }
 
