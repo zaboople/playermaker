@@ -18,24 +18,24 @@ public class XTester {
             );
         else
             test(midi,
-                new Test7Slash16Time(),
-                new TestArpeggio(),
-                new TestBeatWithSound(),
-                new TestBends(),
-                new TestBends2(),
-                new TestBendsPartial(),
-                new TestBendTo(),
-                //new TestBPM(), FIXME
-                new TestChannelTrack(),
-                new TestChords(),
-                new TestFinish(),
-                new TestPlayAfter(),
-                new TestReverb(),
-                new TestTies(),
-                new TestVibrato(),
-                new TestVibratoChanging(),
-                new TestVibratoSpeed(),
-                new TestVibratoTriplet()
+                new Test7Slash16Time()
+                ,new TestArpeggio()
+                ,new TestBeatWithSound()
+                ,new TestBends()
+                ,new TestBends2()
+                ,new TestBendsPartial()
+                ,new TestBendTo()
+                ,new TestBPM()
+                ,new TestChannelTrack()
+                ,new TestChords()
+                ,new TestFinish()
+                ,new TestPlayAfter()
+                ,new TestReverb()
+                ,new TestTies()
+                ,new TestVibrato()
+                ,new TestVibratoChanging()
+                ,new TestVibratoSpeed()
+                ,new TestVibratoTriplet()
                 ,new TestVolume()
                 ,new TestVolumeSwell()
             );

@@ -253,6 +253,8 @@ public class MyMidi3  {
             channelIndex=reserveChannels.useSpare(player, channelAttrs, chordTick);
         else
             channelIndex=channelAttrs.mainChannel;
+        if (chord.tag()!=null)
+            Log.log("MyMidi3", "Chord: {}", chord.tag());
         Log.log(
             "MyMidi3",
             "Chord setup: Channel: {} restBefore: {} duration: {} pitches: {} start tick: {} end tick: {}",

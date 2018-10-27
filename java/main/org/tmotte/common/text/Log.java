@@ -3,22 +3,39 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.HashSet;
 
+/** My hacky Logging thing. It's completely static. You are responsible specifying
+    a "type" when you log, as the first parameter. Use add() to add types that will
+    actually be logged; others are ignored.
+    <br>
+    This is reasonably thread-safe in that a given log() calls will not overlap with
+    others; but adding & removing log types affects all threads.
+*/
 public class Log {
     private static boolean enabled=true;
-    public static Set<String> types=new HashSet<>(
-    );
-    public static void add(String... toAdd) {
-        for (String s: toAdd) types.add(s);
+    private static Set<String> types=new HashSet<>();
+
+    public static void add(String... addTypes) {
+        for (String s: addTypes) types.add(s);
     }
-    public static void remove(String... toAdd) {
-        for (String s: toAdd) types.remove(s);
+    public static void remove(String... removeTypes) {
+        for (String s: removeTypes) types.remove(s);
     }
-    public static void with(Runnable r, String... toAdd) {
-        add(toAdd);
+
+    public static void with(Runnable r, String... addTypes) {
+        add(addTypes);
         try {
             r.run();
         } finally {
-            remove(toAdd);
+            remove(addTypes);
+        }
+    }
+
+    public static void without(Runnable r, String... removeTypes) {
+        remove(removeTypes);
+        try {
+            r.run();
+        } finally {
+            add(removeTypes);
         }
     }
 

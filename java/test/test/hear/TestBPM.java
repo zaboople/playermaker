@@ -2,84 +2,95 @@ package test.hear;
 import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
+import org.tmotte.common.text.Log;
 
 /** FIXME */
 public class TestBPM implements XTest {
     public static void main(String args[]) throws Exception {
+        Log.add("SwellGen", "MyMidi3" /*, "MidiTracker"*/);
 	    new TestBPM().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
-		    .instrument("Strings - Contrabass")
+		    .instrument("Organ - Bandoneon")
 		    .channel(0)
 		    .setBendSensitivity(4)
 		    .octave(4)
+		    .pressure(64)
 		    .r(4)
 
-		    .bpm(30)
+		    .bpm(20)
 		    .p(16.3, G)
 		    .p(16.3, A_)
 		    .p(16.3, A)
 		    .p(8, G, A)
 
-		    .bpm(30)
-		    .c(16., G-12)
-			    .r(32.3)
+		    .bpm(25)
+		    .c(4, G-12)
+			    .r(16.3)
 				    .finup(C)
+			    .r(16.3).t(16.3)
+				    .finup(E)
 			    .up()
-		    .r(32.3).r(32.3)
-		    .p(16.3, D)
-		    .p(8, G, D)
 
-
-		    .p(8, D+24)
-
-
-		    .bpm(30)
-		    .c(16.3, G)
-			    .r(16.3).up(16.3, A)
+		    .bpm(35)
+		    .c(4, G)
+			    .r(16.3)
+				    .finup(A)
+			    .r(16.3).t(16.3)
+				    .finup(D_)
 			    .up()
-		    .p(16.3, B_)
-
-		    .bpm(30)
-		    .c(16.3, G)
-			    .r(16.3).up(16.3, A)
-			    .up()
-		    .p(16.3, B_)
 
 		    .bpm(40)
+		    .c(4, G-12)
+			    .r(16.3)
+				    .finup(B)
+			    .r(16.3).t(16.3)
+				    .finup(F)
+			    .up()
+
+		    .bpm(50)
 		    .p(16.3, C)
 		    .p(16.3, D_)
 		    .p(16.3, E)
-		    .bpm(50)
+		    .bpm(60)
 		    .p(16.3, G)
 		    .p(16.3, A)
 		    .p(16.3, B_)
-		    .bpm(60)
+		    .bpm(70)
+		    .p(16.3, F)
+		    .p(16.3, E_)
+		    .p(16.3, G)
+		    .bpm(70)
 		    .p(16.3, F)
 		    .p(16.3, E_)
 		    .p(16.3, G)
 
-		    .bpm(70)
+		    .c(2, B+24)
+			    .r(8).finup(D+24)
+			    .r(4).finup(C+12)
+			    .up()
+
+		    .bpm(60)
 		    .p(16.3, E_)
 		    .p(16.3, G)
 		    .p(16.3, B)
 		    .p(8, E_, G, B)
-		    .bpm(60)
+		    .bpm(50)
 		    .p(16.3, C)
 		    .p(16.3, D_)
 		    .p(16.3, E)
 		    .p(8, C, E)
-		    .bpm(50)
+		    .bpm(40)
 		    .p(16.3, E)
 		    .p(16.3, A_)
 		    .p(16.3, B)
-		    .p(8, E, A_, B)
-		    .bpm(40)
+		    .p(8, E, G, B)
+		    .bpm(30)
 		    .p(16.3, C)
 		    .p(16.3, D_)
 		    .p(16.3, G)
-		    .p(2, B, E-12, C, G)
+		    .p(4, B, E-12, C, G)
 
 			.r(4);
 	    midi.play(stop, player);

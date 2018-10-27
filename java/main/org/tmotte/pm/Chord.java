@@ -26,6 +26,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     private List<Chord<Chord<T>>> subChords=null;
     private long duration;
     private boolean bendWithParent=false;
+    private String tag;
 
 
     protected Chord(T parent, NoteAttributes attributes, long duration, int... pitches) {
@@ -41,12 +42,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         Log.log("Chord", "Parent {} pitches {} restBefore {} duration {}", parent, this.pitches, restBefore, duration);
     }
 
-
-    public Chord<T> bendWithParent() {
-        bendWithParent=true;
-        return this;
-    }
-
     /**
      * Takes us back to the original Player/Chord, for the sake of "fluent" programming.
      */
@@ -54,6 +49,22 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         return parent;
     }
 
+    /** Only for use with sub-chords created with rest(); indicates that
+        that the sub-chord should be bent in the same fashion as its parent.*/
+    public Chord<T> bendWithParent() {
+        bendWithParent=true;
+        return this;
+    }
+
+    /** For debugging purposes only; will print the tag when debugging info for the chord is printed. */
+    public Chord<T> tag(String t) {
+        this.tag=t;
+        return this;
+    }
+
+    public String tag() {
+        return tag;
+    }
 
     ///////////////////////////////
     // TIES, RESTS & SUB-CHORDS  //
@@ -128,7 +139,15 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     /////////////
 
     public Chord<T> swell(int toVolume) {
-        return swell(0L, duration, toVolume);
+        final long sd=
+            totalDuration() -
+            makeSwells().stream()
+                .map(
+                    swell->swell.delay()+swell.duration()
+                )
+                .reduce(Long::sum)
+                .orElse(0L);
+        return swell(0L, sd, toVolume);
     }
     public Chord<T> swell(int duration, int toVolume) {
         return swell(0, duration, toVolume);
