@@ -4,6 +4,7 @@ import java.util.function.LongSupplier;
 import java.util.List;
 import org.tmotte.common.text.Log;
 
+/** Generates volume swells; only used by MyMidi3. */
 class SwellGen  {
 	static @FunctionalInterface interface ExpressionSender{
 		void sendExpression(int channel, int volume, long tick);

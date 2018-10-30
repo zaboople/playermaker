@@ -33,7 +33,6 @@ public class MyMidi3  {
     public final static int TICKS_PER_SECOND=SEQUENCE_RESOLUTION*2;
     public final static int TICKS_PER_MINUTE=TICKS_PER_SECOND*60;
 
-    private final static int NO_BEND = 8192;
     private final static int REVERB = 91;
     private final static int DRUM_CHANNEL=9;
 
@@ -70,6 +69,7 @@ public class MyMidi3  {
     private ReserveChannels reserveChannels=new ReserveChannels();
     public long tickX=0;
     private SwellGen swellGen=new SwellGen(()->tickX, midiTracker::sendExpression);
+    private BendGen bendGen=new BendGen(()->tickX, midiTracker::sendBend);
 
     public MyMidi3() {
         this(Optional.empty());
@@ -285,8 +285,8 @@ public class MyMidi3  {
 
         // And bends:
         if (hasBends) {
-            sendBends(channelIndex, chordTick, chord.bends());
-            midiTracker.eventBendEnd(channelIndex, chordEndTick);
+            bendGen.handle(channelIndex, chordTick, chord.bends());
+            midiTracker.sendBendEnd(channelIndex, chordEndTick);
         }
 
         // And finally, sub-chords
@@ -357,35 +357,6 @@ public class MyMidi3  {
         midiTracker.sendBendSense(channel, channelAttrs.bendSense, currTick);
         midiTracker.sendPressure(channel, channelAttrs.pressure, currTick);
         midiTracker.sendInstrument(channel, channelAttrs.instrument, currTick);
-    }
-
-    private void sendBends(int channel, long soundStart, List<Bend> bends) {
-        Log.log("MyMidi3", "sendBends size: "+bends.size());
-        long t=soundStart;
-        int pitch=NO_BEND;
-        for (Bend bend: bends) {
-            Log.log("MyMidi3", "Bend delay {} duration {} denominator {} ", bend.delay, bend.duration, bend.denominator);
-            t+=(bend.delay * tickX);
-            int change = NO_BEND / bend.denominator;
-            int perTicky = change / (int)bend.duration;
-            int leftover = change % (int)bend.duration;
-            int leftoverIncr=leftover>0 ?1 :-1;
-            Log.log("MyMidi3", " change: {} perTicky {} leftover {}", change, perTicky, leftover);
-            for (int i=0; i<bend.duration; i++) {
-                int thisAmount = perTicky;
-                if (leftover!=0) {
-                    thisAmount+=leftoverIncr;
-                    leftover-=leftoverIncr;
-                }
-                pitch+=thisAmount;
-                if (pitch==16384) pitch=16383;
-                if (pitch > 16383 || pitch < 0)
-                    throw new RuntimeException("You bent too far, probably by doing multiple bends");
-                Log.log("MyMidi3", "Sending bend "+pitch+" at "+t);
-                midiTracker.eventBend(channel, pitch, t);
-                t+=tickX;
-            }
-        }
     }
 
 

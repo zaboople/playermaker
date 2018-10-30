@@ -2,9 +2,11 @@ package test.hear;
 import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
+import org.tmotte.common.text.Log;
 
 public class TestBendTo implements XTest {
     public static void main(String args[]) throws Exception {
+        Log.add("BendGen", "MyMidi3", "MidiTracker");
 	    new TestBendTo().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {

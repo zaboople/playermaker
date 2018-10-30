@@ -69,7 +69,7 @@ final class Bend {
     //////////////////////////////////////////
 
 
-    private Bend(long delay, long duration, int denominator) {
+    protected Bend(long delay, long duration, int denominator) {
         this.delay=delay;
         this.duration=duration;
         this.denominator=denominator;

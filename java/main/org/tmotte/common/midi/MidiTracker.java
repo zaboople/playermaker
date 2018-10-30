@@ -39,15 +39,17 @@ public class MidiTracker  {
     }
 
 
-    public void eventBend(int channel, int amount, long tick) {
+    public void sendBend(int channel, int amount, long tick) {
+		Log.log("MidiTracker", "Bend {} at {} ", amount, tick);
+
         // A bend is 14 bits - no, not 16. That won't fit in a byte, but
         // even better, you are required to split it into a 7-bits-each pair.
         int lsb=amount & 127,
             msb=amount >>> 7;
         event(channel, ShortMessage.PITCH_BEND, lsb, msb, tick);
     }
-    public void eventBendEnd(int channel, long tick) {
-        eventBend(channel, 8192, tick);
+    public void sendBendEnd(int channel, long tick) {
+        sendBend(channel, 8192, tick);
     }
 
 	public void sendInstrument(int channel, Instrument instr, long tick) {

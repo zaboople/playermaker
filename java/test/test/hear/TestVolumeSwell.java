@@ -10,7 +10,7 @@ import static org.tmotte.pm.Pitches.*;
  */
 public class TestVolumeSwell  implements XTest {
     public static void main(String args[]) throws Exception {
-        Log.add("SwellGen", "MyMidi3" /*, "MidiTracker"*/);
+        Log.add("SwellGen", "MyMidi3", "MidiTracker");
 	    new TestVolumeSwell().test(new MyMidi3(), true);
 	}
     public @Override void test(MyMidi3 midi, boolean stop)  {
