@@ -2,20 +2,20 @@ package org.tmotte.pm;
 
 /** For internal use only. This is exposed only for unit tests. */
 class Divisions {
-    public final static int triplet128=2;
-    public final static int triplet64=triplet128 * 2;
-    public final static int triplet32=triplet64  * 2;
-    public final static int triplet16=triplet32  * 2;
-    public final static int triplet8 =triplet16  * 2;
+    final static int triplet128=2;
+    final static int triplet64=triplet128 * 2;
+    final static int triplet32=triplet64  * 2;
+    final static int triplet16=triplet32  * 2;
+    final static int triplet8 =triplet16  * 2;
 
-    public final static int reg128=3;
-    public final static int reg64=reg128 * 2;
-    public final static int reg32=reg64 * 2;
-    public final static int reg16=reg32 * 2;
-    public final static int reg8=reg16 * 2;
-    public final static int reg4=reg8 * 2;
-    public final static int reg2=reg4 * 2;
-    public final static int whole=reg2 * 2;
+    final static int reg128=3;
+    final static int reg64=reg128 * 2;
+    final static int reg32=reg64 * 2;
+    final static int reg16=reg32 * 2;
+    final static int reg8=reg16 * 2;
+    final static int reg4=reg8 * 2;
+    final static int reg2=reg4 * 2;
+    final static int whole=reg2 * 2;
 
     /**
      * Convert a triplet e.g. expressed as 8.3 to an 8th of a triplet.
