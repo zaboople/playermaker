@@ -11,7 +11,7 @@ public class TestVibratoTriplet implements XTest {
 	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
 		    .setBeatsPerMinute(60)
-		    .instrument(41)
+		    .instrument("Strings - Viola")
 		    .setBendSensitivity(4)
 		    .setReverb(80)
 		    .octave(5)

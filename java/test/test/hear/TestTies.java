@@ -10,7 +10,8 @@ public class TestTies implements XTest {
     public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .setBeatsPerMinute(60)
-		    .instrumentChannel(43, 3)
+		    .channel(3)
+		    .instrument("Strings - Contrabass")
 		    .setBendSensitivity(4)
 		    .r(4)
 

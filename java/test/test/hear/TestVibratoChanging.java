@@ -10,7 +10,8 @@ public class TestVibratoChanging implements XTest {
     public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .setBeatsPerMinute(60)
-		    .instrumentChannel(0,  0)
+		    .channel(0)
+		    .instrument("Piano - Piano 1")
 		    .bendSense(8)
 		    .octave(2)
 		    .r(4)

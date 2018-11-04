@@ -11,7 +11,8 @@ public class TestVibratoSpeed implements XTest {
     public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 			.setBeatsPerMinute(100)
-		    .instrumentChannel(23, 0)
+		    .channel(0)
+		    .instrument("Organ - Bandoneon")
 		    .setBendSensitivity(4)
 		    .octave(5)
 		    .r(4)

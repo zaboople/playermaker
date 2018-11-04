@@ -11,7 +11,7 @@ public class TestBendsPartial implements XTest {
 	    //Organ 1:
 	    Player player=new Player()
 		    .setBeatsPerMinute(90)
-		    .instrument(16)
+		    .instrument("Organ - Organ 1")
 		    .octave(5)
 
 		    .r(4)

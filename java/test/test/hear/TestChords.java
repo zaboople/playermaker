@@ -16,12 +16,12 @@ public class TestChords implements XTest {
 			    .octave(2 + (i % 3))
 			    .p(16, i+1, 13, 25);
 	    player
-		    .instrument(42)
+		    .instrument("Strings - Cello")
 		    .p(8., checks, checks+5, checks+8)
 		    .p(4, checks-1, checks-1+4, checks-1+7)
 		    .p(8, checks-2, checks+3, checks+5)
 		    .p(4., checks-4, checks, checks+3)
-		    .instrument(1)
+		    .instrument("Piano - Piano 2")
 		    .p(1, checks-5, checks-3, checks)
 		    .r(4);
 	    midi.play(stop, player);

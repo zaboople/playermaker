@@ -10,7 +10,7 @@ public class TestVibrato implements XTest {
     public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .setBeatsPerMinute(60)
-		    .instrument(16)
+		    .instrument("Organ - Organ 1")
 		    .setBendSensitivity(4)
 		    .octave(5)
 		    .r(4)

@@ -24,7 +24,6 @@ class Event {
     private static class AnythingButChord {
         private Instrument instrument=null;
         private String instrumentName=null;
-        private Integer instrumentIndex=null;
         private Integer channel=null;
         private Integer bendSense=null;
         private Integer bpm=null;
@@ -41,10 +40,6 @@ class Event {
     }
     public Event(Instrument instrument) {
         anything().instrument=instrument;
-    }
-    public Event setInstrument(int index){//FIXME remove
-        anything().instrumentIndex=index;
-        return this;
     }
     public Event setInstrument(String name){
         anything().instrumentName=name;
@@ -76,9 +71,6 @@ class Event {
     }
     public Instrument getInstrument() {
         return anything(a -> a.instrument);
-    }
-    public Integer getInstrumentIndex() {
-        return anything(a -> a.instrumentIndex);
     }
     public String getInstrumentName() {
         return anything(a -> a.instrumentName);

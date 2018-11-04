@@ -18,10 +18,11 @@ public class Test7Slash16Time  implements XTest {
 		midi.play(
 			stop,
 			new Player()
+				.channel(0)
 				.setBPM(70)
 				.setReverb(64)
 				.setPressure(32)
-				.instrumentChannel(instr, 0)
+				.instrument(instr)
 				.r(4)
 				.octave(3)
 

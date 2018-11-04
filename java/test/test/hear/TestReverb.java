@@ -11,7 +11,7 @@ public class TestReverb implements XTest {
     public @Override void test(MyMidi3 midi, boolean stop)  {
 		Player player=new Player()
 			.setBeatsPerMinute(65)
-		    .instrument(16)
+		    .instrument("Organ - Organ 1")
 		    .setReverb(100)
 		    .setPressure(0)
 		    .octave(5)

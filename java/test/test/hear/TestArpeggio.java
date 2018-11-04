@@ -11,7 +11,7 @@ public class TestArpeggio implements XTest {
     public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .setBeatsPerMinute(80)
-		    .instrument(1)
+			    .instrument("Piano - Piano 3")
 		    .bendSense(4)
 		    .r(8)
 		    .octave(2)

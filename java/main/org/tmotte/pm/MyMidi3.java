@@ -24,6 +24,10 @@ import org.tmotte.common.text.Log;
  */
 public class MyMidi3  {
 
+    /////////////////////////////////////////
+    // STATIC CONSTANTS & DATA STRUCTURES: //
+    /////////////////////////////////////////
+
     // The latter is inversely related to the other:
     public final static int SEQUENCE_RESOLUTION=Divisions.whole * 5 * 7;
 
@@ -54,20 +58,23 @@ public class MyMidi3  {
         }
     }
 
+    ////////////////////////////////////////////
+    // INSTANCE VARIABLES AND INITIALIZATION: //
+    ////////////////////////////////////////////
 
-    private final MidiTracker midiTracker=new MidiTracker();
+    long tickX=0;
+
     private Sequencer sequencer;
+    private Sequence sequence;
     private Synthesizer synth;
     private MidiChannel[] midiChannels;
     private Instrument[] instruments;
-    private Map<String, MetaInstrument> instrumentsByName;
-    private SequencerWatcher sequencerWatcher;
 
     private boolean waitForSequencerToStopPlaying=true;
-
-    private Sequence sequence;
+    private final MidiTracker midiTracker=new MidiTracker();
+    private Map<String, MetaInstrument> instrumentsByName;
+    private SequencerWatcher sequencerWatcher;
     private ReserveChannels reserveChannels=new ReserveChannels();
-    public long tickX=0;
     private SwellGen swellGen=new SwellGen(()->tickX, midiTracker::sendExpression);
     private BendGen bendGen=new BendGen(()->tickX, midiTracker::sendBend);
 
@@ -104,6 +111,62 @@ public class MyMidi3  {
         return instrumentsByName.get(name).instrument;
     }
 
+    void setBeatsPerMinute(int bpm) {
+        tickX = Math.round(
+            ((double)TICKS_PER_MINUTE) /
+            (
+                ((double)bpm) * ((double) Divisions.reg4)
+            )
+        );
+        Log.log("MyMidi3", "TickX: {} ", tickX);
+    }
+
+    ///////////
+    // PLAY: //
+    ///////////
+
+
+    public MyMidi3 play() {
+        return play(false);
+    }
+    public MyMidi3 playAndStop() {
+        return play(true);
+    }
+    public MyMidi3 play(boolean stop, Player... players) {
+        sequence(players);
+        return play(stop);
+    }
+    public void playAndStop(Player... players)  {
+        sequence(players);
+        play(true);
+    }
+    public MyMidi3 play(boolean andThenStop) {
+        sequencerWatcher.closeOnFinishPlay(andThenStop);
+        try {
+            //System.out.println("MyMidi3.play() starting..."+sequencer+" "+andThenStop);
+            if (!sequencer.isOpen())
+                sequencer.open();
+            sequencer.setSequence(sequence);
+            sequencer.setLoopCount(0);
+            sequencer.setLoopStartPoint(0);
+            sequencer.setTickPosition(0);
+            sequencer.start();
+            sequencerWatcher.waitForIf();
+        } catch (Exception e) {
+            sequencer.close();
+            throw new RuntimeException(e);
+        }
+        return this;
+    }
+
+    public void stopPlay() {
+        sequencer.stop();
+    }
+    public void close() {
+        System.out.println("MyMidi3.close()");
+        sequencer.close();
+        //sequencer=null;
+    }
 
     public MyMidi3 reset() {
         Except.run(()-> {
@@ -113,13 +176,9 @@ public class MyMidi3  {
         return this;
     }
 
-    public void write(File file) throws Exception {
-        int[] fileTypes = MidiSystem.getMidiFileTypes(sequence);
-        if (MidiSystem.write(sequence, fileTypes[0], file) == -1) {
-            throw new Exception("Write didn't work");
-        }
-    }
-
+    ///////////////////////
+    // SEQUENCE & WRITE: //
+    ///////////////////////
 
     public MyMidi3 sequence(Player... players) {
         for (Player player: players)
@@ -129,17 +188,6 @@ public class MyMidi3  {
         return this;
     }
 
-    /** Exposed only for testing. */
-    protected MyMidi3 setBeatsPerMinute(int bpm) {
-        tickX = Math.round(
-            ((double)TICKS_PER_MINUTE) /
-            (
-                ((double)bpm) * ((double) Divisions.reg4)
-            )
-        );
-        Log.log("MyMidi3", "TickX: {} ", tickX);
-        return this;
-    }
 
     private void sequencePlayer(Player player)  {
         // Track & time & defaults:
@@ -206,16 +254,16 @@ public class MyMidi3  {
     /** Only called by processNonChordEvent() */
     private Instrument getInstrument(Event event) {
         Instrument instrument=event.getInstrument();
+        if (instrument!=null)
+            return instrument;
         String instrumentName=event.getInstrumentName();
         if (instrumentName!=null) {
             MetaInstrument mi=instrumentsByName.get(instrumentName);
-            if (mi==null) throw new IllegalStateException("No instrument named: \""+instrumentName+"\"");
-            instrument=mi.instrument;
+            if (mi==null)
+                throw new IllegalStateException("No instrument named: \""+instrumentName+"\"");
+            return mi.instrument;
         }
-        Integer instrumentIndex=event.getInstrumentIndex();
-        if (instrumentIndex!=null)
-            instrument=instruments[instrumentIndex];
-        return instrument;
+        return null;
     }
 
     private long processChordEvent(
@@ -353,58 +401,18 @@ public class MyMidi3  {
     }
 
     private void setupChannelForPlayer(int channel, ChannelAttrs channelAttrs, long currTick)  {
-        midiChannels[channel].controlChange(REVERB, channelAttrs.reverb);
+        midiChannels[channel].controlChange(REVERB, channelAttrs.reverb); //FIXME this is not a midi event and should be treated differently.
         midiTracker.sendBendSense(channel, channelAttrs.bendSense, currTick);
         midiTracker.sendPressure(channel, channelAttrs.pressure, currTick);
         midiTracker.sendInstrument(channel, channelAttrs.instrument, currTick);
     }
 
-
-    ///////////
-    // PLAY: //
-    ///////////
-
-
-    public MyMidi3 play() {
-        return play(false);
-    }
-    public MyMidi3 playAndStop() {
-        return play(true);
-    }
-    public MyMidi3 play(boolean stop, Player... players) {
-        sequence(players);
-        return play(stop);
-    }
-    public void playAndStop(Player... players)  {
-        sequence(players);
-        play(true);
-    }
-    public MyMidi3 play(boolean andThenStop) {
-        sequencerWatcher.closeOnFinishPlay(andThenStop);
-        try {
-            //System.out.println("MyMidi3.play() starting..."+sequencer+" "+andThenStop);
-            if (!sequencer.isOpen())
-                sequencer.open();
-            sequencer.setSequence(sequence);
-            sequencer.setLoopCount(0);
-            sequencer.setLoopStartPoint(0);
-            sequencer.setTickPosition(0);
-            sequencer.start();
-            sequencerWatcher.waitForIf();
-        } catch (Exception e) {
-            sequencer.close();
-            throw new RuntimeException(e);
+    public void write(File file) throws Exception {
+        int[] fileTypes = MidiSystem.getMidiFileTypes(sequence);
+        if (MidiSystem.write(sequence, fileTypes[0], file) == -1) {
+            throw new Exception("Write didn't work");
         }
-        return this;
     }
 
-    public void stopPlay() {
-        sequencer.stop();
-    }
-    public void close() {
-        System.out.println("MyMidi3.close()");
-        sequencer.close();
-        //sequencer=null;
-    }
 
 }

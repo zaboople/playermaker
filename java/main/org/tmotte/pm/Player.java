@@ -8,15 +8,16 @@ import javax.sound.midi.Instrument;
 
 /**
  * A Player is roughly analagous to a human musician, and thereby to a Midi Channel.
- * It can play any instrument, but only one instrument at any given time. A composition
+ * It can play any Instrument, and many simultaneous notes on the same Instrument,
+ * but only one Instrument at any given time. A composition
  * can be made of many Players. Notes are added to a Player using methods inherited from
  * {@link Notable}.
  * <br>
- * <b>Event-based attributes</b>
+ * <b>Attributes, event-based and otherwise</b>
  * While it may be unexpected, many of the attributes of Player cannot be attributes
- * of a Chord or Note because they are applied to the entire channel. Most of them can be changed
+ * of a Chord because they are applied to the entire channel. Most of them can be changed
  * throughout the course of a composition, however, because these settings are treated as events,
- * the same as Chords/Notes. Thus a call to, say, setInstrument() will only affect the instrument for
+ * the same as Chords. Thus a call to, say, setInstrument() will only affect the instrument for
  * notes added after that call is made.
  * <br>
  * These attributes include:
@@ -28,8 +29,14 @@ import javax.sound.midi.Instrument;
  *    <li>Bend sensitivity: Refer to {@link BendContainer} for more information.
  *    <li>Instrument
  *    <li>Channel: While this can be set more than once, it generally isn't useful to change its initial
- *        setting (arguably channel should be a constructor parameter for Player()).
+ *        setting (arguably channel should be a constructor parameter for Player()). FIXME
  * </ul>
+ * Additionally, we have defaults that can be controlled at the Player level, but also customized for each Chord,
+ * which "inherits" its initial setting from Player. These settings are technically not event-based, but they
+ * achieve the same results, which is that changes only affect Chords created after a setting change.
+ * <ul>
+ *    <li>Volume
+ *    <li>Transpose/Octave: Allows for an offset to be applied to every note added thereafter.
  * <br>
  * And then we have: Reverb. For whatever reasons, the Java Sequencer ignores reverb events, so we apply
  * reverb directly to the synthesizer at the very beginning of playback, once and only once. This means
@@ -40,7 +47,7 @@ import javax.sound.midi.Instrument;
  * Timing values in Midi are called "ticks". PlayerMaker has its own separate internal system of ticks,
  * leaving the actual Midi ticks inaccessible. Normally you will use setBPM() in combination with
  * classical timing notation to control timing, but it is often useful to synchronize different players
- * using the internal relative timing with methods like {@link #setStartTime(long)} and {@link #getEndTime()}.
+ * using our internal "relative" timing with methods like {@link #setStartTime(long)} and {@link #getEndTime()}.
  */
 public class Player extends NoteAttributeHolder<Player> implements Notable<Player> {
     private static class TimeTracking {
@@ -64,25 +71,11 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     // INSTRUMENT / CHANNEL EVENTS: //
     //////////////////////////////////
 
-    /** Achieves the equivalent of instrumentChannel(instrumentIndex, 0) */
-    public Player instrument(int instrumentIndex) {
-        return event(new Event().setInstrument(instrumentIndex));
-    }
     public Player instrument(Instrument instrument) {
         return event(new Event(instrument));
     }
     public Player instrument(String name) {
         return event(new Event().setInstrument(name));
-    }
-    public Player instrumentChannel(Instrument instrument, int channel) {
-        channel(channel);
-        instrument(instrument);
-        return this;
-    }
-    public Player instrumentChannel(int instrumentIndex, int channelIndex) {
-        channel(channelIndex);
-        instrument(instrumentIndex);
-        return this;
     }
     /**
        Assigns the Player a Midi channel index, which is 0 by default. Two Players can
