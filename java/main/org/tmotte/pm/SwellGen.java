@@ -59,14 +59,11 @@ class SwellGen  {
 
             // Now loop thru the ticks, incrementing volume by one each time.
             // Then set up our new starting volume and time
-            for (long i=0; i<absChange; i++) {
+            boolean[] spread=Spreader.array(absChange, (int)leftoverTicks);
+            for (int i=0; i<absChange; i++) {
                 midiTracker.sendExpression(channel, volume, t);
                 volume+=increment;
-                t+=ticksPer;
-                if (leftoverTicks>0) {
-                    t++;
-                    leftoverTicks--;
-                }
+                t+=ticksPer + (spread[i] ?1 :0);
             }
             startTick+=duration;
             volume=toVolume;

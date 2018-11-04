@@ -1,11 +1,12 @@
 - Allow swells & bends to either tie, or finish a note by specifying zero delay & duration
 - We can make bends more accurate by not using tickx and using the true duration
-- make use of spreader
-- Player channel should only be set once
-    - MyMidi3.ReserveChannels appears to have state problems and is global
+- Make use of spreader
 - Let's do named arguments in groovy; really need it for bends
     - Also, you can skip parentheses but you have to keep commas
-- Player setVolume() and setTranspose() need to be documented... and should they be event-based too?
+- Player setVolume() and setTranspose() need to be documented...
+- Slurs/Slides or do we even - just do 128ths... but we could do them different
+    - Portamento
+    - How about series of 128ths or whatever, and then a sort of finish...didn't i already make a finish?
 
 - Keyboard
     Label keys C1 - G8 or whatever
@@ -24,12 +25,6 @@
             - Change speed - and put speed in player. My idea is that speed is typically 0, but
                 you can enhance it by speed(+/-X). This means anytime a Sound is added, the
                 speed needs to be added to it.
-    - Hammer-ons/pull-offs
-        - This makes no sense at all.
-        - And a 16th that appears at the end of a half (right before another note)
-        - Or a 16th that starts a half
-    - Slurs/Slides or do we even - just do 128ths... but we could do them different
-        - How about series of 128ths or whatever, and then a sort of finish...didn't i already make a finish?
     - Can't help but think you should just allow player to do bends/vibratos etc. on the last note played, and just
         have c() return player itself. But consider p(8,C).rest(16).n(16, D)
 

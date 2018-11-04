@@ -24,7 +24,6 @@ class Event {
     private static class AnythingButChord {
         private Instrument instrument=null;
         private String instrumentName=null;
-        private Integer channel=null;
         private Integer bendSense=null;
         private Integer bpm=null;
         private Integer pressure=null;
@@ -43,10 +42,6 @@ class Event {
     }
     public Event setInstrument(String name){
         anything().instrumentName=name;
-        return this;
-    }
-    public Event setChannel(Integer channel){
-        anything().channel=channel;
         return this;
     }
     public Event setBendSensitivity(Integer bendSense){
@@ -74,9 +69,6 @@ class Event {
     }
     public String getInstrumentName() {
         return anything(a -> a.instrumentName);
-    }
-    public Integer getChannel() {
-        return anything(a -> a.channel);
     }
     public Integer getBendSensitivity() {
         return anything(a -> a.bendSense);

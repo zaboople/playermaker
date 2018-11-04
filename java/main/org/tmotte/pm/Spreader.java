@@ -8,6 +8,8 @@ public class Spreader {
 
 
     public static boolean[] array(int iterations, int remainder) {
+        if (remainder<0)
+            throw new IllegalArgumentException("Remainder "+remainder+" should be > 0");
         if (iterations<=remainder)
             throw new IllegalArgumentException("Iterations "+iterations+" < remainder "+remainder);
         final boolean[] array=new boolean[iterations];
@@ -25,6 +27,7 @@ public class Spreader {
             throw new RuntimeException("Remainder is "+remainder+", should be 0");
         return array;
     }
+
 
     public static void main(String[] args) {
         spreadTest(4, 2);

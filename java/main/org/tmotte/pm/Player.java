@@ -57,8 +57,8 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     }
     private TimeTracking timeTracker=new TimeTracking();
     private List<Event> events=new ArrayList<>();
-    private int reverb=0;
-    private boolean reverbSetOnce=false;
+    private int reverb=0, channel=0;
+    private boolean reverbSetOnce=false, channelSetOnce=false;
     private long startTime=0;
     private NoteAttributes attributes=new NoteAttributes();
 
@@ -89,7 +89,14 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
        @param Channel: The channel index, usually constrained to 0-15 allowed values.
      */
     public Player channel(int channel) {
-        return event(new Event().setChannel(channel));
+        if (channelSetOnce)
+            throw new IllegalStateException("Channel can only be set once");
+        channelSetOnce=true;
+        this.channel=channel;
+        return this;
+    }
+    public int channel() {
+        return channel;
     }
 
     ///////////////////////////////////
@@ -141,8 +148,6 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     public Player reverb(int reverb) {
         return setReverb(reverb);
     }
-
-    /** Note: Reverb can only be set once, because it is not event-based like most other attributes. */
     public Player setReverb(int reverb) {
         if (reverbSetOnce)
             throw new RuntimeException("There is no point in setting the reverb more than once.");
@@ -150,7 +155,7 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
         this.reverb=reverb;
         return this;
     }
-    public int getReverb() {
+    public int reverb() {
         return reverb;
     }
 

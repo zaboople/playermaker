@@ -62,21 +62,24 @@ public class MyMidi3  {
     // INSTANCE VARIABLES AND INITIALIZATION: //
     ////////////////////////////////////////////
 
+    // Simpler state:
     long tickX=0;
+    private boolean waitForSequencerToStopPlaying=true;
+    private Map<String, MetaInstrument> instrumentsByName;
 
+    // Standard Midi objects:
     private Sequencer sequencer;
     private Sequence sequence;
     private Synthesizer synth;
     private MidiChannel[] midiChannels;
     private Instrument[] instruments;
 
-    private boolean waitForSequencerToStopPlaying=true;
+    // Custom objects:
     private final MidiTracker midiTracker=new MidiTracker();
-    private Map<String, MetaInstrument> instrumentsByName;
-    private SequencerWatcher sequencerWatcher;
-    private ReserveChannels reserveChannels=new ReserveChannels();
-    private SwellGen swellGen=new SwellGen(()->tickX, midiTracker::sendExpression);
-    private BendGen bendGen=new BendGen(()->tickX, midiTracker::sendBend);
+    private final ReserveChannels reserveChannels=new ReserveChannels();
+    private final SwellGen swellGen=new SwellGen(()->tickX, midiTracker::sendExpression);
+    private final BendGen bendGen=new BendGen(()->tickX, midiTracker::sendBend);
+    private final SequencerWatcher sequencerWatcher;
 
     public MyMidi3() {
         this(Optional.empty());
@@ -89,12 +92,12 @@ public class MyMidi3  {
                 SequencerUtils.getOrReplaceInstruments(synth, replaceInstruments)
             );
             sequencer=MidiSystem.getSequencer();
-            sequencerWatcher=new SequencerWatcher(sequencer);
             SequencerUtils.hookSequencerToSynth(sequencer, synth);
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
             setBeatsPerMinute(60);
             midiChannels = synth.getChannels();
         });
+        sequencerWatcher=new SequencerWatcher(sequencer);
     }
 
     public MyMidi3 setInstruments(Instrument... instruments) {
@@ -165,7 +168,6 @@ public class MyMidi3  {
     public void close() {
         System.out.println("MyMidi3.close()");
         sequencer.close();
-        //sequencer=null;
     }
 
     public MyMidi3 reset() {
@@ -194,7 +196,8 @@ public class MyMidi3  {
         midiTracker.setTrack(sequence.createTrack());
         long currTick=player.getStart() * tickX;
         ChannelAttrs channelAttrs=new ChannelAttrs();
-        channelAttrs.reverb=player.getReverb();
+        channelAttrs.reverb=player.reverb();
+        channelAttrs.mainChannel=player.channel();
         channelAttrs.instrument=instruments[0];
 
         // And blast off the rocket:
@@ -225,11 +228,6 @@ public class MyMidi3  {
         getAndSet(event.getBeatsPerMinute(), eBpm ->
             setBeatsPerMinute(eBpm)
         );
-        getAndSet(event.getChannel(), eChannel ->   {
-            channelAttrs.mainChannel=eChannel;
-            if (!firstChord)
-                setupChannelForPlayer(channelAttrs.mainChannel, channelAttrs, currTick);
-        });
         getAndSet(event.getBendSensitivity(), eBendSense -> {
             channelAttrs.bendSense=eBendSense;
             if (!firstChord)
@@ -371,12 +369,8 @@ public class MyMidi3  {
             currSpares.clear();
         }
         /** Players can overlap on a channel, assuming it won't cause a problem. */
-        public void reserve(Player player) { //FIXME see this would be less stupid if we only allow channel to change once.
-            for (Event event: player.events()) {
-                Integer ch=event.getChannel();
-                if (ch!=null)
-                    reservedAll[ch]=true;
-            }
+        public void reserve(Player player) {
+            reservedAll[player.channel()]=true;
         }
         public int useSpare(Player player, ChannelAttrs channelAttrs, long tick) {
             for (int ch=channelAttrs.mainChannel+1; ch<reservedAll.length; ch++) {

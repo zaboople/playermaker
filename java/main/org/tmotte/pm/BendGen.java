@@ -22,7 +22,7 @@ class BendGen  {
 	}
 
     void handle(int channel, long soundStart, List<Bend> bends) {
-        Log.log("BendGen", "sendBends size: "+bends.size());
+        Log.log("BendGen", "sendBends size: {}", bends.size());
         long tickX=tickXget.getAsLong();
         long t=soundStart;
         int pitch=NO_BEND;
@@ -34,6 +34,7 @@ class BendGen  {
             int perTicky = change / realDuration;
             int leftover = change % realDuration;
             int leftoverIncr=leftover>0 ?1 :-1;
+            boolean[] spread=Spreader.array((int)bend.duration, Math.abs(leftover));
             Log.log("BendGen", " change: {} perTicky {} leftover {}", change, perTicky, leftover);
             for (int i=0; i<bend.duration; i++) {
                 if (pitch==16384) pitch=16383;
@@ -42,7 +43,7 @@ class BendGen  {
                 midiTracker.eventBend(channel, pitch, t);
                 t+=tickX;
                 int thisAmount = perTicky;
-                if (leftover!=0) {
+                if (spread[i]) {
                     thisAmount+=leftoverIncr;
                     leftover-=leftoverIncr;
                 }

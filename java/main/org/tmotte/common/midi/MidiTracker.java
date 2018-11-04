@@ -16,9 +16,9 @@ import javax.sound.midi.*;
 
 
 /**
- * A general-purpose class for sending Midi Messages to a given Track. It exposes a certain number of high-level
- * messages that I've figured out, like "tell this channel to play this instrument at this time" i.e. sendInstrument(),
- * but it also exposes some lower-level helpers (for no good reason).
+ * A general-purpose class for sending Midi Messages to a given Track. Essentially this provides a lot of sequencing
+ * methods that the Java Midi API should already have, but "forgot" to include. A lot of these were quite difficult to
+ * figure out.
  */
 public class MidiTracker  {
 
