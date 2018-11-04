@@ -71,6 +71,9 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     // INSTRUMENT / CHANNEL EVENTS: //
     //////////////////////////////////
 
+    /**
+     * Assign this player an instrument. Instruments can be obtained from MyMidi3.
+     */
     public Player instrument(Instrument instrument) {
         return event(new Event(instrument));
     }
@@ -94,7 +97,6 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     ///////////////////////////////////
 
     /**
-     * FIXME test BPM changes in mid-flight!
      * BPM means "beats per minute". This setting is event-based, so it affects only the notes added after BPM is changed.
      * <br>
      * However: BPM is really a function of the MyMidi pseudo-sequencer; when it changes, all Players are affected. So if Player A
@@ -119,8 +121,7 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
      * steps. Refer to FIXME for actual bend methods.
      */
     public Player setBendSensitivity(int sensitivity) {
-        event(new Event().setBendSensitivity(sensitivity));
-        return this;
+        return event(new Event().setBendSensitivity(sensitivity));
     }
     /** A shortcut to setBendSensitivity(int) */
     public Player bendSense(int sensitivity) {
@@ -128,9 +129,10 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     }
 
     public Player setPressure(int pressure) {
-        event(new Event().setPressure(pressure));
-        return this;
+        return event(new Event().setPressure(pressure));
     }
+    /** Sets the Midi "pressure", which usually means vibrato; larger values are more "intense", which is to
+        say more "variable". */
     public Player pressure(int pressure) {
         return setPressure(pressure);
     }
@@ -180,16 +182,16 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
         return startTime;
     }
     public long getEndTime() {
-        return getEnd();
+        return end();
     }
-    public long getEnd() {
+    public long end() {
         return startTime + getTimeLength();
     }
     /** Gets the duration of the composition in ticks. */
     public long duration() {
         return getTimeLength();
     }
-    public long getTimeLength() {
+    long getTimeLength() {
         int eventCount=events.size();
         while (timeTracker.indexForTimeCounted < eventCount-1)
             timeTracker.timeUpToIndex += getDuration(timeTracker.indexForTimeCounted++);
@@ -268,7 +270,7 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     }
     private Chord<Player> addChord(long duration, int... pitches) {
         var chord=new Chord<>(this, attributes, duration, pitches);
-        events.add(new Event(chord));
+        event(new Event(chord));
         return chord;
     }
 
