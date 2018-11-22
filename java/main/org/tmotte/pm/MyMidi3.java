@@ -129,21 +129,14 @@ public class MyMidi3  {
     ///////////
 
 
-    public MyMidi3 play() {
-        return play(false);
-    }
-    public MyMidi3 playAndStop() {
-        return play(true);
+    public MyMidi3 playAndStop(Player... players)  {
+        return play(true, players);
     }
     public MyMidi3 play(boolean stop, Player... players) {
         sequence(players);
         return play(stop);
     }
-    public void playAndStop(Player... players)  {
-        sequence(players);
-        play(true);
-    }
-    public MyMidi3 play(boolean andThenStop) {
+    private MyMidi3 play(boolean andThenStop) {
         sequencerWatcher.closeOnFinishPlay(andThenStop);
         try {
             //System.out.println("MyMidi3.play() starting..."+sequencer+" "+andThenStop);
@@ -212,7 +205,7 @@ public class MyMidi3  {
                     firstChord=false;
                     setupChannelForPlayer(channelAttrs.mainChannel, channelAttrs, currTick);
                 }
-                currTick=processChordEvent(chord, player, channelAttrs, currTick, noParent); //FIXME shouldn't it be +1?
+                currTick=processChordEvent(chord, player, channelAttrs, currTick, noParent);
             }
         }
     }
@@ -395,7 +388,10 @@ public class MyMidi3  {
     }
 
     private void setupChannelForPlayer(int channel, ChannelAttrs channelAttrs, long currTick)  {
-        midiChannels[channel].controlChange(REVERB, channelAttrs.reverb); //FIXME this is not a midi event and should be treated differently.
+        // While reverb is not a recordable event, we are allowing it here
+        // because it is a function of the channel, and each channel has its own setting, and
+        // each channel can be used by different players at different times.
+        midiChannels[channel].controlChange(REVERB, channelAttrs.reverb);
         midiTracker.sendBendSense(channel, channelAttrs.bendSense, currTick);
         midiTracker.sendPressure(channel, channelAttrs.pressure, currTick);
         midiTracker.sendInstrument(channel, channelAttrs.instrument, currTick);

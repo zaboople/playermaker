@@ -32,7 +32,7 @@ final class Bend {
         );
         int flipper=1;
         for (long i=0; i<count; i++) {
-            bends.add(new Bend(delay, frequency, denominator * (flipper*=-1))); //FIXME don't need bends=add(, just add(
+            add(bends, delay, frequency, denominator * (flipper*=-1));
             if (i==0) {
                 delay=0;
                 denominator/=2;
@@ -56,7 +56,7 @@ final class Bend {
     long delay() {
         return delay;
     }
-    /** This is not the duration as input, but converted to tick groups. FIXME rename durationTicks */
+    /** This is not the duration as input, but converted to our custom "tick" system. */
     long duration() {
         return duration;
     }

@@ -28,8 +28,6 @@ import javax.sound.midi.Instrument;
  *        play at various points during the composition.
  *    <li>Bend sensitivity: Refer to {@link BendContainer} for more information.
  *    <li>Instrument
- *    <li>Channel: While this can be set more than once, it generally isn't useful to change its initial
- *        setting (arguably channel should be a constructor parameter for Player()). FIXME
  * </ul>
  * Additionally, we have defaults that can be controlled at the Player level, but also customized for each Chord,
  * which "inherits" its initial setting from Player. These settings are technically not event-based, but they
@@ -39,7 +37,7 @@ import javax.sound.midi.Instrument;
  *    <li>Transpose/Octave: Allows for an offset to be applied to every note added thereafter.
  * <br>
  * And then we have: Reverb. For whatever reasons, the Java Sequencer ignores reverb events, so we apply
- * reverb directly to the synthesizer at the very beginning of playback, once and only once. This means
+ * reverb directly to the synthesizer channel during playback, once and only once per player. This means
  * you can have only one reverb setting per Player; also, if you save your composition to a
  * standard Midi sequence file, any reverb settings are lost.
  * <br>
@@ -125,7 +123,7 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     /**
      * In Midi a bend can go a "whole step" by default, which is to say, two notes up or down.
      * However, you can change the "Bend sensitivity" to increase the range from a whole step to many more
-     * steps. Refer to FIXME for actual bend methods.
+     * steps. Refer to {@link Chord#bend} for actual bend methods.
      */
     public Player setBendSensitivity(int sensitivity) {
         return event(new Event().setBendSensitivity(sensitivity));

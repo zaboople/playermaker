@@ -1,6 +1,5 @@
 package org.tmotte.pm;
 
-/** For internal use only. This is exposed only for unit tests. */
 class Divisions {
     final static int triplet128=2;
     final static int triplet64=triplet128 * 2;
@@ -37,7 +36,7 @@ class Divisions {
             throw new RuntimeException("Don't know what to do with "+d);
     }
 
-    static long convert(int d) { //FIXME what a mess but it works
+    static long convert(int d) {
         //System.out.println("unconvert "+d+" / 128 * "+reg128);
         if (d==0) return 0;
         //if (d>128) throw new RuntimeException("The value "+d+" is greater than the limit of 128");

@@ -11,7 +11,6 @@ import org.tmotte.common.text.Log;
  * Represents a chord, be it one note or many. While a chord will often sound all of its
  * notes at once and finish them all at once, overlapping/arpeggiating possibilities are
  * allowed via the r() method, which creates a Rest, and then delayed notes can be added.
- * FIXME test much overlapping waxing/waning etc.
  */
 public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
@@ -188,8 +187,8 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      *        2/4/8/16/32/64 etc to indicate a period corresponding to half/quarter/eighth/etc
      *        notes, or 8.3 for triplet and 8. for dotted notes.
      * @param duration The time over which the bend takes place, expressed in the same notation
-     *        as delay; if this is shorter than the length
-     *        of the given Note/Chord, the pitch remains constant for the rest of the Note/Chord's duration.
+     *        as delay; if this is shorter than the length of the given Note/Chord, the pitch remains
+     *        constant for the rest of the Note/Chord's duration.
      * @param denominator Can be negative or positive. Indicates the 1/denominator of our bend range to go
      *        up or down. So, if our bend sensitivity is set to the default of one whole step (which is to say,
      *        2 semitones):
@@ -219,13 +218,12 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     /**
      * A shortcut for a bend spread across the entire duration of the note with no delay,
      * i.e. bend(0, <duration>, denominator.
-     * FIXME test this
      */
     public Chord<T> bend(int denominator) {
         return bend(0L, duration, denominator);
     }
 
-    /** FIXME test and verify we need the doubles, probably don't */
+
     public Chord<T> bend(double delay, double duration, int denominator) {
         Bend.add(makeBends(), delay, duration, denominator);
         return this;
@@ -357,26 +355,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     // INTERNAL LOGIC FOR NoteAttributes : //
     /////////////////////////////////////////
 
-    /**
-        FIXME why not do away with this garbage? Now we have the ability
-        to specify subchords separately, so we only need to create a new
-        parent attributes if we are using parent attributes. Most of the time
-        we would set volume/etc. before creating sub-chords, in which case
-        they will inherit. If we set it after creating them, they shouldn't.
-
-       This is tricky because Notes are created immediately for the
-       chord as well as after (via Chord.n()) so we may or may not
-       want the notes to inherit attributes. Complicating this is:
-       1. We start with the Player's attributes, which we must not change.
-          So we have to create a new NoteAttributes if we are still using
-          the NoteAttributes we got from Player.
-       2. We want Sub-Chords to get our changes, but we just made
-          a new NoteAttributes, so we'll tell them to use it instead of
-          the old one they already have.
-       3. But if the Note already customized its attributes... we'll leave
-          their Attributes object alone, but still pass on the individual
-          attribute value to them and tell them to accept it.
-    */
     protected @Override NoteAttributes getNoteAttributesForRead(){
         return attributes;
     }

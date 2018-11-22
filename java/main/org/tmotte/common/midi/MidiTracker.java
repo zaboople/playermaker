@@ -34,7 +34,7 @@ public class MidiTracker  {
         event(channel, ShortMessage.NOTE_ON, pitch, volume, tick);
     }
 
-	public void noteOff(int channel, int pitch, long tick) { //FIXME why do I need to send pitch & volume?
+	public void noteOff(int channel, int pitch, long tick) {
         event(channel, ShortMessage.NOTE_OFF, pitch, 0, tick);
     }
 

@@ -4,11 +4,6 @@ import java.util.List;
 
 final class Swell {
 
-
-    /////////////////////////
-    // INSTANCE VARIABLES: //
-    /////////////////////////
-
     final long delay;
     final long duration;
     final int toVolume;
@@ -16,7 +11,7 @@ final class Swell {
     long delay() {
         return delay;
     }
-    /** This is not the duration as input, but converted to tick groups. FIXME rename durationTicks */
+    /** This is not the duration as input, but converted to tick groups. */
     long duration() {
         return duration;
     }

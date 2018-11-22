@@ -4,7 +4,7 @@ import org.tmotte.pm.Player;
 import static org.tmotte.pm.Pitches.*;
 import org.tmotte.common.text.Log;
 
-/** FIXME */
+/** Speeds up & slows down BPM (beats per minute) */
 public class TestBPM implements XTest {
     public static void main(String args[]) throws Exception {
         Log.add("SwellGen", "MyMidi3" /*, "MidiTracker"*/);
@@ -66,9 +66,9 @@ public class TestBPM implements XTest {
 		    .p(16.3, E_)
 		    .p(16.3, G)
 
-		    .c(2, B+24)
+		    .c(2, B)
 			    .r(8).finup(D+24)
-			    .r(4).finup(C+12)
+			    .r(4).finup(B+12)
 			    .up()
 
 		    .bpm(60)
