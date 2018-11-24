@@ -1,10 +1,12 @@
 package test.hear;
 import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
+import org.tmotte.common.text.Log;
 import static org.tmotte.pm.Pitches.*;
 
 public class TestBendsPartial implements XTest {
     public static void main(String args[]) throws Exception {
+        Log.add("BendGen", "MyMidi3", "Bend", "MidiTracker");
 	    new TestBendsPartial().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {

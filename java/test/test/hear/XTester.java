@@ -24,6 +24,7 @@ public class XTester {
                 ,new TestBends()
                 ,new TestBends2()
                 ,new TestBendsPartial()
+                ,new TestBendTie()
                 ,new TestBendTo()
                 ,new TestBPM()
                 ,new TestChannelTrack()

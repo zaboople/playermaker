@@ -12,8 +12,9 @@ public class TestVibratoSpeed implements XTest {
 	    Player player=new Player()
 			.setBeatsPerMinute(100)
 		    .channel(0)
-		    .instrument("Organ - Bandoneon")
+		    .instrument("Tenor Sax")
 		    .setBendSensitivity(4)
+		    .reverb(64)
 		    .octave(5)
 		    .r(4)
 

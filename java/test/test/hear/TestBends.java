@@ -10,7 +10,7 @@ public class TestBends implements XTest {
     public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .setBeatsPerMinute(90)
-		    .instrument("60's Organ 1")
+		    .instrument("Halo Pad")
 		    .octave(6)
 		    .r(4)
 
@@ -34,15 +34,14 @@ public class TestBends implements XTest {
 
 		    .p(8, B_, B_+3, B_+5)
 		    .p(8, B_+2, B_+4, B_+5)
-		    .octave(2)
+		    .octave(3)
 		    .r(8)
 		    .p(8, C)
 
-			.volume(100)
 		    .p(8, B_)
-		    .octave(1)
+		    //.octave(2)
 		    .p(8, E_, G, E_+12)
-		    .p(16, E_, E_+12)
+		    .p(8, E_, E_+12)
 		    .r(4);
 	    midi.play(stop, player);
     }

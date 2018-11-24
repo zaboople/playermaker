@@ -216,11 +216,12 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         return bend(0, duration, denominator);
     }
     /**
-     * A shortcut for a bend spread across the entire duration of the note with no delay,
-     * i.e. bend(0, <duration>, denominator.
+     * A shortcut for a bend spread across the entire duration of the chord with no delay,
+     * i.e. chord.bend(0, [chord duration], denominator). However, if there are already bends
+     * in the Chord, then this bend will only take the time remaining.
      */
     public Chord<T> bend(int denominator) {
-        return bend(0L, duration, denominator);
+        return bend(0L, duration-bendDuration(), denominator);
     }
 
 
@@ -235,9 +236,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     private Chord<T> bend(long delay, long duration, int denominator) {
         Bend.add(makeBends(), delay, duration, denominator);
         return this;
-    }
-    private Chord<T> bend(long duration, int denominator) {
-        return bend(0L, duration, denominator);
     }
 
     //////////////
@@ -267,7 +265,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     }
 
     public Chord<T> vibrato(int frequency, int denominator) {
-        return vibrato(0L, duration, Divisions.convert(frequency), denominator);
+        return vibrato(0L, duration-bendDuration(), Divisions.convert(frequency), denominator);
     }
     public Chord<T> vibrato(int duration, int frequency, int denominator) {
         return vibrato(0, duration, frequency, denominator);
@@ -282,7 +280,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     }
 
     public Chord<T> vibrato(double frequency, int denominator) {
-        return vibrato(0L, duration, Divisions.convert(frequency), denominator);
+        return vibrato(0L, duration-bendDuration(), Divisions.convert(frequency), denominator);
     }
     public Chord<T> vibrato(Number duration, Number frequency, int denominator) {
         Long long0=0l;//Avoids java 10 compiler warning
@@ -294,17 +292,18 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         Bend.vibrato(makeBends(), delay, duration, frequency, denominator);
         return this;
     }
-    private Chord<T> vibrato(long frequency, int denominator) {
-        return vibrato(0L, duration, frequency, denominator);
-    }
-    private Chord<T> vibrato(long duration, long frequency, int denominator) {
-        return vibrato(0L, duration, frequency, denominator);
-    }
 
     private List<Bend> makeBends() {
         return bends==null
             ?bends=new ArrayList<>()
             :bends;
+    }
+
+    private long bendDuration() {
+        long time=makeBends().stream().reduce(
+            0L, (n, bend)->n+bend.delay()+bend.duration(), (x, y)->x+y
+        );
+        return time;
     }
 
 

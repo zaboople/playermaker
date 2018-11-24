@@ -8,7 +8,6 @@ public class TestVibratoTriplet implements XTest {
 	    new TestVibratoTriplet().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
-	    //Organ 1, with double bend-sensitivity:
 	    Player player=new Player()
 		    .setBeatsPerMinute(60)
 		    .instrument("Strings - Viola")
