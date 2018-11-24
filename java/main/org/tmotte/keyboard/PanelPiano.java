@@ -8,8 +8,7 @@ import java.util.*;
 import java.util.function.IntSupplier;
 
 /**
- * Piano renders black & white keys and plays the notes for a MIDI
- * channel.
+ * Piano renders black and white keys, and when keys are pressed, plays the notes for a MIDI channel.
  */
 public class PanelPiano extends JComponent {
 

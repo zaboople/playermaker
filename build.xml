@@ -30,6 +30,11 @@
 
   <target name="help">
     <echo>
+        Targets:
+            clean
+            compile
+            javadoc
+            jar
     </echo>
   </target>
 

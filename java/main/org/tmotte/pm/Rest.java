@@ -24,7 +24,7 @@ public class Rest<T> {
     public Rest<T> t(int duration) {
         return t(Divisions.convert(duration));
     }
-    /** A double version of t(int) for use with dotted & triplet notes.*/
+    /** A double version of t(int) for use with dotted &amp; triplet notes.*/
     public Rest<T> t(double duration) {
         return t(Divisions.convert(duration));
     }
@@ -40,7 +40,7 @@ public class Rest<T> {
      * but (usually) before the end of the same original chord.
      * <br>
      * You can use .bend(), .vibrato(), .volume() and even .r() against the new Chord like any other.
-     * So yes, you can nest chords within others as far as you want to go, e.g. Chord<Chord<Chord...<T>>>>.
+     * So yes, you can nest chords within others as far as you want to go, e.g. Chord&lt;Chord&lt;Chord...&lt;T&gt;&gt;&gt;.
      * <br>
      * Use .up() to get back to the parent chord, or use up(int, int...) as a shortcut instead of .c().
      */

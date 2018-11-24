@@ -17,15 +17,15 @@
  * </ul>
  * <br>
  * <b>Bends &amp; Vibrato</b>
- * Note "bends" can be done using {@link Chord#bend(Number, Number, int) and other variations of Chord.bend().
- * There is also {@link Chord#vibrato(Number, Number, Number, int), which can be used instead of {@link Player.pressure(int)}
+ * Note "bends" can be done using {@link Chord#bend(Number, Number, int)} and other variations of Chord.bend().
+ * There is also {@link Chord#vibrato(Number, Number, Number, int)}, which can be used instead of {@link Player#pressure(int)}
  * for more control over vibrato.
  * <br>
- * Bends & vibratos are done sequentially, so you can do
+ * Bends &amp; vibratos are done sequentially, so you can do
      <pre>
      chord.bend(...).bend(....)..vibrato(...).bend(...)
      </pre>
-   and each bend or vibrato will happen after the previous. So, no, you can't do vibrato & bend at the same
+   and each bend or vibrato will happen after the previous. So, no, you can't do vibrato &amp; bend at the same
    time.
  * <br>
  * In Midi, bends apply to the whole channel. This is rather inflexible, so internally we make use of "spare"

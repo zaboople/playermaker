@@ -9,32 +9,34 @@ import javax.sound.midi.Instrument;
 /**
  * A Player is roughly analagous to a human musician, and thereby to a Midi Channel.
  * It can play any Instrument, and many simultaneous notes on the same Instrument,
- * but only one Instrument at any given time. A composition
- * can be made of many Players. Notes are added to a Player using methods inherited from
- * {@link Notable}.
+ * but only one Instrument at any given time. A composition can be made of many Players.
+ * Chords are added to a Player using methods like {@link Player#p(int, int...)} and
+ * {@link Player#c(int, int...)}.
  * <br>
  * <b>Attributes, event-based and otherwise</b>
  * While it may be unexpected, many of the attributes of Player cannot be attributes
  * of a Chord because they are applied to the entire channel. Most of them can be changed
  * throughout the course of a composition, however, because these settings are treated as events,
  * the same as Chords. Thus a call to, say, setInstrument() will only affect the instrument for
- * notes added after that call is made.
+ * Chords added after that call is made.
  * <br>
  * These attributes include:
  * <ul>
- *    <li>Pressure: Which usually means vibrato. See {@link BendContainer} for more fine-grained vibrato
+ *    <li>Pressure: Which usually means vibrato. See {@link Chord#vibrato(Number, Number, Number, int)} for more fine-grained vibrato
  *        as well as bend control.
- *    <li>Beats per minute: Commonly abbreviated as "BPM". This can be used to speed up & slow down
+ *    <li>Beats per minute: Commonly abbreviated as "BPM". This can be used to speed up &amp; slow down
  *        play at various points during the composition.
- *    <li>Bend sensitivity: Refer to {@link BendContainer} for more information.
+ *    <li>Bend sensitivity: Refer to {@link Chord#bend(Number, Number, int)} for more information.
  *    <li>Instrument
  * </ul>
+ * <br>
  * Additionally, we have defaults that can be controlled at the Player level, but also customized for each Chord,
  * which "inherits" its initial setting from Player. These settings are technically not event-based, but they
  * achieve the same results, which is that changes only affect Chords created after a setting change.
  * <ul>
  *    <li>Volume
  *    <li>Transpose/Octave: Allows for an offset to be applied to every note added thereafter.
+ * </ul>
  * <br>
  * And then we have: Reverb. For whatever reasons, the Java Sequencer ignores reverb events, so we apply
  * reverb directly to the synthesizer channel during playback, once and only once per player. This means
@@ -42,12 +44,12 @@ import javax.sound.midi.Instrument;
  * standard Midi sequence file, any reverb settings are lost.
  * <br>
  * <b>Timing</b>
- * Timing values in Midi are called "ticks". PlayerMaker has its own separate internal system of ticks,
+ * Timing values in Midi are called "ticks". PlayerMaker has its own separate internal system of "relative" ticks,
  * leaving the actual Midi ticks inaccessible. Normally you will use setBPM() in combination with
  * classical timing notation to control timing, but it is often useful to synchronize different players
- * using our internal "relative" timing with methods like {@link #setStartTime(long)} and {@link #getEndTime()}.
+ * using our relative ticks with methods like {@link #setStartTime(long)} and {@link #getEndTime()}.
  */
-public class Player extends NoteAttributeHolder<Player> implements Notable<Player> {
+public class Player extends NoteAttributeHolder<Player> {
     private static class TimeTracking {
         long timeUpToIndex=0;
         long timeAtIndex=0;
@@ -84,7 +86,7 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
        are applied to the entire channel, sharing is likely to have undesirable effects.
        Most Midi sequencers allow 16 channels, with channel 10 reserved for percussion/drum
        instruments only.
-       @param Channel: The channel index, usually constrained to 0-15 allowed values.
+       @param channel: The channel index, 0-based, usually constrained to 0-15 for 16 channels.
      */
     public Player channel(int channel) {
         if (channelSetOnce)
@@ -217,7 +219,7 @@ public class Player extends NoteAttributeHolder<Player> implements Notable<Playe
     /**
      * The "r" is short for "rest". The Player will pause for
      * the specified duration. Use rest(int) for whole/half/quarter/eigth/etc. notes,
-     * and {@link #rest(double)} for dotted & triplet rests.
+     * and {@link Player#rest(double)} for dotted &amp; triplet rests.
      * <br>
      * Internally, a rest is actually represented as a Chord.
      */

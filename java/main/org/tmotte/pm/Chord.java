@@ -77,7 +77,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         <pre>
         player.c(4, C).t(16).up()
         </pre>
-        Use {@link t(double)} for dotted & triplet notes.
+        Use {@link t(double)} for dotted &amp; triplet notes.
      * @param duration A time period expressed in the typical notation.
      */
     public Chord<T> t(int duration) {
@@ -92,31 +92,51 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     }
 
     /**
-     * Allows one to add delayed, overlapping notes to the Chord.
-     * {@link Rest} implements Notable, so it has a {@link Rest#n(int, int)},
-     * {@link Rest#c(int, int)}, etc. methods for adding notes. This is similar
+     * Allows one to add delayed, overlapping Chords to the original Chord.
+     * Use {@link Rest#c(int, int...)}, etc. methods for to adding them. This is similar
      * to the notes &amp; staves practice of placing a rest above/below a note
      * to indicate an amount of time to wait before playing a parallel note.
-     * @param A standard notation integer duration: 4 for a quarter rest, 8
+     * @param duration A standard notation integer duration: 4 for a quarter rest, 8
      *        for an eighth rest, etc.
      */
-    public Rest<T> r(int i) {return rest(Divisions.convert(i));}
+    public Rest<T> r(int duration) {
+        return rest(Divisions.convert(duration));
+    }
     /**
      * Does the same as {@link #r(int)} but allowing for triplet &amp; dotted-note
      * values.
      */
-    public Rest<T> r(double d) {return rest(Divisions.convert(d));}
+    public Rest<T> r(double duration) {
+        return rest(Divisions.convert(duration));
+    }
     private Rest<T> rest(long duration) {
         return new Rest<>(this, duration);
     }
 
+
+    /**
+     * Allows us to add a chord that plays at the same time as this one,
+     * but that is not subject to the same bend/vibrato/volume etc. effects. Note
+     * that if other chords have already been added, the new chord will
+     * be played after those sub-chords; however you can do multiple parallel
+     * sub-chords via:
+     <pre>
+          player
+            .c(...)
+                .c(...)
+                    .c(...)
+                        .c(...)
+            .up().up().up().up()
+    </pre>
+     * All four of the above chords would play in parallel.
+     * parallel chord by adding it as a sub-chord of the first sub-chord).
+     */
     public Chord<Chord<T>> c(int duration, int... notes) {
         return addChord(0L, Divisions.convert(duration), notes);
     }
     public Chord<Chord<T>> c(double duration, int... notes) {
         return addChord(0L, Divisions.convert(duration), notes);
     }
-
     /** A shortcut to c(int, int...).up() */
     public Chord<T> up(int duration, int... notes) {
         return c(duration, notes).up();
@@ -125,6 +145,8 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     public Chord<T> up(double duration, int... notes) {
         return c(duration, notes).up();
     }
+
+
     /** Exposed for use by Rest, which will supply a non-zero restBefore */
     protected Chord<Chord<T>> addChord(long restBefore, long duration, int... pitches) {
         var n=new Chord<>(this, attributes, restBefore, duration, pitches);

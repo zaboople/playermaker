@@ -1,23 +1,23 @@
 package org.tmotte.pm;
 
 /**
- * This is extended by Chord, Note & Player. Player passes its attributes on to the Chord (when created, for example, by Player#c()),
- * and Chord passes its on to Note. Chord and Note can in turn override the passed-on settings.
+ * This is extended by Chordand Player. Player passes its attributes on to Chord when creating a Chord via Player#c()),
+ * but Chord can override those settings. Chord passes its own attributes on to its sub-chords.
  * <br>
- * The only actual things set in here are octave/transpose & volume.
+ * The only actual things set in here are octave/transpose &amp; volume.
  */
 public abstract class NoteAttributeHolder<T> {
 
     /**
      * Sets an absolute value for volume, directly corresponding to the midi standard volume settings.
-     * @param volume Should be between 0 &amp; 127 inclusive.
+     * @param v Should be between 0 &amp; 127 inclusive.
      * @return The orginal object
      */
     public T volume(int v) {
         return setVolume(v);
     }
     /**
-     * Adds the given amount to the current volume setting; both positive & negative values
+     * Adds the given amount to the current volume setting; both positive &amp; negative values
      * are allowed as long as the resulting value fits within standard limits.
      */
     public T addVolume(int change) {

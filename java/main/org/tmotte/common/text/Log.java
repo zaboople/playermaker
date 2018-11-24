@@ -3,13 +3,13 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.HashSet;
 
-/** My hacky Logging thing. It's completely static. You are responsible specifying
-    a "type" when you log, as the first parameter. Use add() to add types that will
-    actually be logged; others are ignored.
-    <br>
-    This is reasonably thread-safe in that a given log() calls will not overlap with
-    others; but adding & removing log types affects all threads.
-*/
+/**
+ * My hacky Logging thing. It's completely static. You are responsible for specifying a "type" when you
+ * log, as the first parameter. Use add() to add types that will actually be logged; others are ignored.
+ * <br>
+ * This is reasonably thread-safe in that a given log() calls will not overlap with  thers; but adding &amp;
+ * removing log types affects all threads.
+ */
 public class Log {
     private static boolean enabled=true;
     private static Set<String> types=new HashSet<>();
