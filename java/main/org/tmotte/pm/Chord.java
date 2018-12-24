@@ -27,6 +27,13 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     private boolean bendWithParent=false;
     private String tag;
 
+    /**
+     * In cases where you want a duration to be a combination of say, 2 dotted eighth notes, or whatever,
+     * this will allow you to tie arbitrary durations together.
+     */
+    public static long tie(Number... durations) {
+        return Divisions.convert(durations);
+    }
 
     protected Chord(T parent, NoteAttributes attributes, long duration, int... pitches) {
         this(parent, attributes, 0L, duration, pitches);
@@ -51,6 +58,12 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     /** Only for use with sub-chords created with rest(); indicates that
         that the sub-chord should be bent in the same fashion as its parent.*/
     public Chord<T> bendWithParent() {
+        bendWithParent=true;
+        return this;
+    }
+
+    /** A shortcut to {@link bendWithParent()} */
+    public Chord<T> bwp() {
         bendWithParent=true;
         return this;
     }
@@ -80,10 +93,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         Use {@link t(double)} for dotted &amp; triplet notes.
      * @param duration A time period expressed in the typical notation.
      */
-    public Chord<T> t(int duration) {
-        return t(Divisions.convert(duration));
-    }
-    public Chord<T> t(double duration) {
+    public Chord<T> t(Number duration) {
         return t(Divisions.convert(duration));
     }
     private Chord<T> t(long duration) {
@@ -99,14 +109,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * @param duration A standard notation integer duration: 4 for a quarter rest, 8
      *        for an eighth rest, etc.
      */
-    public Rest<T> r(int duration) {
-        return rest(Divisions.convert(duration));
-    }
-    /**
-     * Does the same as {@link #r(int)} but allowing for triplet &amp; dotted-note
-     * values.
-     */
-    public Rest<T> r(double duration) {
+    public Rest<T> r(Number duration) {
         return rest(Divisions.convert(duration));
     }
     private Rest<T> rest(long duration) {
@@ -170,22 +173,12 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
                 .orElse(0L);
         return swell(0L, sd, toVolume);
     }
-    public Chord<T> swell(int duration, int toVolume) {
+
+    public Chord<T> swell(Number duration, int toVolume) {
         return swell(0, duration, toVolume);
     }
-    public Chord<T> swell(double duration, int toVolume) {
-        return swell(0, duration, toVolume);
-    }
-    public Chord<T> swell(int delay, int duration, int toVolume) {
-        return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
-    }
-    public Chord<T> swell(double delay, double duration, int toVolume) {
-        return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
-    }
-    public Chord<T> swell(double delay, int duration, int toVolume) {
-        return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
-    }
-    public Chord<T> swell(int delay, double duration, int toVolume) {
+
+    public Chord<T> swell(Number delay, Number duration, int toVolume) {
         return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
     }
 
@@ -221,39 +214,27 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
        </ul>
      * ... and so forth.
      * <br>
-     * The denominator must be divisible by 2.
+     * Note: The denominator must be divisible by 2!
      */
     public Chord<T> bend(Number delay, Number duration, int denominator) {
        return bend(Divisions.convert(delay), Divisions.convert(duration), denominator);
     }
 
-    public Chord<T> bend(int delay, int duration, int denominator) {
-       Bend.add(makeBends(), delay, duration, denominator);
-       return this;
-    }
     /**
      * A shortcut to bend(0, duration, denominator) (that is, 0 delay).
      */
-    public Chord<T> bend(int duration, int denominator) {
-        return bend(0, duration, denominator);
+    public Chord<T> bend(Number duration, int denominator) {
+        return bend(0L, Divisions.convert(duration), denominator);
     }
     /**
      * A shortcut for a bend spread across the entire duration of the chord with no delay,
-     * i.e. chord.bend(0, [chord duration], denominator). However, if there are already bends
+     * i.e. chord.bend(delay=0, [chord duration], denominator). However, if there are already bends
      * in the Chord, then this bend will only take the time remaining.
      */
     public Chord<T> bend(int denominator) {
         return bend(0L, duration-bendDuration(), denominator);
     }
 
-
-    public Chord<T> bend(double delay, double duration, int denominator) {
-        Bend.add(makeBends(), delay, duration, denominator);
-        return this;
-    }
-    public Chord<T> bend(double duration, int denominator) {
-        return bend(0D, duration, denominator);
-    }
 
     private Chord<T> bend(long delay, long duration, int denominator) {
         Bend.add(makeBends(), delay, duration, denominator);

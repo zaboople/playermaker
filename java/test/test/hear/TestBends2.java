@@ -13,22 +13,23 @@ public class TestBends2 implements XTest {
 		    .setBendSensitivity(4)
 		    .instrument("Brass - French Horns")
 		    .reverb(55)
-		    .octave(4)
+		    .octave(5)
 		    .r(4)
 			.c(4, G+2, B+2, D+2)
 				.bend(8, 2)
 				.up()
 			.p(4, A, D_, E)
 			.p(8, D_, F)
-			.c(4., C, E, G).vibrato(32, 18).up()
+			.c(4., C, E, G).vibrato(64, 18).up()
 			.bendSense(4)
 			.c(2, B_)
 				.bend(8, 2)
 				.vibrato(8, 64, 24)
 				.bend(8, -2)
 				.vibrato(8, 64, 24)
-				.r(16).finb(D_)
-					.r(16).finb(F).up()
+				.r(16).fin(D_).bwp()
+					.r(16).fin(F).bwp()
+						.up()
 					.up()
 				.up()
 			.bendSense(4)
@@ -40,7 +41,7 @@ public class TestBends2 implements XTest {
 				.bend(16, 32., -2)
 				.up()
 			.c(2, E, G_, B).vibrato(64, 18).up()
-		    .r(2);
+		    .r(4);
 	    midi.play(stop, player);
 	    System.out.println("Done");
     }

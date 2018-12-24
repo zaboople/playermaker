@@ -1,4 +1,4 @@
-package org.tmotte.system;
+package org.tmotte.common.system;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.sound.midi.*;

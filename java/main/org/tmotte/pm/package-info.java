@@ -2,8 +2,7 @@
  * Contains all the classes for musical composition and playback. The following is some general-purpose documentation concerning
  * common features.
  * <br>
- * <b>How to specify a note</b>
- *<br>
+ * <h3>How to specify a note:</h3>
  * Many methods support a note value as input, specified as an int. In these cases, 0 is C, 1 is C# (or D&#x266d;), and so forth. There
  * are convenience constants for these values in the {@link Pitches} class.
  * <br>
@@ -15,12 +14,11 @@
  *   <li>"8.3" indicates a "triplet" 8th note. Whereas two regular 8th notes are the same duration as a quarter note, three eighth notes in a
  *       triplet are also the same duration as a quarter note.
  * </ul>
- * <br>
- * <b>Bends &amp; Vibrato</b>
+ * <h3>Bends &amp; Vibrato:</h3>
  * Note "bends" can be done using {@link Chord#bend(Number, Number, int)} and other variations of Chord.bend().
  * There is also {@link Chord#vibrato(Number, Number, Number, int)}, which can be used instead of {@link Player#pressure(int)}
  * for more control over vibrato.
- * <br>
+ * <p>
  * Bends &amp; vibratos are done sequentially, so you can do
      <pre>
      chord.bend(...).bend(....)..vibrato(...).bend(...)

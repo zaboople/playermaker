@@ -189,10 +189,11 @@ public class Player extends NoteAttributeHolder<Player> {
     public long getEndTime() {
         return end();
     }
+    /** Gets the absolute end time of the player's track in relative ticks. */
     public long end() {
         return startTime + getTimeLength();
     }
-    /** Gets the duration of the composition in ticks. */
+    /** Gets the duration of the composition in relative ticks. */
     public long duration() {
         return getTimeLength();
     }
@@ -218,8 +219,8 @@ public class Player extends NoteAttributeHolder<Player> {
 
     /**
      * The "r" is short for "rest". The Player will pause for
-     * the specified duration. Use rest(int) for whole/half/quarter/eigth/etc. notes,
-     * and {@link Player#rest(double)} for dotted &amp; triplet rests.
+     * the specified duration. Use r(int) for whole/half/quarter/eigth/etc. notes,
+     * and {@link r(double)} for dotted &amp; triplet rests.
      * <br>
      * Internally, a rest is actually represented as a Chord.
      */

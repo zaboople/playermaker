@@ -67,13 +67,6 @@ public class Rest<T> {
     public Chord<T> finup(int... pitches) {
         return addChord(chord.duration()-restFor, pitches).up();
     }
-    /**
-     * A shortcut to fin(int...).bendWithParent()
-     */
-    public Chord<Chord<T>> finb(int... pitches) {
-        return addChord(chord.duration()-restFor, pitches).bendWithParent();
-    }
-
 
     /** A shortcut to c(int, int...).up() */
     public Chord<T> up(int duration, int... notes) {
