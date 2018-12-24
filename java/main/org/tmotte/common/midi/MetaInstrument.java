@@ -31,7 +31,7 @@ public class MetaInstrument {
             .orElse(
                 Optional.ofNullable(
                         instrument.toString().startsWith("Drumkit:")
-                            ?"Drumkit: "
+                            ?"Drumkit - "
                             :null
                     )
                     .map(s -> s + originalName)

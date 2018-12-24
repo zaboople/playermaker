@@ -235,7 +235,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         return bend(0L, duration-bendDuration(), denominator);
     }
 
-
     private Chord<T> bend(long delay, long duration, int denominator) {
         Bend.add(makeBends(), delay, duration, denominator);
         return this;
@@ -250,8 +249,8 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * Note that for delay/duration/frequency, you can use other overloads that allow
      * you to provide a decimal value for dotted notes &amp; triplets as usual, (e.g. 8., 8.3).
      *
-     * @param delay Time to wait before delay
-     * @param duration The period of duration for the vibrato
+     * @param delay Time to wait before starting vibrato (can be 0)
+     * @param duration The duration of the vibrato
      * @param frequency The speed of the vibrato, expressed as a duration (larger numbers are faster).
      * @param denominator The pitch variation of the vibrato, which works the same as for bends: lower
      *    gives more variation, as determined by <code>variation=bend_sensitivy/denominator</code>.
@@ -267,27 +266,19 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         );
     }
 
-    public Chord<T> vibrato(int frequency, int denominator) {
+    /**
+     * A shortcut that assumes the vibrato should have 0 delay and use up all remaining time
+     * for the Chord. Vibratos are treated internally as bends, and like bends, they happen sequentially,
+     * so the actual start and duration depends on how many vibratos/bends preceded this one.
+     */
+    public Chord<T> vibrato(Number frequency, int denominator) {
         return vibrato(0L, duration-bendDuration(), Divisions.convert(frequency), denominator);
     }
-    public Chord<T> vibrato(int duration, int frequency, int denominator) {
-        return vibrato(0, duration, frequency, denominator);
-    }
-    public Chord<T> vibrato(int delay, int duration, int frequency, int denominator) {
-        return vibrato(
-            Divisions.convert(delay),
-            Divisions.convert(duration),
-            Divisions.convert(frequency),
-            denominator
-        );
-    }
-
-    public Chord<T> vibrato(double frequency, int denominator) {
-        return vibrato(0L, duration-bendDuration(), Divisions.convert(frequency), denominator);
-    }
+    /**
+     * Another shortcut to vibrato(), this time only assuming 0 delay.
+     */
     public Chord<T> vibrato(Number duration, Number frequency, int denominator) {
-        Long long0=0l;//Avoids java 10 compiler warning
-        return vibrato(long0, duration, frequency, denominator);
+        return vibrato(0L, duration, frequency, denominator);
     }
 
 

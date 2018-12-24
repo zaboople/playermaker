@@ -13,7 +13,6 @@ public class TestBPM implements XTest {
     public @Override void test(MyMidi3 midi, boolean stop)  {
 	    Player player=new Player()
 		    .instrument("Organ - Bandoneon")
-		    .channel(0)
 		    .setBendSensitivity(4)
 		    .octave(4)
 		    .pressure(64)

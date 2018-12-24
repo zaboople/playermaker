@@ -9,7 +9,7 @@ public class TestArpeggio implements XTest {
 	    new TestArpeggio().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
-	    Player player=new Player()
+	    Player player=new Player(0)
 		    .setBeatsPerMinute(80)
 			    .instrument("Piano - Piano 3")
 		    .bendSense(4)

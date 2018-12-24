@@ -17,6 +17,15 @@ public class XTester {
                 ,new TestBendTo()
             );
         else
+        if (args.length>0 && args[0].startsWith("-v"))
+            test(
+                midi
+                ,new TestVibrato()
+                ,new TestVibratoChanging()
+                ,new TestVibratoSpeed()
+                ,new TestVibratoTriplet()
+            );
+        else
             test(midi,
                 new Test7Slash16Time()
                 ,new TestArpeggio()

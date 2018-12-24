@@ -17,8 +17,7 @@ public class Test7Slash16Time  implements XTest {
     public void test(MyMidi3 midi, boolean stop, Instrument instr) {
 		midi.play(
 			stop,
-			new Player()
-				.channel(0)
+			new Player(0)
 				.setBPM(70)
 				.setReverb(64)
 				.setPressure(32)

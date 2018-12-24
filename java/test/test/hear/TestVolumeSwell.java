@@ -22,7 +22,6 @@ public class TestVolumeSwell  implements XTest {
 				.setReverb(32)
 				.setPressure(32)
 				.instrument("Strings - Viola")
-				.channel(0)
 				.pressure(100)
 				.volume(mainVolume)
 				.octave(3)

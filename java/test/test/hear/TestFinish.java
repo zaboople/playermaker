@@ -11,9 +11,8 @@ public class TestFinish implements XTest {
 	    new TestFinish().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
-	    Player player=new Player()
+	    Player player=new Player(3)
 		    .setBeatsPerMinute(60)
-		    .channel(3)
 		    .instrument("Strings - Contrabass")
 		    .setBendSensitivity(4)
 		    .reverb(50)

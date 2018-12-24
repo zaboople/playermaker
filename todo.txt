@@ -1,3 +1,4 @@
+- Player(channel) yes in the constructor
 - Out-of-tune tuning - instant bend, so to speak. Duration 0?
 - Allow swells & bends to tie
     .bend(Tie(8.3, 8.3), 2)   //static constructory thing

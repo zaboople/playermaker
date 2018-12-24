@@ -55,31 +55,14 @@ public class Player extends NoteAttributeHolder<Player> {
         long timeAtIndex=0;
         int indexForTimeCounted=0;
     }
+    private final int channel;
     private TimeTracking timeTracker=new TimeTracking();
     private List<Event> events=new ArrayList<>();
-    private int reverb=0, channel=0;
+    private int reverb=0;
     private boolean reverbSetOnce=false, channelSetOnce=false;
     private long startTime=0;
     private NoteAttributes attributes=new NoteAttributes();
 
-    public Player() {
-        super();
-        volume(64);
-    }
-
-    //////////////////////////////////
-    // INSTRUMENT / CHANNEL EVENTS: //
-    //////////////////////////////////
-
-    /**
-     * Assign this player an instrument. Instruments can be obtained from MyMidi3.
-     */
-    public Player instrument(Instrument instrument) {
-        return event(new Event(instrument));
-    }
-    public Player instrument(String name) {
-        return event(new Event().setInstrument(name));
-    }
     /**
        Assigns the Player a Midi channel index, which is 0 by default. Two Players can
        use the same Midi channel, but since many sound effects and instrument settings
@@ -88,12 +71,34 @@ public class Player extends NoteAttributeHolder<Player> {
        instruments only.
        @param channel: The channel index, 0-based, usually constrained to 0-15 for 16 channels.
      */
-    public Player channel(int channel) {
-        if (channelSetOnce)
-            throw new IllegalStateException("Channel can only be set once");
-        channelSetOnce=true;
+    public Player(int channel) {
+        super();
+        volume(64);
         this.channel=channel;
-        return this;
+    }
+
+    /** A shortcut to Player(0). */
+    public Player() {
+        this(0);
+    }
+
+
+    //////////////////////////////////
+    // INSTRUMENT / CHANNEL EVENTS: //
+    //////////////////////////////////
+
+    /**
+     * Assign this player an instrument. Instruments can be obtained from MyMidi3. The instrument will only
+     * be used for Chords played after the instrument method is called.
+     */
+    public Player instrument(Instrument instrument) {
+        return event(new Event(instrument));
+    }
+    /**
+     * Selects an instrument based on MyMidi3's naming convention: FIXME.
+     */
+    public Player instrument(String name) {
+        return event(new Event().setInstrument(name));
     }
     public int channel() {
         return channel;
@@ -224,13 +229,7 @@ public class Player extends NoteAttributeHolder<Player> {
      * <br>
      * Internally, a rest is actually represented as a Chord.
      */
-    public Player r(int duration) {return rest(Divisions.convert(duration));}
-    public Player r(double duration) {return rest(Divisions.convert(duration));}
-    /**
-     * This special version of rest() allows one to specify a rest duration using the internal timing
-     * values by getTimeLength(), getStart(), getEndTime(), etc.
-     */
-    public Player r(long i) {return rest(i);}
+    public Player r(Number... durations) {return rest(Divisions.convert(durations));}
 
     private Player rest(long division) {
         int v=volume();
@@ -252,26 +251,16 @@ public class Player extends NoteAttributeHolder<Player> {
      *       as many octaves high as the synthesizer can perform. Note values directly correspond to the midi
      *       standard.
      */
-    public Player p(int duration, int... notes) {
+    public Player p(Number duration, int... notes) {
         return c(duration, notes).up();
     }
 
-    /**
-     * An alternate version of {@link #p(int, int...)} that accepts a double, allowing
-     * dotted and triplet notes, e.g. "8." and "8.3" as respective examples.
-     */
-    public Player p(double duration, int... notes) {
-        return c(duration, notes).up();
-    }
 
     /**
      * Adds a Chord made of the given notes for the specified duration, and returns that Chord, which can be further modified.
      * Duration and notes work the same as for @link{#p(int, int...)}
      */
-    public Chord<Player> c(int duration, int... notes) {
-        return addChord(Divisions.convert(duration), notes);
-    }
-    public Chord<Player> c(double duration, int... notes) {
+    public Chord<Player> c(Number duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
     }
     private Chord<Player> addChord(long duration, int... pitches) {

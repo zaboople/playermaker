@@ -10,10 +10,9 @@ public class TestBendTo implements XTest {
 	    new TestBendTo().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
-	    Player player=new Player()
+	    Player player=new Player(3)
 		    .setBeatsPerMinute(60)
 		    .instrument("Strings - Viola")
-		    .channel(3)
 		    .setBendSensitivity(4)
 		    .r(4)
 

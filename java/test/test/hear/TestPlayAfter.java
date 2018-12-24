@@ -11,20 +11,17 @@ public class TestPlayAfter implements XTest {
         new TestPlayAfter().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
-        Player player1=new Player()
+        Player player1=new Player(0)
             .setBeatsPerMinute(60)
-            .channel(0)
             .instrument("Piano - Honky-tonk")
             .setBendSensitivity(4)
             .octave(4)
             .r(4);
-        Player player2=new Player()
-            .channel(3)
+        Player player2=new Player(3)
             .instrument("Organ - Harmonica")
             .setBendSensitivity(4)
             .octave(3);
-        Player player3=new Player()
-            .channel(6)
+        Player player3=new Player(6)
             .instrument("Square Wave")
             .setBendSensitivity(4)
             .octave(4);

@@ -14,10 +14,9 @@ public class TestChannelTrack implements XTest {
 	    new TestChannelTrack().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
-	    Player player1=new Player()
+	    Player player1=new Player(1)
 		    .setBeatsPerMinute(60)
 		    .instrument("Organ - Accordion Fr")
-		    .channel(1)
 		    .setReverb(0)
 		    .octave(5)
 		    .r(4)
@@ -42,9 +41,8 @@ public class TestChannelTrack implements XTest {
 			.r(32)
 			.c(4, E, E+12, E+24).vibrato(64,8).up()
 		    .r(4);
-	    Player player2=new Player()
+	    Player player2=new Player(5)
 		    .instrument("Chiffer Lead")
-		    .channel(10)
 		    .setReverb(127)
 		    .octave(4)
 		    .r(4)

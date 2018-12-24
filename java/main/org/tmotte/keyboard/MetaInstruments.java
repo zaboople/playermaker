@@ -23,7 +23,7 @@ public class MetaInstruments {
 	            if (mi.categorized || !useDefaultCategories)
 	                metaInstruments.add(mi);
 	            else
-	            if (mi.displayName.startsWith("Drumkit:"))
+	            if (mi.displayName.startsWith("Drumkit -"))
 	                drums.add(mi);
 	            else
 	                more.add(mi);

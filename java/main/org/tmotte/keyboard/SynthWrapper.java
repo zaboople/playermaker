@@ -173,7 +173,7 @@ public class SynthWrapper implements MetaEventListener {
 			    if (mi.displayName.equals(track.name))
 				    nominate=track.chanNum-1;
 		    }
-	    if (mi.displayName.startsWith("Drumkit:"))
+	    if (mi.displayName.startsWith("Drumkit -"))
 		    return 10-1;
 	    if (currChannel!=10-1 && (
 			    recording || !channelsUsed[currChannel]
