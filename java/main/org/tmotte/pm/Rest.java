@@ -1,10 +1,10 @@
 package org.tmotte.pm;
 
 /**
- * Rest acts as a temporary placeholder, only used by Chord (not Player); the intention is that you
+ * Rest acts as a temporary placeholder, returned by {@link Chord#r(Number)}; the intention is that you
  * want to create a chord where notes are delayed for an arpeggiated effect.
  *
- * @see Player#r(int)
+ * @see Chord#r(Number)
  */
 public class Rest<T> {
     private final Chord<T> chord;
@@ -16,16 +16,11 @@ public class Rest<T> {
     }
 
 
-
     /**
      * Ties this Rest to another - actually returns itself after extending its duration.
      * @param duration A period expressed using the same notation as Player.p(), Chord.c(), etc.
      */
-    public Rest<T> t(int duration) {
-        return t(Divisions.convert(duration));
-    }
-    /** A double version of t(int) for use with dotted &amp; triplet notes.*/
-    public Rest<T> t(double duration) {
+    public Rest<T> t(Number duration) {
         return t(Divisions.convert(duration));
     }
     private Rest<T> t(long duration) {
@@ -43,11 +38,10 @@ public class Rest<T> {
      * So yes, you can nest chords within others as far as you want to go, e.g. Chord&lt;Chord&lt;Chord...&lt;T&gt;&gt;&gt;.
      * <br>
      * Use .up() to get back to the parent chord, or use up(int, int...) as a shortcut instead of .c().
+     * <br>
+     * Also refer to {@link Chord#c(Number, int...)} if you only want to create parallel chords without rests.
      */
-    public Chord<Chord<T>> c(int duration, int... notes) {
-        return addChord(Divisions.convert(duration), notes);
-    }
-    public Chord<Chord<T>> c(double duration, int... notes) {
+    public Chord<Chord<T>> c(Number duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
     }
     private Chord<Chord<T>> addChord(long duration, int... pitches){
@@ -68,21 +62,13 @@ public class Rest<T> {
         return addChord(chord.duration()-restFor, pitches).up();
     }
 
-    /** A shortcut to c(int, int...).up() */
-    public Chord<T> up(int duration, int... notes) {
-        return c(duration, notes).up();
-    }
-    /** A shortcut to c(double, int...).up() */
-    public Chord<T> up(double duration, int... notes) {
+    /** A shortcut to c(Number, int...).up() */
+    public Chord<T> up(Number duration, int... notes) {
         return c(duration, notes).up();
     }
 
-    /** A shortcut to c(int, int...).bendWithParent() */
-    public Chord<Chord<T>> bwp(int duration, int... notes) {
-        return c(duration, notes).bendWithParent();
-    }
-    /** A shortcut to c(double, int...).bendWithParent() */
-    public Chord<Chord<T>> bwp(double duration, int... notes) {
+    /** A shortcut to c(Number, int...).bendWithParent() */
+    public Chord<Chord<T>> bwp(Number duration, int... notes) {
         return c(duration, notes).bendWithParent();
     }
 

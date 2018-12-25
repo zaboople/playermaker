@@ -29,7 +29,8 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
     /**
      * In cases where you want a duration to be a combination of say, 2 dotted eighth notes, or whatever,
-     * this will allow you to tie arbitrary durations together.
+     * this will allow you to tie arbitrary durations together. The result can be passed as the duration
+     * to methods like Chord.c(duration, int...).
      */
     public static long tie(Number... durations) {
         return Divisions.convert(durations);
@@ -103,7 +104,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
     /**
      * Allows one to add delayed, overlapping Chords to the original Chord.
-     * Use {@link Rest#c(int, int...)}, etc. methods for to adding them. This is similar
+     * Use {@link Rest#c(Double, int...)}, etc. methods for to adding them. This is similar
      * to the notes &amp; staves practice of placing a rest above/below a note
      * to indicate an amount of time to wait before playing a parallel note.
      * @param duration A standard notation integer duration: 4 for a quarter rest, 8
@@ -134,18 +135,11 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * All four of the above chords would play in parallel.
      * parallel chord by adding it as a sub-chord of the first sub-chord).
      */
-    public Chord<Chord<T>> c(int duration, int... notes) {
+    public Chord<Chord<T>> c(Number duration, int... notes) {
         return addChord(0L, Divisions.convert(duration), notes);
     }
-    public Chord<Chord<T>> c(double duration, int... notes) {
-        return addChord(0L, Divisions.convert(duration), notes);
-    }
-    /** A shortcut to c(int, int...).up() */
-    public Chord<T> up(int duration, int... notes) {
-        return c(duration, notes).up();
-    }
-    /** A shortcut to c(double, int...).up() */
-    public Chord<T> up(double duration, int... notes) {
+    /** A shortcut to <code>c(Number, int...).up()</code> */
+    public Chord<T> up(Number duration, int... notes) {
         return c(duration, notes).up();
     }
 
@@ -162,6 +156,24 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     // SWELLS: //
     /////////////
 
+    /**
+     * Does a volume "swell", where the volume is raised or lowered to <code>toVolume</code>
+     * over <code>duration</code> after waiting for <code>delay</code>
+     */
+    public Chord<T> swell(Number delay, Number duration, int toVolume) {
+        return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
+    }
+
+    /** A shortcut to <code>swell(0, duration, volume)</code> */
+    public Chord<T> swell(Number duration, int toVolume) {
+        return swell(0, duration, toVolume);
+    }
+
+    /**
+     * A shortcut to <code>swell(0, duration, volume)</code> where <code>duration</code>
+     * is all time left in the chord after previous swells are accounted for, since swells
+     * are sequential. This is similar to the <code>bend()</code> method's calculations.
+     */
     public Chord<T> swell(int toVolume) {
         final long sd=
             totalDuration() -
@@ -172,14 +184,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
                 .reduce(Long::sum)
                 .orElse(0L);
         return swell(0L, sd, toVolume);
-    }
-
-    public Chord<T> swell(Number duration, int toVolume) {
-        return swell(0, duration, toVolume);
-    }
-
-    public Chord<T> swell(Number delay, Number duration, int toVolume) {
-        return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
     }
 
     private Chord<T> swell(long delay, long duration, int toVolume) {
@@ -198,6 +202,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     ////////////
 
     /**
+     * Bends a note, as can be done on instruments like the guitar.
      * @param delay A period to wait before the bend; this can be expressed as
      *        2/4/8/16/32/64 etc to indicate a period corresponding to half/quarter/eighth/etc
      *        notes, or 8.3 for triplet and 8. for dotted notes.

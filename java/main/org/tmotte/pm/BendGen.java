@@ -4,7 +4,7 @@ import java.util.function.LongSupplier;
 import java.util.List;
 import org.tmotte.common.text.Log;
 
-/** Generates bends; only used by MyMidi3. */
+/** Generates bends; only used by MyMidi3 during midi track generation. */
 class BendGen  {
 
 	private final static int NO_BEND = 8192;

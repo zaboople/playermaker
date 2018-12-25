@@ -10,10 +10,10 @@ import javax.sound.midi.Instrument;
  * A Player is roughly analagous to a human musician, and thereby to a Midi Channel.
  * It can play any Instrument, and many simultaneous notes on the same Instrument,
  * but only one Instrument at any given time. A composition can be made of many Players.
- * Chords are added to a Player using methods like {@link Player#p(int, int...)} and
- * {@link Player#c(int, int...)}.
+ * Chords are added to a Player using methods like {@link Player#p(Number, int...)} and
+ * {@link Player#c(Number, int...)}.
  * <br>
- * <b>Attributes, event-based and otherwise</b>
+ * <h4>Attributes, event-based and otherwise</h4>
  * While it may be unexpected, many of the attributes of Player cannot be attributes
  * of a Chord because they are applied to the entire channel. Most of them can be changed
  * throughout the course of a composition, however, because these settings are treated as events,
@@ -43,11 +43,11 @@ import javax.sound.midi.Instrument;
  * you can have only one reverb setting per Player; also, if you save your composition to a
  * standard Midi sequence file, any reverb settings are lost.
  * <br>
- * <b>Timing</b>
+ * <h4>Timing</h4>
  * Timing values in Midi are called "ticks". PlayerMaker has its own separate internal system of "relative" ticks,
  * leaving the actual Midi ticks inaccessible. Normally you will use setBPM() in combination with
  * classical timing notation to control timing, but it is often useful to synchronize different players
- * using our relative ticks with methods like {@link #setStartTime(long)} and {@link #getEndTime()}.
+ * using our relative ticks with methods like {@link #setStart(long)} and {@link #getEnd()}.
  */
 public class Player extends NoteAttributeHolder<Player> {
     private static class TimeTracking {
@@ -120,9 +120,11 @@ public class Player extends NoteAttributeHolder<Player> {
     public Player bpm(int bpm) {
         return setBeatsPerMinute(bpm);
     }
+    /** An alias to bpm(int) */
     public Player setBeatsPerMinute(int bpm) {
         return event(new Event().setBeatsPerMinute(bpm));
     }
+    /** An alias to bpm(int) */
     public Player setBPM(int bpm) {
         return setBeatsPerMinute(bpm);
     }
@@ -135,24 +137,26 @@ public class Player extends NoteAttributeHolder<Player> {
     public Player setBendSensitivity(int sensitivity) {
         return event(new Event().setBendSensitivity(sensitivity));
     }
-    /** A shortcut to setBendSensitivity(int) */
+    /** An alias to setBendSensitivity(int) */
     public Player bendSense(int sensitivity) {
         return setBendSensitivity(sensitivity);
     }
 
-    public Player setPressure(int pressure) {
-        return event(new Event().setPressure(pressure));
-    }
     /** Sets the Midi "pressure", which usually means vibrato; larger values are more "intense", which is to
         say more "variable". */
     public Player pressure(int pressure) {
         return setPressure(pressure);
+    }
+    /** An alias to pressure(int) */
+    public Player setPressure(int pressure) {
+        return event(new Event().setPressure(pressure));
     }
 
     /** Note: Reverb can only be set once, because it is not event-based like most other attributes. */
     public Player reverb(int reverb) {
         return setReverb(reverb);
     }
+    /** An alias to reverb(int) */
     public Player setReverb(int reverb) {
         if (reverbSetOnce)
             throw new RuntimeException("There is no point in setting the reverb more than once.");
@@ -160,6 +164,7 @@ public class Player extends NoteAttributeHolder<Player> {
         this.reverb=reverb;
         return this;
     }
+    /** Obtains the reverb setting, see setReverb() */
     public int reverb() {
         return reverb;
     }
@@ -173,6 +178,17 @@ public class Player extends NoteAttributeHolder<Player> {
      * Sets the start time in ticks. Changing the start time <i>after</i> adding notes/chords/rests is forbidden
      * and will throw an IllegalStateException
      */
+    public Player setStart(long time) {
+        this.startTime=time;
+        return this;
+    }
+    /** Gets the start time in relative ticks. */
+    public long getStart() {
+        return startTime;
+    }
+
+
+    /** An alias for setStart(long) */
     public Player setStartTime(long time) {
         for (Event e: events)
             if (e.hasChord())
@@ -180,24 +196,24 @@ public class Player extends NoteAttributeHolder<Player> {
         this.startTime=time;
         return this;
     }
-    public Player setStart(long time) {
-        this.startTime=time;
-        return this;
-    }
-    /** Gets the start time in ticks. */
+    /** An alias for getStart() */
     public long getStartTime() {
         return startTime;
     }
-    public long getStart() {
-        return startTime;
+
+    /** Gets the absolute end time of the player's track in relative ticks. */
+    public long getEnd() {
+        return end();
     }
+    /** An alias for getEnd(). */
     public long getEndTime() {
         return end();
     }
-    /** Gets the absolute end time of the player's track in relative ticks. */
+    /** An alias for getEnd(). */
     public long end() {
         return startTime + getTimeLength();
     }
+
     /** Gets the duration of the composition in relative ticks. */
     public long duration() {
         return getTimeLength();
@@ -245,8 +261,7 @@ public class Player extends NoteAttributeHolder<Player> {
 
     /**
      * Adds a Chord made of the given notes for the specified duration, and returns the original Player object.
-     * @param duration Use 1 for a whole note, 2 for a half note, 4 for a quarter, and so on. For dotted notes
-     *       and triplets, use {@link #p(double, int...)}
+     * @param duration Follows the general rules for note durations
      * @param notes Follows the 12-tone western scale, with low C at 0, D&#x266d; at 1, and so on, allowing up
      *       as many octaves high as the synthesizer can perform. Note values directly correspond to the midi
      *       standard.
@@ -258,7 +273,6 @@ public class Player extends NoteAttributeHolder<Player> {
 
     /**
      * Adds a Chord made of the given notes for the specified duration, and returns that Chord, which can be further modified.
-     * Duration and notes work the same as for @link{#p(int, int...)}
      */
     public Chord<Player> c(Number duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);

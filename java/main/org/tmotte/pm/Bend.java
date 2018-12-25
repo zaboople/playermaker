@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.tmotte.common.text.Log;
 
+/** Contains information about a Bend, created by Chord.bend() */
 final class Bend {
 
     /////////////////////

@@ -1,6 +1,6 @@
 /**
- * Contains all the classes for musical composition and playback. The following is some general-purpose documentation concerning
- * common features.
+ * Contains all of PlayerMaker's end-user classes for musical composition and playback. The following is some general-purpose
+ * documentation concerning common features.
  * <br>
  *
  * <h3>How to specify a note:</h3>
@@ -16,9 +16,9 @@
  *   <li>"8.3" indicates a "triplet" 8th note. Whereas two regular 8th notes are the same duration as a quarter note, three eighth notes in a
  *       triplet are also the same duration as a quarter note.
  * </ul>
- * Be careful about using the <code>long</code> type for durations: Internally, your double &amp; int "symbolic" values are converted into
- * longs that represent the exact number of ticks in PlayerMaker's timing system. So an <code>int</code> "8" will be converted, but a
- * <code>long</code> "8L" will not.
+ * Be careful about using the <code>long</code> type for durations: Internally, your <code>double</code> &amp; <code>int</code>
+ * "symbolic" values are converted into <code>long</code>s that represent the exact number of ticks in PlayerMaker's timing system.
+ * So an "8" or "8.0" or "8." will be converted, but a "8L" will not.
  * <p>
  * However: Suppose you want to combine the following into a single duration:
  * <br>
@@ -30,7 +30,7 @@
    Chord.tie(4, 8, 16, 32)
    </pre>
  * This will return a long value which will be used as is, no further conversion necessary. You can of course mix and match
- * doubles and ints with Chord.tie() as you please, since it accepts a varargs-mixture of Number. You might also find it useful to
+ * doubles and ints with Chord.tie() as you please, since it accepts a varargs of Number. You might also find it useful to
  * do <code>import static Chord.tie;</code> for brevity.
  *
  * <h3>Bends &amp; Vibrato:</h3>
@@ -50,7 +50,7 @@
  * This is handled invisibly, except that when using multiple Players and bending notes, you should assign the
  * Players channels with gaps in between, e.g. for three Players you might assign 0, 3, 6 instead of 0, 1, 2.
  * This would give the first two players two extra channels, and the 3rd player all of the rest (except channel 10,
- * which can only play drums). Refer to {@link Player#channel(int)}.
+ * which can only play drums). Refer to {@link Player#Player(int)}.
  */
 
 package org.tmotte.pm;

@@ -17,7 +17,7 @@ package org.tmotte.common.function;
     ...method(...->try {....} catch (Exception e) {throw new RuntimeException(e);});
   </pre>
   * We could do one of these:
-  </pre><pre>
+  <pre>
 
     ...method(() ->  Except.run(() -> ...));
     ...method(... -> Except.get(() -> ...));

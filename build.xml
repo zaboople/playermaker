@@ -99,6 +99,7 @@
              destdir="${javadoc.dir}"
              packagenames="org.**,com.**"
              Public="true"
+             additionalparam="-html5"
              >
       <classpath>
          <pathelement path="${build.dir}"/>
