@@ -12,7 +12,6 @@ import javax.sound.midi.Instrument;
  * but only one Instrument at any given time. A composition can be made of many Players.
  * Chords are added to a Player using methods like {@link Player#p(Number, int...)} and
  * {@link Player#c(Number, int...)}.
- * <br>
  * <h4>Attributes, event-based and otherwise</h4>
  * While it may be unexpected, many of the attributes of Player cannot be attributes
  * of a Chord because they are applied to the entire channel. Most of them can be changed
@@ -240,10 +239,7 @@ public class Player extends NoteAttributeHolder<Player> {
 
     /**
      * The "r" is short for "rest". The Player will pause for
-     * the specified duration. Use r(int) for whole/half/quarter/eigth/etc. notes,
-     * and {@link r(double)} for dotted &amp; triplet rests.
-     * <br>
-     * Internally, a rest is actually represented as a Chord.
+     * the specified duration. Internally, a rest is actually represented as a Chord.
      */
     public Player r(Number... durations) {return rest(Divisions.convert(durations));}
 

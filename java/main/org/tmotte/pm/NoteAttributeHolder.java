@@ -1,8 +1,9 @@
 package org.tmotte.pm;
 
 /**
- * This is extended by Chord and Player. Player passes its attributes on to Chord when creating a Chord via {@link Player#c(int, int...)},
- * but Chord can override those settings. Chord passes its own attributes on to its sub-chords.
+ * This is extended by Chord and Player. Player passes its attributes on to Chord when creating a Chord
+ * via {@link Player#c(Number, int...)}, but Chord can override those settings. Chord passes its own attributes
+ * on to its sub-chords similarly.
  * <br>
  * The only actual things set in here are octave/transpose &amp; volume.
  */

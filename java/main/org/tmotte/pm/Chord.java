@@ -91,7 +91,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         <pre>
         player.c(4, C).t(16).up()
         </pre>
-        Use {@link t(double)} for dotted &amp; triplet notes.
      * @param duration A time period expressed in the typical notation.
      */
     public Chord<T> t(Number duration) {
