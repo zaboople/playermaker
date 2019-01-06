@@ -1,4 +1,3 @@
-- Player(channel) yes in the constructor
 - Out-of-tune tuning - instant bend, so to speak. Duration 0?
 - Allow swells & bends to tie
     .bend(Tie(8.3, 8.3), 2)   //static constructory thing
@@ -12,6 +11,11 @@
 - Slurs/Slides or do we even - just do 128ths... but we could do them different
     - Portamento
     - How about series of 128ths or whatever, and then a sort of finish...didn't i already make a finish?
+        Number: 5 (coarse) 37 (fine)
+        Affects:
+        The rate at which portamento slides the pitch between 2 notes. If a MultiTimbral device, then each Part usually has its own Portamento Time.
+        Value Range:
+        14-bit coarse/fine resolution. 0x0000 to 0x3FFF where 0 is slowest rate.
 
 - Keyboard
     Label keys C1 - G8 or whatever

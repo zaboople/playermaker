@@ -3,7 +3,7 @@
  * documentation concerning common features.
  * <br>
  *
- * <h3>How to specify a note:</h3>
+ * <h3>Notation for pitch &amp; duration</h3>
  * Many methods support a note value as input, specified as an int. In these cases, 0 is C, 1 is C# (or D&#x266d;), and so forth. There
  * are convenience constants for these values in the {@link Pitches} class.
  * <br>

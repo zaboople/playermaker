@@ -11,6 +11,9 @@ import org.tmotte.common.text.Log;
  * Represents a chord, be it one note or many. While a chord will often sound all of its
  * notes at once and finish them all at once, overlapping/arpeggiating possibilities are
  * allowed via the r() method, which creates a Rest, and then delayed notes can be added.
+ * <p>
+ * Note: Refer to <a href="./package-summary.html">the org.tmotte.pm package summary</a> for an explanation
+ * of note durations &amp; pitches.
  */
 public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
@@ -103,11 +106,10 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
     /**
      * Allows one to add delayed, overlapping Chords to the original Chord.
-     * Use {@link Rest#c(Double, int...)}, etc. methods for to adding them. This is similar
-     * to the notes &amp; staves practice of placing a rest above/below a note
+     * Use {@link Rest#c(Number, int...)}, etc. methods for adding these delayed notes.
+     * <p>
+     * This is similar to the notes &amp; staves practice of placing a rest above/below a note
      * to indicate an amount of time to wait before playing a parallel note.
-     * @param duration A standard notation integer duration: 4 for a quarter rest, 8
-     *        for an eighth rest, etc.
      */
     public Rest<T> r(Number duration) {
         return rest(Divisions.convert(duration));
