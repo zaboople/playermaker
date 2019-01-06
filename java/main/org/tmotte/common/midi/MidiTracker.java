@@ -87,6 +87,7 @@ public class MidiTracker  {
         sendControlChange(channel, 38, 0, tick);
     }
 
+	/** This is vibrato (usually) */
     public void sendPressure(int channel, int amount, long tick) {
 	    event(channel, ShortMessage.CHANNEL_PRESSURE, amount, 0, tick);
     }
