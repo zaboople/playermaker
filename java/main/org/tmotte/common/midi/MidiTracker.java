@@ -91,6 +91,7 @@ public class MidiTracker  {
 	    event(channel, ShortMessage.CHANNEL_PRESSURE, amount, 0, tick);
     }
 
+	/** This is volume swells */
     public void sendExpression(int channel, int volume, long tick) {
 		Log.log("MidiTracker", "sendExpression() tick {} volume {}", tick, volume);
 	    sendControlChange(channel, 11, volume,  tick);
