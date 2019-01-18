@@ -16,6 +16,7 @@
         The rate at which portamento slides the pitch between 2 notes. If a MultiTimbral device, then each Part usually has its own Portamento Time.
         Value Range:
         14-bit coarse/fine resolution. 0x0000 to 0x3FFF where 0 is slowest rate.
+        This is another 7 bits and then 7 more i think
 
 - Keyboard
     Label keys C1 - G8 or whatever

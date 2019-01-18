@@ -98,23 +98,41 @@ public class MidiTracker  {
 	    sendControlChange(channel, 11, volume,  tick);
     }
 
+
+    public void sendPortamento(int channel, int amount, long tick) {
+		Log.log("MidiTracker", "sendPortamentoTime() tick {} amount {}", tick, amount);
+		// Portamento on:
+	    sendControlChange(channel, 65, 127,  tick);
+	    // Portamento amount:
+	    sendControlChange(channel, 11, amount,  tick);
+    }
+
+    public void sendPortamentoOff(int channel, long tick) {
+		Log.log("MidiTracker", "sendPortamentoOff() tick {} ", tick);
+	    sendControlChange(channel, 11, 0,  tick);
+    }
+
+	/**
+	 * @param amount 0-127
+	 */
+    public void sendPortamentoTime(int channel, int amount, long tick) {
+		Log.log("MidiTracker", "sendPortamentoTime() tick {} amount {}", tick, amount);
+	    sendControlChange(channel, 5, amount,  tick);
+    }
+
+
+
     private void sendControlChange(int channel, int data1, int data2, long tick)  {
-	    Except.run(()->
-	        sendMessage(
-	            new ShortMessage(
-	                ShortMessage.CONTROL_CHANGE, channel, data1, data2
-	            ),
-	            tick
-	        )
-        );
+	    event(channel, ShortMessage.CONTROL_CHANGE, data1, data2, tick);
 	}
 
     private void event(int channel, int type, int data1, int data2, long tick) {
-        Except.run(()-> {
-            ShortMessage message = new ShortMessage();
-            message.setMessage(type + channel, data1, data2);
-            sendMessage(message, tick);
-        });
+        Except.run(()->
+            sendMessage(
+	            new ShortMessage(type, channel, data1, data2),
+	            tick
+            )
+        );
     }
 
     private void sendMessage(ShortMessage msg, long tick) {
