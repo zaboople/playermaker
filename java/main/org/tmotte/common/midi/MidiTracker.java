@@ -41,31 +41,20 @@ public class MidiTracker  {
 
     public void sendBend(int channel, int amount, long tick) {
 		Log.log("MidiTracker", "Bend {} at {} ", amount, tick);
-
         // A bend is 14 bits - no, not 16. That won't fit in a byte, but
         // even better, you are required to split it into a 7-bits-each pair.
-        int lsb=amount & 127,
-            msb=amount >>> 7;
-        event(channel, ShortMessage.PITCH_BEND, lsb, msb, tick);
+        event(channel, ShortMessage.PITCH_BEND, getLSB(amount), getMSB(amount), tick);
     }
     public void sendBendEnd(int channel, long tick) {
         sendBend(channel, 8192, tick);
     }
 
 	public void sendInstrument(int channel, Instrument instr, long tick) {
-		Except.run(()-> {
-            Patch patch = instr.getPatch();
-			int bank = patch.getBank(),
-				program=patch.getProgram();
-			int msgType = ShortMessage.CONTROL_CHANGE;
-	        sendMessage(
-		        new ShortMessage(msgType, channel, 0,  bank >> 7), tick   // = 9
-	        );
-	        sendMessage(
-		        new ShortMessage(msgType, channel, 32, bank & 0x7f), tick // = 0
-	        );
-	        event(channel, ShortMessage.PROGRAM_CHANGE, program, 0, tick);
-        });
+        Patch patch=instr.getPatch();
+		int bank   =patch.getBank();
+		sendControlChange(channel, 0,  getMSB(bank), tick);
+        sendControlChange(channel, 32, getLSB(bank), tick);
+        event(channel, ShortMessage.PROGRAM_CHANGE, patch.getProgram(), 0, tick);
 	}
 
 
@@ -120,6 +109,20 @@ public class MidiTracker  {
 	    sendControlChange(channel, 5, amount,  tick);
     }
 
+
+	////////////////
+	// INTERNALS: //
+	////////////////
+
+	/** Get the most significant 7 - not 8 - bits */
+	private int getMSB(int value) {
+		return value >>> 7;
+	}
+
+	/** Get the least significant 7 bits */
+	private int getLSB(int value) {
+		return value & 127; // 127 is binary 0111 1111
+	}
 
 
     private void sendControlChange(int channel, int data1, int data2, long tick)  {
