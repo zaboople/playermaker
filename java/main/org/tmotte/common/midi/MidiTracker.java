@@ -39,16 +39,6 @@ public class MidiTracker  {
     }
 
 
-    public void sendBend(int channel, int amount, long tick) {
-		Log.log("MidiTracker", "Bend {} at {} ", amount, tick);
-        // A bend is 14 bits - no, not 16. That won't fit in a byte, but
-        // even better, you are required to split it into a 7-bits-each pair.
-        event(channel, ShortMessage.PITCH_BEND, getLSB(amount), getMSB(amount), tick);
-    }
-    public void sendBendEnd(int channel, long tick) {
-        sendBend(channel, 8192, tick);
-    }
-
 	public void sendInstrument(int channel, Instrument instr, long tick) {
         Patch patch=instr.getPatch();
 		int bank   =patch.getBank();
@@ -57,11 +47,6 @@ public class MidiTracker  {
         event(channel, ShortMessage.PROGRAM_CHANGE, patch.getProgram(), 0, tick);
 	}
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    // CONTROL CHANGE:                                                                        //
-    // https://www.midi.org/specifications/item/table-3-control-change-messages-data-bytes-2  //
-    ////////////////////////////////////////////////////////////////////////////////////////////
 
     /** Short for Bend Sensitivity (hard word to type). */
     public void sendBendSense(int channel, int amount, long tick) {
@@ -74,6 +59,15 @@ public class MidiTracker  {
         sendControlChange(channel, 6, amount, tick);
         //Data Entry LSB:
         sendControlChange(channel, 38, 0, tick);
+    }
+    public void sendBend(int channel, int amount, long tick) {
+		Log.log("MidiTracker", "Bend {} at {} ", amount, tick);
+        // A bend is 14 bits - no, not 16. That won't fit in a byte, but
+        // even better, you are required to split it into a 7-bits-each pair.
+        event(channel, ShortMessage.PITCH_BEND, getLSB(amount), getMSB(amount), tick);
+    }
+    public void sendBendEnd(int channel, long tick) {
+        sendBend(channel, 8192, tick);
     }
 
 	/** This is vibrato (usually) */
@@ -88,25 +82,32 @@ public class MidiTracker  {
     }
 
 
-    public void sendPortamento(int channel, int amount, long tick) {
-		Log.log("MidiTracker", "sendPortamentoTime() tick {} amount {}", tick, amount);
-		// Portamento on:
-	    sendControlChange(channel, 65, 127,  tick);
-	    // Portamento amount:
-	    sendControlChange(channel, 11, amount,  tick);
+
+	/**
+	 * @param noteFrom The note to (sorta) "slur" from when the next note-on
+	 * message is received.
+	 */
+    public void sendPortamento(int channel, int noteFrom, long tick) {
+		Log.log("MidiTracker", "sendPortamentoTime() tick {} noteFrom {}", tick, noteFrom);
+		// Portamento on, then send the note to "slur" from:
+	    sendControlChange(channel, 65, 64,  tick);
+	    sendControlChange(channel, 84, noteFrom,  tick);
     }
 
     public void sendPortamentoOff(int channel, long tick) {
 		Log.log("MidiTracker", "sendPortamentoOff() tick {} ", tick);
-	    sendControlChange(channel, 11, 0,  tick);
+	    sendControlChange(channel, 65, 0,  tick);
     }
 
 	/**
-	 * @param amount 0-127
+	 * Portamento time appears to be limited to 0-127, but then we're allowed to
+	 * send a MSB and LSB and so I'm not sure.
+	 * @param amount 0-127 or 0-4095 (14 bits)
 	 */
     public void sendPortamentoTime(int channel, int amount, long tick) {
 		Log.log("MidiTracker", "sendPortamentoTime() tick {} amount {}", tick, amount);
-	    sendControlChange(channel, 5, amount,  tick);
+	    sendControlChange(channel, 5, getMSB(amount),  tick);
+	    sendControlChange(channel, 37, getLSB(amount),  tick);
     }
 
 
@@ -124,6 +125,11 @@ public class MidiTracker  {
 		return value & 127; // 127 is binary 0111 1111
 	}
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // CONTROL CHANGE:                                                                        //
+    // https://www.midi.org/specifications/item/table-3-control-change-messages-data-bytes-2  //
+    ////////////////////////////////////////////////////////////////////////////////////////////
 
     private void sendControlChange(int channel, int data1, int data2, long tick)  {
 	    event(channel, ShortMessage.CONTROL_CHANGE, data1, data2, tick);
