@@ -128,13 +128,12 @@ public class MyMidi3  {
     // PLAY: //
     ///////////
 
-
     public MyMidi3 playAndStop(Player... players)  {
         return play(true, players);
     }
-    public MyMidi3 play(boolean stop, Player... players) {
+    public MyMidi3 play(boolean andThenStop, Player... players) {
         sequence(players);
-        return play(stop);
+        return play(andThenStop);
     }
     private MyMidi3 play(boolean andThenStop) {
         sequencerWatcher.closeOnFinishPlay(andThenStop);
@@ -147,7 +146,7 @@ public class MyMidi3  {
             sequencer.setLoopStartPoint(0);
             sequencer.setTickPosition(0);
             sequencer.start();
-            sequencerWatcher.waitForIf();
+            sequencerWatcher.waitForFinish();
         } catch (Exception e) {
             sequencer.close();
             throw new RuntimeException(e);

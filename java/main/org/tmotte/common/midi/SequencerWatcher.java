@@ -25,11 +25,19 @@ public class SequencerWatcher {
             }
         );
     }
-    /** Defaults to false */
+
+    /** Defaults to false; if true we will close the underlying Sequencer on */
     public SequencerWatcher closeOnFinishPlay(boolean close) {
         this.closeOnEndPlay=close;
         return this;
     }
+
+
+    /** This waits for the sequencer to stop playing. */
+    public void waitForFinish() {
+        Except.run(()->eventHook.take());
+    }
+
     /** Defaults to true */
     public SequencerWatcher waitForFinishPlay(boolean wait) {
         this.waitForEndPlay=wait;
@@ -39,8 +47,5 @@ public class SequencerWatcher {
         if (waitForEndPlay)
             waitForFinish();
     }
-    /** This waits for the sequencer to stop playing. */
-    public void waitForFinish() {
-        Except.run(()->eventHook.take());
-    }
+
 }
