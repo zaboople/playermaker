@@ -19,10 +19,22 @@ import javax.sound.midi.*;
  * A general-purpose class for sending Midi Messages to a given Track. Essentially this provides a lot of sequencing
  * methods that the Java Midi API should already have, but "forgot" to include. A lot of these were quite difficult to
  * figure out.
+ *
+ * FIXME all these "send" things are silly idioms.
  */
 public class MidiTracker  {
 
     private Track currTrack;
+
+    public MidiTracker() {}
+
+    public MidiTracker(Track t) {
+	    this.currTrack=t;
+    }
+
+    public MidiTracker createTrack(Sequence sequence) {
+	    return setTrack(sequence.createTrack());
+    }
 
     public MidiTracker setTrack(Track t) {
 	    currTrack=t;

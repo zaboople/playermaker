@@ -100,7 +100,7 @@ public class MyMidi3  {
         sequencerWatcher=new SequencerWatcher(sequencer);
     }
 
-    public MyMidi3 setInstruments(Instrument... instruments) {
+    private MyMidi3 setInstruments(Instrument... instruments) {
         this.instruments=instruments;
         instrumentsByName=MetaInstrument.map(true, instruments);
         return this;
