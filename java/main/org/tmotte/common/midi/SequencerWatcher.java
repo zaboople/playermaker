@@ -11,7 +11,7 @@ public class SequencerWatcher {
     private final static int SEQUENCER_END_PLAY=47;
     private final ArrayBlockingQueue<Integer> eventHook=new ArrayBlockingQueue<>(1);
 
-    private boolean waitForEndPlay=true, closeOnEndPlay=false;
+    private boolean async=false, closeOnEndPlay=false;
 
     public SequencerWatcher(Sequencer sequencer) {
         sequencer.addMetaEventListener(
@@ -19,7 +19,7 @@ public class SequencerWatcher {
                 if (event.getType() == SEQUENCER_END_PLAY){
                     if (closeOnEndPlay)
                         sequencer.close();
-                    if (waitForEndPlay)
+                    if (!async && eventHook.size()==0)
                         eventHook.add(1);
                 }
             }
@@ -35,17 +35,14 @@ public class SequencerWatcher {
 
     /** This waits for the sequencer to stop playing. */
     public void waitForFinish() {
+        if (async)
+            throw new IllegalStateException("Not set to synchronous");
         Except.run(()->eventHook.take());
     }
 
-    /** Defaults to true */
-    public SequencerWatcher waitForFinishPlay(boolean wait) {
-        this.waitForEndPlay=wait;
+    public SequencerWatcher setAsync(boolean async) {
+        this.async=async;
         return this;
-    }
-    public void waitForIf() {
-        if (waitForEndPlay)
-            waitForFinish();
     }
 
 }

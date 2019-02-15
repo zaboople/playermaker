@@ -23,10 +23,9 @@ public class SequencerMgr implements Closeable {
 
     private Sequencer sequencer;
     private Synthesizer synth;
-    private MidiChannel[] midiChannels;
     private Instrument[] instruments;
-    private final MidiTracker midiTracker=new MidiTracker();
     private Map<String, MetaInstrument> instrumentsByName;
+    private final MidiTracker midiTracker=new MidiTracker();
 
     public SequencerMgr() {
         this(Optional.empty(), Optional.empty(), Optional.empty());
@@ -88,12 +87,11 @@ public class SequencerMgr implements Closeable {
     }
 
 
-    /** Defaults to true */
+    /** Defaults to false */
     public SequencerMgr setAsync(boolean async) {
         this.async=async;
         return this;
     }
-
 
     public @Override void close() {
         sequencer.close();
