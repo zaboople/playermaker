@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -22,7 +23,7 @@ import org.tmotte.common.text.Log;
  * Whereas Player is used to compose musical "tracks" (analagous but not exactly the same
  * as Midi Tracks), MyMidi is used for playback of the composition.
  */
-public class MyMidi3  {
+public class MyMidi3 implements Closeable {
 
     /////////////////////////////////////////
     // STATIC CONSTANTS & DATA STRUCTURES: //
@@ -64,8 +65,8 @@ public class MyMidi3  {
 
     // Simpler state:
     long tickX=0;
-    private boolean waitForSequencerToStopPlaying=true;
     private Map<String, MetaInstrument> instrumentsByName;
+    private boolean async=false;
 
     // Standard Midi objects:
     private Sequencer sequencer;
@@ -100,6 +101,12 @@ public class MyMidi3  {
         sequencerWatcher=new SequencerWatcher(sequencer);
     }
 
+    /** Defaults to true */
+    public MyMidi3 setAsync(boolean async) {
+        this.async=async;
+        return this;
+    }
+
     private MyMidi3 setInstruments(Instrument... instruments) {
         this.instruments=instruments;
         instrumentsByName=MetaInstrument.map(true, instruments);
@@ -131,14 +138,14 @@ public class MyMidi3  {
     public MyMidi3 playAndStop(Player... players)  {
         return play(true, players);
     }
-    public MyMidi3 play(boolean andThenStop, Player... players) {
+    public MyMidi3 play(boolean andThenClose, Player... players) {
         sequence(players);
-        return play(andThenStop);
+        return play(andThenClose);
     }
-    private MyMidi3 play(boolean andThenStop) {
-        sequencerWatcher.closeOnFinishPlay(andThenStop);
+    private MyMidi3 play(boolean andThenClose) {
+        sequencerWatcher.closeOnFinishPlay(andThenClose);
         try {
-            //System.out.println("MyMidi3.play() starting..."+sequencer+" "+andThenStop);
+            //System.out.println("MyMidi3.play() starting..."+sequencer+" "+andThenClose);
             if (!sequencer.isOpen())
                 sequencer.open();
             sequencer.setSequence(sequence);
@@ -146,7 +153,8 @@ public class MyMidi3  {
             sequencer.setLoopStartPoint(0);
             sequencer.setTickPosition(0);
             sequencer.start();
-            sequencerWatcher.waitForFinish();
+            if (!async)
+                sequencerWatcher.waitForFinish();
         } catch (Exception e) {
             sequencer.close();
             throw new RuntimeException(e);
@@ -157,8 +165,7 @@ public class MyMidi3  {
     public void stopPlay() {
         sequencer.stop();
     }
-    public void close() {
-        System.out.println("MyMidi3.close()");
+    public @Override void close() {
         sequencer.close();
     }
 
