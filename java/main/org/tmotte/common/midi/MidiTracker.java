@@ -42,6 +42,7 @@ public class MidiTracker  {
     }
 
 	public void noteOn(int channel, int pitch, int volume, long tick) {
+		// NOTE_ON=144
 		Log.log("MidiTracker", "noteOn() tick {} pitch {} volume {}", tick, pitch, volume);
         event(channel, ShortMessage.NOTE_ON, pitch, volume, tick);
     }
@@ -96,11 +97,23 @@ public class MidiTracker  {
 
 
 	/**
+	 * Portamento time appears to be limited to 0-127, but then we're allowed to
+	 * send a MSB and LSB and so I'm not sure. And it looks like the Java synthesizer
+	 * doesn't handle portamento at all, not to mention that there's ambiguity about
+	 * polyphony/chords to begin with.
+	 * @param amount 0-127 or 0-4095 (14 bits)
+	 */
+    public void sendPortamentoTime(int channel, int amount, long tick) {
+		Log.log("MidiTracker", "sendPortamentoTime() tick {} amount {}", tick, amount);
+	    sendControlChange(channel, 5, getMSB(amount),  tick);
+	    sendControlChange(channel, 37, getLSB(amount),  tick);
+    }
+	/**
 	 * @param noteFrom The note to (sorta) "slur" from when the next note-on
 	 * message is received.
 	 */
     public void sendPortamento(int channel, int noteFrom, long tick) {
-		Log.log("MidiTracker", "sendPortamentoTime() tick {} noteFrom {}", tick, noteFrom);
+		Log.log("MidiTracker", "sendPortamento() tick {} noteFrom {}", tick, noteFrom);
 		// Portamento on, then send the note to "slur" from:
 	    sendControlChange(channel, 65, 64,  tick);
 	    sendControlChange(channel, 84, noteFrom,  tick);
@@ -111,16 +124,6 @@ public class MidiTracker  {
 	    sendControlChange(channel, 65, 0,  tick);
     }
 
-	/**
-	 * Portamento time appears to be limited to 0-127, but then we're allowed to
-	 * send a MSB and LSB and so I'm not sure.
-	 * @param amount 0-127 or 0-4095 (14 bits)
-	 */
-    public void sendPortamentoTime(int channel, int amount, long tick) {
-		Log.log("MidiTracker", "sendPortamentoTime() tick {} amount {}", tick, amount);
-	    sendControlChange(channel, 5, getMSB(amount),  tick);
-	    sendControlChange(channel, 37, getLSB(amount),  tick);
-    }
 
 
 	////////////////
