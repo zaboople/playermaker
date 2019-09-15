@@ -30,14 +30,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     private boolean bendWithParent=false;
     private String tag;
 
-    /**
-     * In cases where you want a duration to be a combination of say, 2 dotted eighth notes, or whatever,
-     * this will allow you to tie arbitrary durations together. The result can be passed as the duration
-     * to methods like Chord.c(duration, int...).
-     */
-    public static long tie(Number... durations) {
-        return Divisions.convert(durations);
-    }
 
     protected Chord(T parent, NoteAttributes attributes, long duration, int... pitches) {
         this(parent, attributes, 0L, duration, pitches);
@@ -89,12 +81,12 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
 
     /**
-     * Use to create "tied" notes, for example if you wanted to
-     * extend an quarter note by a sixteenth, you could write
-        <pre>
-        player.c(4, C).t(16).up()
-        </pre>
+     * Increases the duration of this Chord by "tying" it to duration.
+     * <br>
+     * Also consider using the {@link Tie} class, which is a Number and can be used to
+     * to create tied durations.
      * @param duration A time period expressed in the typical notation.
+     * @see Tie
      */
     public Chord<T> t(Number duration) {
         return t(Divisions.convert(duration));
@@ -134,7 +126,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
             .up().up().up().up()
     </pre>
      * All four of the above chords would play in parallel.
-     * parallel chord by adding it as a sub-chord of the first sub-chord).
      */
     public Chord<Chord<T>> c(Number duration, int... notes) {
         return addChord(0L, Divisions.convert(duration), notes);
@@ -252,10 +243,8 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
     /**
      * Aside from using Player.setPressure(), this gives a more fine-tuned variation.
-     * Note that for delay/duration/frequency, you can use other overloads that allow
-     * you to provide a decimal value for dotted notes &amp; triplets as usual, (e.g. 8., 8.3).
      *
-     * @param delay Time to wait before starting vibrato (can be 0)
+     * @param delay Duration to wait before starting vibrato (can be 0)
      * @param duration The duration of the vibrato
      * @param frequency The speed of the vibrato, expressed as a duration (larger numbers are faster).
      * @param denominator The pitch variation of the vibrato, which works the same as for bends: lower

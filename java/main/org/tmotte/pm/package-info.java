@@ -20,18 +20,19 @@
  * "symbolic" values are converted into <code>long</code>s that represent the exact number of ticks in PlayerMaker's timing system.
  * So an "8" or "8.0" or "8." will be converted, but a "8L" will not.
  * <p>
- * However: Suppose you want to combine the following into a single duration:
+ * Suppose you want to combine the following into a single duration:
  * <br>
- *   quarter note + eighth note + sixteenth note + thirty-second note
+ *   &nbsp;&nbsp;<code>quarter note + eighth note + sixteenth note + thirty-second note</code>
  * <br>
- * One way (and sometimes the only way, with bends &amp; swells) is the static {@link Chord#tie(Number...)}:
-   <pre>
-
-   Chord.tie(4, 8, 16, 32)
-   </pre>
- * This will return a long value which will be used as is, no further conversion necessary. You can of course mix and match
- * doubles and ints with Chord.tie() as you please, since it accepts a varargs of Number. You might also find it useful to
- * do <code>import static Chord.tie;</code> for brevity.
+ * There are two ways:
+ * <ol>
+ *   <li> Use {@link Tie#tie(Number...)}:
+ *   This will return a Tie, which extends Number. You can of course mix and match
+ *   doubles and ints with Tie.tie() as you please, since it accepts a varargs of Number. You might also find it useful to
+ *   do <code>import static Tie.tie;</code> for brevity.
+ *   <li> Use {@link Chord#t(Number)}: The "t" is short for "tie". This shortcut will extend the duration of the Chord by
+ *   the given duration. This is less flexible than option #1, but it's there if you want to use it.
+ * </ol>
  *
  * <h3>Bends &amp; Vibrato:</h3>
  * Note "bends" can be done using {@link Chord#bend(Number, Number, int)} and other variations of Chord.bend().
@@ -42,8 +43,8 @@
      <pre>
      chord.bend(...).bend(....)..vibrato(...).bend(...)
      </pre>
-   and each bend or vibrato will happen after the previous. So, no, you can't do vibrato &amp; bend at the same
-   time.
+   and each bend or vibrato will happen after the previous. So, no, you can't do vibrato() &amp; bend() at the same
+   time, although vibratos are really just a rapid series of bends.
  * <p>
  * In Midi, bends apply to the whole channel. This is rather inflexible, so internally we make use of "spare"
  * channels when bends are applied differently to simultaneous notes, or if only certain notes in a Chord are bent.

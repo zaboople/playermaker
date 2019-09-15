@@ -42,6 +42,7 @@ public class XTester {
                     ,new TestPlayAfter()
                     ,new TestReverb()
                     ,new TestTies()
+                    ,new TestTies2()
                     ,new TestVibrato()
                     ,new TestVibratoChanging()
                     ,new TestVibratoSpeed()

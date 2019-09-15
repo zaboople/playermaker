@@ -1,4 +1,6 @@
 package org.tmotte.pm;
+import java.util.Map;
+import java.util.HashMap;
 
 class Divisions {
     final static int triplet128=2;
@@ -16,10 +18,13 @@ class Divisions {
     final static int reg2=reg4 * 2;
     final static int whole=reg2 * 2;
 
+    private final static Map<Class, ConverterLambda> converters=makeConverterMap();
+
     /**
-     * Convert a triplet e.g. expressed as 8.3 to an 8th of a triplet.
-     * as well as a dotted e.g. expressed as 8.0 to an 8th + 16th
-     * - note that 8.0 can be written as "8.", i.e. without the zero. Nice.
+     * Convert a triplet e.g. expressed as 8.3 to an 8th of a triplet,
+     * or a dotted e.g. expressed as 8.0 to an 8th + 16th.
+     * <br>
+     * Note that 8.0 can be written as "8.", i.e. without the zero. Nice.
      */
     static long convert(double d) {
         long main=(long)Math.floor(d);
@@ -44,19 +49,10 @@ class Divisions {
     }
 
     static long convert(Number number) {
-        if (number instanceof Long)
-            return (Long) number;
-        else
-        if (number instanceof Double)
-            return convert(number.doubleValue());
-        else
-        if (number instanceof Integer)
-            return convert(number.intValue());
-        else
-        if (number instanceof Float)
-            return convert(((Float)number).doubleValue());
-        else
+        ConverterLambda c=converters.get(number.getClass());
+        if (c==null)
             throw new RuntimeException("Can't handle number: "+number);
+        return c.convert(number);
     }
 
     static long convert(double... ds) {
@@ -78,4 +74,28 @@ class Divisions {
         return result;
     }
 
+    private static Map<Class, ConverterLambda> makeConverterMap() {
+        Map<Class, ConverterLambda> map=new HashMap<>();
+        map.put(Long.class, number->
+            (Long) number
+        );
+        map.put(Double.class, number->
+            convert(number.doubleValue())
+        );
+        map.put(Integer.class, number->
+            convert(number.intValue())
+        );
+        map.put(Float.class, number->
+            convert(number.doubleValue())
+        );
+        map.put(Tie.class, number->
+            convert(
+                ((Tie)number).durations
+            )
+        );
+        return map;
+    }
+    private static interface ConverterLambda {
+        public long convert(Number number);
+    }
 }
