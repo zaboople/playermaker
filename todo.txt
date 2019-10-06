@@ -2,12 +2,6 @@
     wouldn't it be nice to say, "delay(x).durat(y).freq(z).denom(a)"?
     or maybe "c.vibrato().delay(x).durat(y).freq(z).denom(a).up()"?
 - Out-of-tune tuning - instant bend, so to speak. Duration 0?
-- Allow swells & bends to tie
-    .bend(Tie(8.3, 8.3), 2)   //static constructory thing
-    .bendtie(8.3).bend(8.3, 2) //or this
-    .swell(...) // same deal
-    but consider
-    .bend(delay, tie(...,...,...)
 - Let's do named arguments in groovy; really need it for bends
     - Also, you can skip parentheses but you have to keep commas
 - Player setVolume() and setTranspose() need to be documented...

@@ -54,14 +54,15 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     /** Only for use with sub-chords created with rest(); indicates that
         that the sub-chord should be bent in the same fashion as its parent.*/
     public Chord<T> bendWithParent() {
+        if (parent==null)
+            throw new IllegalStateException("No parent to bend with");
         bendWithParent=true;
         return this;
     }
 
     /** A shortcut to {@link bendWithParent()} */
     public Chord<T> bwp() {
-        bendWithParent=true;
-        return this;
+        return bendWithParent();
     }
 
     /** For debugging purposes only; will print the tag when debugging info for the chord is printed. */
