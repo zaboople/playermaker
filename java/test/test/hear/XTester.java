@@ -38,6 +38,7 @@ public class XTester {
                     ,new TestBPM()
                     ,new TestChannelTrack()
                     ,new TestChords()
+                    ,new TestDelay()
                     ,new TestFinish()
                     ,new TestPlayAfter()
                     ,new TestReverb()
