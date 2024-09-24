@@ -52,7 +52,7 @@ public class SequencerMgr implements Closeable {
 
 
     public SequencerMgr play(Sequence seq) {
-        try {
+        Except.run(() -> {
             //System.out.println("SequencerMgr.play() starting..."+sequencer+" "+andThenStop);
             if (!sequencer.isOpen())
                 sequencer.open();
@@ -62,10 +62,8 @@ public class SequencerMgr implements Closeable {
             sequencer.setTickPosition(0);
             sequencer.start();
             if (!async)
-                Except.run(()->endPlayHook.take());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+                endPlayHook.take();
+        });
         return this;
     }
 
