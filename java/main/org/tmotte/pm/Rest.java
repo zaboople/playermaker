@@ -18,7 +18,7 @@ public class Rest<T> {
 
     /**
      * Ties this Rest to another - actually returns itself after extending its duration.
-     * @param duration A period expressed using the same notation as Player.p(), Chord.c(), etc.
+     * @param duration A duration expressed using the same notation as Player.p(), Chord.c(), etc.
      */
     public Rest<T> t(Number duration) {
         return t(Divisions.convert(duration));
