@@ -240,6 +240,7 @@ public class Player extends NoteAttributeHolder<Player> {
     /**
      * The "r" is short for "rest". The Player will pause for
      * the specified duration. Internally, a rest is actually represented as a Chord.
+     * @param durations Durations of each of the tied rests
      */
     public Player r(Number... durations) {return rest(Divisions.convert(durations));}
 
@@ -257,6 +258,7 @@ public class Player extends NoteAttributeHolder<Player> {
 
     /**
      * Adds a Chord made of the given notes for the specified duration, and returns the original Player object.
+     * Also refer to c() if you want to modify the resulting chord further.
      * @param duration Follows the general rules for note durations
      * @param notes Follows the 12-tone western scale, with low C at 0, D&#x266d; at 1, and so on, allowing up
      *       as many octaves high as the synthesizer can perform. Note values directly correspond to the midi
@@ -268,7 +270,8 @@ public class Player extends NoteAttributeHolder<Player> {
 
 
     /**
-     * Adds a Chord made of the given notes for the specified duration, and returns that Chord, which can be further modified.
+     * Same as p(), adding a Chord made of the given notes for the specified duration,
+     * but returns that Chord instead of the Player.
      */
     public Chord<Player> c(Number duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);

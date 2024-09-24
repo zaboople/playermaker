@@ -82,11 +82,11 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
 
     /**
-     * Increases the duration of this Chord by "tying" it to duration.
+     * Increases the duration of this Chord by "tying" it to <code>duration</code>.
      * <br>
      * Also consider using the {@link Tie} class, which is a Number and can be used to
      * to create tied durations.
-     * @param duration A time period expressed in the typical notation.
+     * @param duration A duration expressed in the typical notation.
      * @see Tie
      */
     public Chord<T> t(Number duration) {
@@ -103,6 +103,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * <p>
      * This is similar to the notes &amp; staves practice of placing a rest above/below a note
      * to indicate an amount of time to wait before playing a parallel note.
+     * @param duration A duration expressed in the typical notation.
      */
     public Rest<T> r(Number duration) {
         return rest(Divisions.convert(duration));
@@ -152,12 +153,13 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     /**
      * Does a volume "swell", where the volume is raised or lowered to <code>toVolume</code>
      * over <code>duration</code> after waiting for <code>delay</code>
+     * @return The same Chord instance
      */
     public Chord<T> swell(Number delay, Number duration, int toVolume) {
         return swell(Divisions.convert(delay), Divisions.convert(duration), toVolume);
     }
 
-    /** A shortcut to <code>swell(0, duration, volume)</code> */
+    /** A shortcut to <code>swell(0, duration, toVolume)</code> */
     public Chord<T> swell(Number duration, int toVolume) {
         return swell(0, duration, toVolume);
     }
@@ -199,10 +201,10 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * @param delay A period to wait before the bend; this can be expressed as
      *        2/4/8/16/32/64 etc to indicate a period corresponding to half/quarter/eighth/etc
      *        notes, or 8.3 for triplet and 8. for dotted notes.
-     * @param duration The time over which the bend takes place, expressed in the same notation
+     * @param dur The duration over which the bend takes place, expressed in the same notation
      *        as delay; if this is shorter than the length of the given Note/Chord, the pitch remains
      *        constant for the rest of the Note/Chord's duration.
-     * @param denominator Can be negative or positive. Indicates the 1/denominator of our bend range to go
+     * @param denom Denominator: Can be negative or positive. Indicates the 1/denominator of our bend range to go
      *        up or down. So, if our bend sensitivity is set to the default of one whole step (which is to say,
      *        2 semitones):
        <ul>
@@ -214,23 +216,23 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * <br>
      * Note: The denominator must be divisible by 2!
      */
-    public Chord<T> bend(Number delay, Number duration, int denominator) {
-       return bend(Divisions.convert(delay), Divisions.convert(duration), denominator);
+    public Chord<T> bend(Number delay, Number duration, int denom) {
+       return bend(Divisions.convert(delay), Divisions.convert(duration), denom);
     }
 
     /**
-     * A shortcut to bend(0, duration, denominator) (that is, 0 delay).
+     * A shortcut to bend(0, duration, denom) (that is, 0 delay).
      */
-    public Chord<T> bend(Number duration, int denominator) {
-        return bend(0L, Divisions.convert(duration), denominator);
+    public Chord<T> bend(Number duration, int denom) {
+        return bend(0L, Divisions.convert(duration), denom);
     }
     /**
      * A shortcut for a bend spread across the entire duration of the chord with no delay,
-     * i.e. chord.bend(delay=0, [chord duration], denominator). However, if there are already bends
+     * i.e. chord.bend(delay=0, [chord duration], denom). However, if there are already bends
      * in the Chord, then this bend will only take the time remaining.
      */
-    public Chord<T> bend(int denominator) {
-        return bend(0L, duration-bendDuration(), denominator);
+    public Chord<T> bend(int denom) {
+        return bend(0L, duration-bendDuration(), denom);
     }
 
     private Chord<T> bend(long delay, long duration, int denominator) {
@@ -246,35 +248,39 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * Aside from using Player.setPressure(), this gives a more fine-tuned variation.
      *
      * @param delay Duration to wait before starting vibrato (can be 0)
-     * @param duration The duration of the vibrato
+     * @param dur The duration of the vibrato
      * @param frequency The speed of the vibrato, expressed as a duration (larger numbers are faster).
-     * @param denominator The pitch variation of the vibrato, which works the same as for bends: lower
-     *    gives more variation, as determined by <code>variation=bend_sensitivy/denominator</code>.
+     * @param denom The "denominator" of pitch variation of the vibrato, which works the same as
+     *    for bends: lower gives more variation, as determined by
+        <pre>
+            variation = bend_sensitivy / denom
+        </pre>.
      */
-    public Chord<T> vibrato(Number delay, Number duration, Number frequency, int denominator) {
+    public Chord<T> vibrato(Number delay, Number duration, Number freq, int denom) {
         //log("vibrato(Number, Number, Number, int)");
-        //log("vibrato("+delay+", "+duration+", "+frequency+", "+denominator+")");
+        //log("vibrato("+delay+", "+duration+", "+freq+", "+denominator+")");
         return vibrato(
             Divisions.convert(delay),
             Divisions.convert(duration),
-            Divisions.convert(frequency),
-            denominator
+            Divisions.convert(freq),
+            denom
         );
     }
 
     /**
      * A shortcut that assumes the vibrato should have 0 delay and use up all remaining time
-     * for the Chord. Vibratos are treated internally as bends, and like bends, they happen sequentially,
-     * so the actual start and duration depends on how many vibratos/bends preceded this one.
+     * for the Chord. Vibratos are treated internally as bends, and like bends, they happen
+     * sequentially, so the actual start and duration depends on how many vibratos/bends
+     * preceded this one.
      */
-    public Chord<T> vibrato(Number frequency, int denominator) {
-        return vibrato(0L, duration-bendDuration(), Divisions.convert(frequency), denominator);
+    public Chord<T> vibrato(Number freq, int denom) {
+        return vibrato(0L, duration-bendDuration(), Divisions.convert(freq), denom);
     }
     /**
      * Another shortcut to vibrato(), this time only assuming 0 delay.
      */
-    public Chord<T> vibrato(Number duration, Number frequency, int denominator) {
-        return vibrato(0L, duration, frequency, denominator);
+    public Chord<T> vibrato(Number duration, Number freq, int denom) {
+        return vibrato(0L, duration, freq, denom);
     }
 
 
