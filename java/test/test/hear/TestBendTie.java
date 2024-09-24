@@ -21,21 +21,19 @@ public class TestBendTie implements XTest {
 			    .p(8.3, B_, D_+12, B_+12)
 			    .p(8.3, B, D+12, B+12)
 
-			    .octave(3)
 			    .c(8.3, A, E+12)
 				    .bend(2)
 				    .t(8.3).t(8.3)
 				    .vibrato(64, 16)
 				    .up()
 
-				.octave(3)
 			    .c(4, A, G_+12)
 				    .tag("HELLO")
 				    .bend(16, 2)
 				    .vibrato(8, 64, 16)
 				    .bend(16, -2)
 				    .t(8)
-				    .vibrato(64, 16)//FIXME the vibrato leaves us out of tune, and so the -4 is also out of tune
+				    .vibrato(64, 16)
 				    .t(8)
 				    .bend(-2)
 				    .up()
