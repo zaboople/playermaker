@@ -51,7 +51,7 @@ class Divisions {
     static long convert(Number number) {
         ConverterLambda c=converters.get(number.getClass());
         if (c==null)
-            throw new RuntimeException("Can't handle number: "+number);
+            throw new RuntimeException("Can't handle number: "+number.getClass());
         return c.convert(number);
     }
 
@@ -80,6 +80,9 @@ class Divisions {
             (Long) number
         );
         map.put(Double.class, number->
+            convert(number.doubleValue())
+        );
+        map.put(java.math.BigDecimal.class, number->
             convert(number.doubleValue())
         );
         map.put(Integer.class, number->
