@@ -169,6 +169,7 @@ public class PanelMain {
     }
 
     private class TableTrackModel extends AbstractTableModel {
+        private static final long serialVersionUID = 1L;
         public int getColumnCount() { return tblTrackColNames.length; }
         public int getRowCount() { return synthWrapper.getTrackCount();}
         public Object getValueAt(int row, int col) {
@@ -180,7 +181,7 @@ public class PanelMain {
             }
         }
         public String getColumnName(int col) {return tblTrackColNames[col]; }
-        public Class getColumnClass(int c) {
+        public Class<?> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
         }
         public boolean isCellEditable(int row, int col) {
@@ -434,7 +435,7 @@ public class PanelMain {
         int value = slider.getValue();
         TitledBorder tb = (TitledBorder) slider.getBorder();
         String s = tb.getTitle();
-        tb.setTitle(s.substring(0, s.indexOf('=')+1) + s.valueOf(value));
+        tb.setTitle(s.substring(0, s.indexOf('=')+1) + String.valueOf(value));
     }
 
     private void setPianoTriggerAction() {

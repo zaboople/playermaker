@@ -11,6 +11,7 @@ import java.util.function.IntSupplier;
  * Piano renders black and white keys, and when keys are pressed, plays the notes for a MIDI channel.
  */
 public class PanelPiano extends JComponent {
+    private static final long serialVersionUID = 1L;
 
     // Constants:
     public final static int ACTION_MOUSE_OVER=0, ACTION_MOUSE_CLICK=1, ACTION_CLICK_ON_CLICK_OFF=2;
@@ -120,7 +121,7 @@ public class PanelPiano extends JComponent {
         g2.fillRect(0, 0, 42*kw, kh);
 
         for (int i = 0; i < whiteKeys.size(); i++) {
-            Key key = (Key) whiteKeys.get(i);
+            Key key = whiteKeys.get(i);
             if (key.isNoteOn()) {
                 g2.setColor(synthWrapper.recording() ? pink : jfcBlue);
                 g2.fill(key);
@@ -129,7 +130,7 @@ public class PanelPiano extends JComponent {
             g2.draw(key);
         }
         for (int i = 0; i < blackKeys.size(); i++) {
-            Key key = (Key) blackKeys.get(i);
+            Key key = blackKeys.get(i);
             if (key.isNoteOn()) {
                 g2.setColor(synthWrapper.recording() ? pink : jfcBlue);
                 g2.fill(key);
@@ -150,6 +151,8 @@ public class PanelPiano extends JComponent {
      * Black and white keys or notes on the piano.
      */
     private class Key extends Rectangle {
+        private static final long serialVersionUID = 1L;
+
         private boolean noteOn = false;
         private int kNum;
         public Key(int x, int y, int width, int height, int num) {

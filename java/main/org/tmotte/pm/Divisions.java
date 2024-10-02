@@ -18,7 +18,7 @@ class Divisions {
     final static int reg2=reg4 * 2;
     final static int whole=reg2 * 2;
 
-    private final static Map<Class, ConverterLambda> converters=makeConverterMap();
+    private final static Map<Class<?>, ConverterLambda> converters=makeConverterMap();
 
     /**
      * Convert a triplet e.g. expressed as 8.3 to an 8th of a triplet,
@@ -74,8 +74,8 @@ class Divisions {
         return result;
     }
 
-    private static Map<Class, ConverterLambda> makeConverterMap() {
-        Map<Class, ConverterLambda> map=new HashMap<>();
+    private static Map<Class<?>, ConverterLambda> makeConverterMap() {
+        Map<Class<?>, ConverterLambda> map=new HashMap<>();
         map.put(Long.class, number->
             (Long) number
         );
