@@ -15,7 +15,6 @@ public class Rest<T> {
         this.restFor=restFor;
     }
 
-
     /**
      * Ties this Rest to another - actually returns itself after extending its duration.
      * @param duration A duration expressed using the same notation as Player.p(), Chord.c(), etc.
@@ -28,18 +27,19 @@ public class Rest<T> {
         return this;
     }
 
-
     /**
      * Does the same as Player.c(), but in this case a "sub-chord" is returned, since the original Rest
      * was against a Chord to begin with. The new chord will play after the start of the original chord
      * but (usually) before the end of the same original chord.
      * <br>
      * You can use .bend(), .vibrato(), .volume() and even .r() against the new Chord like any other.
-     * So yes, you can nest chords within others as far as you want to go, e.g. Chord&lt;Chord&lt;Chord...&lt;T&gt;&gt;&gt;.
+     * So yes, you can nest chords within others as far as you want to go, e.g.
+     * Chord&lt;Chord&lt;Chord...&lt;T&gt;&gt;&gt;.
      * <br>
      * Use .up() to get back to the parent chord, or use up(int, int...) as a shortcut instead of .c().
      * <br>
-     * Also refer to {@link Chord#c(Number, int...)} if you only want to create parallel chords without rests.
+     * Also refer to {@link Chord#c(Number, int...)} if you only want to create parallel chords without
+     * rests.
      */
     public Chord<Chord<T>> c(Number duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
@@ -49,8 +49,9 @@ public class Rest<T> {
     }
 
     /**
-     * Indicates that we should "finish", i.e. play the pitches for the remaining duration of the original Chord.
-     * @return The original Chord.
+     * Indicates that we should "finish", i.e. play the pitches for the remaining duration of the
+     * original Chord.
+     * @return A new Chord, parallel to this Rest.
      */
     public Chord<Chord<T>> fin(int... pitches) {
         return addChord(chord.duration()-restFor, pitches);
@@ -71,6 +72,5 @@ public class Rest<T> {
     public Chord<Chord<T>> bwp(Number duration, int... notes) {
         return c(duration, notes).bendWithParent();
     }
-
 
 }
