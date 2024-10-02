@@ -62,7 +62,7 @@
       deprecation="true"
       failonerror="true"
       >
-      <compilerarg value="-Xlint:unchecked"/>
+      <compilerarg value="-Xlint"/>
       <src path="${src.dir}/main"/>
       <!--classpath><fileset dir="${lib.dir}" includes="*.jar"/></classpath-->
     </javac>
