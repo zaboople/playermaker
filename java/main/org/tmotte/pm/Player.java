@@ -81,6 +81,12 @@ public class Player extends NoteAttributeHolder<Player> {
         this(0);
     }
 
+    /** A shortcut to use a player that uses the special drum channel. Warning: Java
+        tends to insist that channel 9 is the drum channel, not 10.
+    */
+    public static Player drummer() {
+        return new Player(MyMidi3.DRUM_CHANNEL);
+    }
 
     //////////////////////////////////
     // INSTRUMENT / CHANNEL EVENTS: //
@@ -94,7 +100,7 @@ public class Player extends NoteAttributeHolder<Player> {
         return event(new Event(instrument));
     }
     /**
-     * Selects an instrument based on MyMidi3's naming convention: FIXME.
+     * Selects an instrument based on MyMidi3's naming convention.
      */
     public Player instrument(String name) {
         return event(new Event().setInstrument(name));

@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -38,8 +40,8 @@ public class MyMidi3 implements Closeable {
     public final static int TICKS_PER_SECOND=SEQUENCE_RESOLUTION*2;
     public final static int TICKS_PER_MINUTE=TICKS_PER_SECOND*60;
 
+    public final static int DRUM_CHANNEL=9;
     private final static int REVERB = 91;
-    private final static int DRUM_CHANNEL=9;
 
     private static class ChannelAttrs {
         int mainChannel;
@@ -113,12 +115,51 @@ public class MyMidi3 implements Closeable {
         return this;
     }
 
+    /** Gets the list of all instruments that have been loaded. */
     public Instrument[] getInstruments() {
         return this.instruments;
     }
 
+    /** Gets an instrument by looking for an exact match by name. */
     public Instrument getInstrument(String name) {
         return instrumentsByName.get(name).instrument;
+    }
+
+    /** Finds Instruments that match names reasonably well
+       @param name A String that approximately matches what you are looking
+        for. It will be treated as a space-delimited series of keywords
+        to match.
+    */
+    public List<Instrument> findInstruments(String names) {
+        return findMetaInstruments(names).map(mi->mi.instrument)
+            .toList();
+    }
+    /** Attempts to find an Instrument that is a best match for name.
+       @param name Same as for findInstruments(name).
+       @throws IllegalArgumentException if none found, or more than one
+       found.
+    */
+    public Instrument findInstrument(String name) {
+        final List<MetaInstrument> found = findMetaInstruments(name).toList();
+        if (found.size()==0)
+            throw new IllegalArgumentException("No instrument found for: \""+name+"\"");
+        if (found.size() > 1)
+            throw new IllegalArgumentException(
+                "More than one instrument found for \""+name+ "\": "+
+                    found.stream().map(it -> it.displayName)
+                        .collect(Collectors.joining(", "))
+            );
+        return found.get(0).instrument;
+    }
+    private Stream<MetaInstrument> findMetaInstruments(String name) {
+        final String[] names = name.toLowerCase().split(" ");
+        return instrumentsByName.values().stream()
+            .filter(i -> {
+                for (String n: names)
+                    if (!i.searchName.contains(n))
+                        return false;
+                return true;
+            });
     }
 
     void setBeatsPerMinute(int bpm) {

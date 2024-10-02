@@ -12,9 +12,8 @@ public class TestTies implements XTest {
 		    .setBeatsPerMinute(60)
 		    .instrument("Strings - Contrabass")
 		    .setBendSensitivity(4)
-		    .r(4)
-
 		    .octave(4)
+		    .r(4)
 		    .c(4, G)
 			    .r(8).up(8, A-12, E_)
 			    .up()

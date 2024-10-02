@@ -100,13 +100,27 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     /**
      * Allows one to add delayed, overlapping Chords to the original Chord.
      * Use {@link Rest#c(Number, int...)}, etc. methods for adding these delayed notes.
+     * This is similar to the notes &amp; staves practice of placing a rest above/below
+     * a note to indicate an amount of time to wait before playing a parallel note.
      * <p>
-     * This is similar to the notes &amp; staves practice of placing a rest above/below a note
-     * to indicate an amount of time to wait before playing a parallel note.
+     * Rest.c() will return a Chord that is a <i>delayed</i> sub-chord of the original
+     * Chord. From there you can call the usual Chord methods on that sub-chord,
+     * finishing with .up() to take you back to the original Chord. So really,
+     * Chord.r().c() does the same thing as Chord.c(), but delaying the sub-chord.
+     *
      * @param duration A duration expressed in the typical notation.
+     * @return A Rest object that is aware of this Chord, so that Rest.c()
+     *   returns a delayed sub-chord of this Chord.
      */
     public Rest<T> r(Number duration) {
         return rest(Divisions.convert(duration));
+    }
+    /**
+     * Same as r(Number) but allows tied-note rest by giving multiple durations.
+     * @param durations More than one duration can be given.
+     */
+    public Rest<T> r(Number... durations) {
+        return rest(Divisions.convert(Tie.tie(durations)));
     }
     private Rest<T> rest(long duration) {
         return new Rest<>(this, duration);
@@ -201,12 +215,12 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * @param delay A period to wait before the bend; this can be expressed as
      *        2/4/8/16/32/64 etc to indicate a period corresponding to half/quarter/eighth/etc
      *        notes, or 8.3 for triplet and 8. for dotted notes.
-     * @param dur The duration over which the bend takes place, expressed in the same notation
-     *        as delay; if this is shorter than the length of the given Note/Chord, the pitch remains
-     *        constant for the rest of the Note/Chord's duration.
-     * @param denom Denominator: Can be negative or positive. Indicates the 1/denominator of our bend range to go
-     *        up or down. So, if our bend sensitivity is set to the default of one whole step (which is to say,
-     *        2 semitones):
+     * @param duration The duration over which the bend takes place, expressed in the same
+     *        notation as delay; if this is shorter than the length of the given Note/Chord, the
+     *        pitch remains constant for the rest of the Note/Chord's duration.
+     * @param denom Denominator: Can be negative or positive. Indicates the 1/denominator of our
+     *        bend range to go up or down. So, if our bend sensitivity is set to the default of
+     *        one whole step (which is to say, 2 semitones):
        <ul>
            <li>1 is a whole step, e.g. C to D
            <li>2 is a half step, e.g. C to C#
@@ -248,8 +262,8 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * Aside from using Player.setPressure(), this gives a more fine-tuned variation.
      *
      * @param delay Duration to wait before starting vibrato (can be 0)
-     * @param dur The duration of the vibrato
-     * @param frequency The speed of the vibrato, expressed as a duration (larger numbers are faster).
+     * @param duration The duration of the vibrato
+     * @param freq The frequency/speed of the vibrato, expressed as a duration (larger numbers are faster).
      * @param denom The "denominator" of pitch variation of the vibrato, which works the same as
      *    for bends: lower gives more variation, as determined by
         <pre>

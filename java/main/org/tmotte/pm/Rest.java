@@ -36,7 +36,8 @@ public class Rest<T> {
      * So yes, you can nest chords within others as far as you want to go, e.g.
      * Chord&lt;Chord&lt;Chord...&lt;T&gt;&gt;&gt;.
      * <br>
-     * Use .up() to get back to the parent chord, or use up(int, int...) as a shortcut instead of .c().
+     * Use .up() to get back to the original chord this Rest was against, or use up(int, int...) as a
+     * shortcut instead of .c().
      * <br>
      * Also refer to {@link Chord#c(Number, int...)} if you only want to create parallel chords without
      * rests.

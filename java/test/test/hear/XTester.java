@@ -39,6 +39,7 @@ public class XTester {
                     ,new TestChannelTrack()
                     ,new TestChords()
                     ,new TestDelay()
+                    ,new TestDrums()
                     ,new TestFinish()
                     ,new TestPlayAfter()
                     ,new TestReverb()
