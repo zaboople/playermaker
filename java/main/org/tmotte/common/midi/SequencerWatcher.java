@@ -26,7 +26,10 @@ public class SequencerWatcher {
         );
     }
 
-    /** Defaults to false; if true we will close the underlying Sequencer on */
+    /** Defaults to false; if true we will close the underlying Sequencer on
+        @param close Whether to close the sequencer when play ends.
+        @return this
+    */
     public SequencerWatcher closeOnFinishPlay(boolean close) {
         this.closeOnEndPlay=close;
         return this;

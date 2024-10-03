@@ -33,6 +33,8 @@
  *   <li> Use {@link Chord#t(Number)}: The "t" is short for "tie". This shortcut will extend the duration of the Chord by
  *   the given duration. This is less flexible than option #1, but it's there if you want to use it.
  * </ol>
+ * Note that you can use negative numbers when using ties! This allows you to subtract a certain amount, e.g. Chord.t(4, -32)
+ * would reduce the quarter note duration by a 32nd note.
  *
  * <h3>Bends &amp; Vibrato:</h3>
  * Note "bends" can be done using {@link Chord#bend(Number, Number, int)} and other variations of Chord.bend().

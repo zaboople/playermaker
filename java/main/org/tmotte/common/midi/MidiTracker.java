@@ -59,7 +59,11 @@ public class MidiTracker  {
     }
 
 
-    /** Short for Bend Sensitivity (hard word to type). */
+    /** Short for Bend Sensitivity (hard word to type).
+        @param channel Channel
+        @param amount Amount of bend sensitivity
+        @param tick Time to send message
+    */
     public void sendBendSense(int channel, int amount, long tick) {
         //This type of message is command, channel, data1, data2
         //RPN MSB (always 0)
@@ -81,12 +85,20 @@ public class MidiTracker  {
         sendBend(channel, 8192, tick);
     }
 
-    /** This is vibrato (usually) */
+    /** This is vibrato (usually)
+        @param channel Channel
+        @param amount Amount of vibrato "pressure"
+        @param tick Time to send message
+    */
     public void sendPressure(int channel, int amount, long tick) {
         event(channel, ShortMessage.CHANNEL_PRESSURE, amount, 0, tick);
     }
 
-    /** This is volume swells */
+    /** This is volume swells
+        @param channel Channel
+        @param volume Volume level
+        @param tick Time to send message
+    */
     public void sendExpression(int channel, int volume, long tick) {
         Log.log("MidiTracker", "sendExpression() tick {} volume {}", tick, volume);
         sendControlChange(channel, 11, volume,  tick);
@@ -99,16 +111,24 @@ public class MidiTracker  {
      * send a MSB and LSB and so I'm not sure. And it looks like the Java synthesizer
      * doesn't handle portamento at all, not to mention that there's ambiguity about
      * polyphony/chords to begin with.
+     *
+     * @param channel Channel
      * @param amount 0-127 or 0-4095 (14 bits)
+     * @param tick Time to send message
      */
     public void sendPortamentoTime(int channel, int amount, long tick) {
         Log.log("MidiTracker", "sendPortamentoTime() tick {} amount {}", tick, amount);
         sendControlChange(channel, 5, getMSB(amount),  tick);
         sendControlChange(channel, 37, getLSB(amount),  tick);
     }
+
     /**
+     * Again, I never got portamento verified with Java's synthesizer.
+     *
+     * @param channel Channel
      * @param noteFrom The note to (sorta) "slur" from when the next note-on
      * message is received.
+     * @param tick Time to send message
      */
     public void sendPortamento(int channel, int noteFrom, long tick) {
         Log.log("MidiTracker", "sendPortamento() tick {} noteFrom {}", tick, noteFrom);

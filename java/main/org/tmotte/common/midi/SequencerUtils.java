@@ -21,14 +21,16 @@ public class SequencerUtils  {
 	   </ul>
 	 * The API works this way so that a sequencer can transmit the same thing to multiple resources;
 	 * the problem is that getTransmitter() should be renamed createTransmitter().
+	 * @param sequencer The sequencer that generates music
+	 * @param synthesizer The synthesizer that plays the music
 	 */
-	public static void hookSequencerToSynth(Sequencer sequencer, Synthesizer synthesizer) throws Exception {
+	public static void hookSequencerToSynth(Sequencer sequencer, Synthesizer synthesizer) {
 		for (Transmitter t: sequencer.getTransmitters())
 			Optional.ofNullable(t.getReceiver()).ifPresent(Receiver::close);
 		sequencer.getTransmitters().stream()
 	        .findFirst()
-	        .orElse(sequencer.getTransmitter())
-	        .setReceiver(synthesizer.getReceiver());
+	        .orElse(Except.get(()->sequencer.getTransmitter()))
+	        .setReceiver(Except.get(()->synthesizer.getReceiver()));
     }
 
     public static Instrument[] getOrReplaceInstruments(Synthesizer synth, Optional<File> replacementFile) {

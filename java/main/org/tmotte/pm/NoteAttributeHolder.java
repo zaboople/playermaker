@@ -20,6 +20,8 @@ public abstract class NoteAttributeHolder<T> {
     /**
      * Adds the given amount to the current volume setting; both positive &amp; negative values
      * are allowed as long as the resulting value fits within standard limits.
+     * @param change The amount to add. Resulting volume should follow the limits for volume(int).
+     * @return this, with child type preserved
      */
     public T addVolume(int change) {
         return volume(getNoteAttributesForRead().volume+change);
@@ -33,14 +35,20 @@ public abstract class NoteAttributeHolder<T> {
 
 
     /**
-     * Select 0 for the default octave, or any positive number to modulate up from 0 by that many octaves.
+     * Set the octave
+     * @param octave 0 for the default octave, or any positive number to modulate up from 0 by
+     *   that many octaves.
+     * @return this, preserving type
      */
     public T octave(int octave) {
         return setTranspose(octave*12);
     }
     /**
      * Modulates by individual semitones, not octaves; adds to the current transposition
-     * setting instead of treating semitones as an absolute value.
+     * setting instead of treating semitones as an absolute value. Use octave() to reset
+     * to a normal octave.
+     * @param semitones The number of semitones to modulate by
+     * @return this, preserving type
      */
     public T modulate(int semitones) {
         return setTranspose(

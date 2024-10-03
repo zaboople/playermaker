@@ -85,7 +85,10 @@ public class SequencerMgr implements Closeable {
     }
 
 
-    /** Defaults to false */
+    /** Defaults to false
+        @param async To async or not
+        @return this
+     */
     public SequencerMgr setAsync(boolean async) {
         this.async=async;
         return this;

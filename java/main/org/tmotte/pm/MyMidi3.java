@@ -126,7 +126,7 @@ public class MyMidi3 implements Closeable {
     }
 
     /** Finds Instruments that match names reasonably well
-       @param name A String that approximately matches what you are looking
+       @param names A String that approximately matches what you are looking
         for. It will be treated as a space-delimited series of keywords
         to match.
     */

@@ -46,13 +46,16 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
     /**
      * Takes us back to the original Player/Chord, for the sake of "fluent" programming.
+     * @return this
      */
     public T up() {
         return parent;
     }
 
     /** Only for use with sub-chords created with rest(); indicates that
-        that the sub-chord should be bent in the same fashion as its parent.*/
+        that the sub-chord should be bent in the same fashion as its parent.
+     * @return this
+     */
     public Chord<T> bendWithParent() {
         if (parent==null)
             throw new IllegalStateException("No parent to bend with");
@@ -60,12 +63,17 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         return this;
     }
 
-    /** A shortcut to {@link bendWithParent()} */
+    /** A shortcut to {@link bendWithParent()}
+     * @return this
+     */
     public Chord<T> bwp() {
         return bendWithParent();
     }
 
-    /** For debugging purposes only; will print the tag when debugging info for the chord is printed. */
+    /** For debugging purposes only; will print the tag when debugging info for the chord is printed.
+     * @param t The tag name
+     * @return this
+     */
     public Chord<T> tag(String t) {
         this.tag=t;
         return this;
@@ -87,6 +95,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * Also consider using the {@link Tie} class, which is a Number and can be used to
      * to create tied durations.
      * @param duration A duration expressed in the typical notation.
+     * @return this
      * @see Tie
      */
     public Chord<T> t(Number duration) {
@@ -118,6 +127,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     /**
      * Same as r(Number) but allows tied-note rest by giving multiple durations.
      * @param durations More than one duration can be given.
+     * @return same as r(Number)
      */
     public Rest<T> r(Number... durations) {
         return rest(Divisions.convert(Tie.tie(durations)));
@@ -142,11 +152,18 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
             .up().up().up().up()
     </pre>
      * All four of the above chords would play in parallel.
+     * @param duration Standard duration notation
+     * @param notes Standard note notation
+     * @return a sub-chord of this Chord
      */
     public Chord<Chord<T>> c(Number duration, int... notes) {
         return addChord(0L, Divisions.convert(duration), notes);
     }
-    /** A shortcut to <code>c(Number, int...).up()</code> */
+    /** A shortcut to <code>c(Number, int...).up()</code>
+     * @param duration Standard duration notation
+     * @param notes Standard note notation
+     * @return this
+     */
     public Chord<T> up(Number duration, int... notes) {
         return c(duration, notes).up();
     }
@@ -229,6 +246,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * ... and so forth.
      * <br>
      * Note: The denominator must be divisible by 2!
+     * @return this
      */
     public Chord<T> bend(Number delay, Number duration, int denom) {
        return bend(Divisions.convert(delay), Divisions.convert(duration), denom);
@@ -269,6 +287,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         <pre>
             variation = bend_sensitivy / denom
         </pre>.
+     * @return this
      */
     public Chord<T> vibrato(Number delay, Number duration, Number freq, int denom) {
         //log("vibrato(Number, Number, Number, int)");
@@ -296,7 +315,6 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     public Chord<T> vibrato(Number duration, Number freq, int denom) {
         return vibrato(0L, duration, freq, denom);
     }
-
 
     private Chord<T> vibrato(long delay, long duration, long frequency, int denominator) {
         Bend.vibrato(makeBends(), delay, duration, frequency, denominator);
@@ -383,6 +401,5 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         }
         return attributes;
     }
-
 
 }

@@ -92,7 +92,9 @@ public class PanelPiano extends JComponent {
         return mute;
     }
 
-    /** Transposes the keyboard by octave-1 (i.e. 1 is lowest) octaves. */
+    /** Transposes the keyboard by octave-1 (i.e. 1 is lowest) octaves.
+        @param octave The octave to use.
+     */
     public void setOctave(int octave) {
         assert(octave > 0);
         transpose=(octave-1) * 12;

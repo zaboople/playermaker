@@ -27,16 +27,17 @@ class Divisions {
      * Note that 8.0 can be written as "8.", i.e. without the zero. Nice.
      */
     static long convert(double d) {
-        long main=(long)Math.floor(d);
-        long fractional=Math.round((d-main) * 10);
-        double dd=8.;
+        final double dabs = Math.abs(d);
+        final long factor = d >= 0.0D ?1 :-1;
+        long main=(long)Math.floor(dabs);
+        final long fractional=Math.round((dabs-main) * 10);
         main=convert((int)main);
         if (fractional==3)
             //triplet
-            return (main * 2) / 3;
+            return factor * (main * 2) / 3;
         else
         if (fractional==2 || fractional==1 || fractional==0)
-            return main + (main / 2); //dotted
+            return factor * (main + (main / 2)); //dotted
         else
             throw new RuntimeException("Don't know what to do with "+d);
     }
