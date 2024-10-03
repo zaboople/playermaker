@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.List;
 
+import org.tmotte.common.function.Except;
+
 /**
+ * This prints out
  * Originally ripped off from a StackOverflow answer, but unrecognizable at this point.
  */
 public class MediaTypes2 {
@@ -35,25 +38,34 @@ public class MediaTypes2 {
             child.ifPresent(this::add);
         }
         public void print() {
-            print(0);
-            System.out.println("******************************");
+            print(System.out);
+        }
+        public void print(Appendable app) {
+            Except.run(()->{
+                print(0, app);
+                app.append("******************************\n");
+            });
         }
 
-        private void print(int level) {
+        private void print(int level, Appendable app) throws Exception {
             if (level > 0) {
                 if (level==1)
-                    System.out.println("******************************");
+                    app.append("******************************\n");
                 for (int i=1; i<level; i++)
-                    System.out.print("  ");
-                System.out.println(name);
+                    app.append("  ");
+                app.append(name).append("\n");
             }
             if (children!=null)
                 for (MyNode c: children)
-                    c.print(level+1);
+                    c.print(level+1, app);
         }
     }
 
     public static void main(String[] args) throws Exception {
+        getAll().print();
+    }
+
+    public static MyNode getAll() {
         MyNode root=new MyNode(null);
 
         // Sound file types, also not remarkable:
@@ -81,50 +93,49 @@ public class MediaTypes2 {
         for (MidiDevice.Info info: MidiSystem.getMidiDeviceInfo())
             midiDeviceNodes.add(processMidiDeviceInfo(info));
 
-        root.print();
+        return root;
     }
 
-
-    private static Optional<MyNode> getLines(String sourceTarget, Line.Info[] names) throws Exception {
+    private static Optional<MyNode> getLines(String sourceTarget, Line.Info[] names) {
         if (names.length==0)
             return Optional.empty();
-        MyNode node=new MyNode(sourceTarget+":");
-        for (Line.Info mainInfo: names) {
-            MyNode child=node.add(mainInfo.toString());
+        final MyNode node=new MyNode(sourceTarget+":");
+        Except.run(()->{
+            for (Line.Info mainInfo: names) {
+                MyNode child=node.add(mainInfo.toString());
 
-            Line line=AudioSystem.getLine(mainInfo);
-            if (line instanceof DataLine) {
-                DataLine dataLine = (DataLine)line;
-                AudioFormat audioFormat = dataLine.getFormat();
-                child.add("Channels: " + audioFormat.getChannels());
-                child.add("Encoding: " + audioFormat.getEncoding());
-                child.add("Frame Rate: " +audioFormat.getFrameRate());
-                child.add("Sample Rate: " +audioFormat.getSampleRate());
-                child.add("Sample Size (bits): " +audioFormat.getSampleSizeInBits());
-                child.add("Big Endian: " +audioFormat.isBigEndian());
-                child.add("Level: " +dataLine.getLevel());
-            }
-            if (line instanceof Port) {
-                Port port = (Port)line;
-                Port.Info portInfo = (Port.Info)port.getLineInfo();
-                child.add("Port Name: " +portInfo.getName());
-                String pType="Unknown port type";
-                if (portInfo==Port.Info.COMPACT_DISC) pType="Compact Disc";
-                else
-                if (portInfo==Port.Info.HEADPHONE) pType="Headphone";
-                else
-                if (portInfo==Port.Info.MICROPHONE) pType="Microphone";
-                else
-                if (portInfo==Port.Info.LINE_IN) pType="Line in";
-                else
-                if (portInfo==Port.Info.LINE_OUT) pType="Line out";
-                else
-                if (portInfo==Port.Info.SPEAKER) pType="Speaker";
-                child.add("Port type: "+pType);
-            }
+                Line line=AudioSystem.getLine(mainInfo);
+                if (line instanceof DataLine) {
+                    DataLine dataLine = (DataLine)line;
+                    AudioFormat audioFormat = dataLine.getFormat();
+                    child.add("Channels: " + audioFormat.getChannels());
+                    child.add("Encoding: " + audioFormat.getEncoding());
+                    child.add("Frame Rate: " +audioFormat.getFrameRate());
+                    child.add("Sample Rate: " +audioFormat.getSampleRate());
+                    child.add("Sample Size (bits): " +audioFormat.getSampleSizeInBits());
+                    child.add("Big Endian: " +audioFormat.isBigEndian());
+                    child.add("Level: " +dataLine.getLevel());
+                }
+                if (line instanceof Port) {
+                    Port port = (Port)line;
+                    Port.Info portInfo = (Port.Info)port.getLineInfo();
+                    child.add("Port Name: " +portInfo.getName());
+                    String pType="Unknown port type";
+                    if (portInfo==Port.Info.COMPACT_DISC) pType="Compact Disc";
+                    else
+                    if (portInfo==Port.Info.HEADPHONE) pType="Headphone";
+                    else
+                    if (portInfo==Port.Info.MICROPHONE) pType="Microphone";
+                    else
+                    if (portInfo==Port.Info.LINE_IN) pType="Line in";
+                    else
+                    if (portInfo==Port.Info.LINE_OUT) pType="Line out";
+                    else
+                    if (portInfo==Port.Info.SPEAKER) pType="Speaker";
+                    child.add("Port type: "+pType);
+                }
 
-            if (!(line instanceof Clip))
-                try {
+                if (!(line instanceof Clip)) {
                     boolean needsOpen=!line.isOpen();
                     if (needsOpen) line.open();
                     Control[] controls=line.getControls();
@@ -134,10 +145,9 @@ public class MediaTypes2 {
                             controlNode.add(control.toString());
                     }
                     if (needsOpen) line.close();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
                 }
-        }
+            }
+        });
         return Optional.of(node);
     }
 

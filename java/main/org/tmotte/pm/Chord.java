@@ -54,6 +54,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
     /** Only for use with sub-chords created with rest(); indicates that
         that the sub-chord should be bent in the same fashion as its parent.
+        This should be used to share vibrato as well, since vibrato is bending.
      * @return this
      */
     public Chord<T> bendWithParent() {
@@ -139,19 +140,9 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 
     /**
      * Allows us to add a chord that plays at the same time as this one,
-     * but that is not subject to the same bend/vibrato/volume etc. effects. Note
-     * that if other chords have already been added, the new chord will
-     * be played after those sub-chords; however you can do multiple parallel
-     * sub-chords via:
-     <pre>
-          player
-            .c(...)
-                .c(...)
-                    .c(...)
-                        .c(...)
-            .up().up().up().up()
-    </pre>
-     * All four of the above chords would play in parallel.
+     * but that is not subject to the same bend/vibrato/swell/etc. effects
+     * unless you use bendWithParent(). Use r() before c() to add a rest/delay
+     * before this chord.
      * @param duration Standard duration notation
      * @param notes Standard note notation
      * @return a sub-chord of this Chord
@@ -184,6 +175,9 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     /**
      * Does a volume "swell", where the volume is raised or lowered to <code>toVolume</code>
      * over <code>duration</code> after waiting for <code>delay</code>
+     * @param delay Time to delay before swell, as standard time notation
+     * @param duration Duration of swell itself
+     * @param toVolume Volume value from 0-127 - can go up or
      * @return The same Chord instance
      */
     public Chord<T> swell(Number delay, Number duration, int toVolume) {

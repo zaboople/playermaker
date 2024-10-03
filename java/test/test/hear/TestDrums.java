@@ -32,8 +32,8 @@ public class TestDrums implements XTest {
 	    for (int i=0; i<2; i++)
 		    for (int j: Arrays.asList(0, 3, 2, 5))
 			    bass
-				    .p(32, A+j)
-				    .r(32);
+				    .p(64, A+j)
+				    .r(32.);
 	    bass.octave(3).volume(60).p(8, A, C, E);
 	    drummer2
 		    .p(16, bigTom)
@@ -58,7 +58,7 @@ public class TestDrums implements XTest {
 		    .p(64, E)
 		    .p(tie(16, -64), F)
 
-		    .r(8)
+		    .r(4)
 		    ;
 	    midi.playAndStop(bass, drummer2);
     }
