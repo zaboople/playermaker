@@ -2,7 +2,6 @@ package test.hear;
 import java.util.Arrays;
 import org.tmotte.pm.MyMidi3;
 import org.tmotte.pm.Player;
-import org.tmotte.common.text.Log;
 
 import static org.tmotte.pm.Tie.tie;
 import static org.tmotte.pm.Pitches.*;
@@ -13,7 +12,6 @@ public class TestDrums implements XTest {
 	    new TestDrums().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
-	    Log.add("MyMidi3");
 	    final int bpm = 20;
 	    Player bass=new Player(0)
 		    .instrument(midi.findInstrument("Contrabass"))
