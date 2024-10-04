@@ -22,8 +22,8 @@ public class PanelPiano extends JComponent {
     private final static int whiteIDs[] = { 0, 2, 4, 5, 7, 9, 11 };
 
     // Final objects:
-    private final SynthWrapper synthWrapper;
-    private final java.util.List<Key>
+    private final transient SynthWrapper synthWrapper;
+    private final transient java.util.List<Key>
         allKeys=new ArrayList<>(octaves * 12),
         whiteKeys = new ArrayList<>(octaves * 7),
         blackKeys = new ArrayList<>(octaves * 5);
@@ -35,6 +35,7 @@ public class PanelPiano extends JComponent {
     private int transpose = 24;
 
 
+    @SuppressWarnings("this-escape")
     public PanelPiano(SynthWrapper synthWrapper) {
         //setLayout(new BorderLayout());
         this.synthWrapper=synthWrapper;
@@ -191,50 +192,52 @@ public class PanelPiano extends JComponent {
     } // End class Key
 
 
-    private MouseMotionListener myMouseMoveListener = new MouseMotionAdapter() {
-        public @Override void mouseMoved(MouseEvent e) {
-            if (pianoTriggerAction==ACTION_MOUSE_OVER) {
-                Key key = getKey(e.getPoint());
-                if (prevKey != null && prevKey != key)
-                    prevKey.off();
-                if (key != null && !key.isNoteOn())
-                    key.on();
-                prevKey = key;
-                repaint();
+    private final transient MouseMotionListener myMouseMoveListener =
+        new MouseMotionAdapter() {
+            public @Override void mouseMoved(MouseEvent e) {
+                if (pianoTriggerAction==ACTION_MOUSE_OVER) {
+                    Key key = getKey(e.getPoint());
+                    if (prevKey != null && prevKey != key)
+                        prevKey.off();
+                    if (key != null && !key.isNoteOn())
+                        key.on();
+                    prevKey = key;
+                    repaint();
+                }
             }
-        }
-    };
+        };
 
-    private MouseListener myMouseListener = new MouseListener() {
-        public @Override void mousePressed(MouseEvent e) {
-            prevKey = getKey(e.getPoint());
-            if (prevKey != null) {
-                if (isClickOnClickOff())
-                    prevKey.flip();
-                else
-                    prevKey.on();
-                repaint();
+    private final transient MouseListener myMouseListener =
+        new MouseListener() {
+            public @Override void mousePressed(MouseEvent e) {
+                prevKey = getKey(e.getPoint());
+                if (prevKey != null) {
+                    if (isClickOnClickOff())
+                        prevKey.flip();
+                    else
+                        prevKey.on();
+                    repaint();
+                }
             }
-        }
-        public @Override void mouseReleased(MouseEvent e) {
-            if (prevKey != null) {
-                if (!isClickOnClickOff())
-                    prevKey.off();
-                repaint();
+            public @Override void mouseReleased(MouseEvent e) {
+                if (prevKey != null) {
+                    if (!isClickOnClickOff())
+                        prevKey.off();
+                    repaint();
+                }
             }
-        }
-        public @Override void mouseExited(MouseEvent e) {
-            if (prevKey != null) {
-                if (!isClickOnClickOff())
-                    prevKey.off();
-                repaint();
+            public @Override void mouseExited(MouseEvent e) {
+                if (prevKey != null) {
+                    if (!isClickOnClickOff())
+                        prevKey.off();
+                    repaint();
+                }
             }
-        }
-        public @Override void mouseClicked(MouseEvent e) { }
-        public @Override void mouseEntered(MouseEvent e) { }
-    };
+            public @Override void mouseClicked(MouseEvent e) { }
+            public @Override void mouseEntered(MouseEvent e) { }
+        };
 
-    private KeyListener MyKeyListener = new KeyAdapter() {
+    private final transient KeyListener MyKeyListener = new KeyAdapter() {
         public @Override void keyPressed(KeyEvent e) {
             int keyCode=e.getKeyCode();
             final boolean

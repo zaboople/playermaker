@@ -70,6 +70,7 @@ public class Player extends NoteAttributeHolder<Player> {
        instruments only.
        @param channel: The channel index, 0-based, usually constrained to 0-15 for 16 channels.
      */
+    @SuppressWarnings("this-escape")
     public Player(int channel) {
         super();
         volume(64);

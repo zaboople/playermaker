@@ -87,6 +87,7 @@ public class MyMidi3 implements Closeable {
     public MyMidi3() {
         this(Optional.empty());
     }
+
     public MyMidi3(Optional<File> replaceInstruments) {
         Except.run(()-> {
             synth=MidiSystem.getSynthesizer();
@@ -162,7 +163,7 @@ public class MyMidi3 implements Closeable {
             });
     }
 
-    void setBeatsPerMinute(int bpm) {
+    final void setBeatsPerMinute(int bpm) {
         tickX = Math.round(
             ((double)TICKS_PER_MINUTE) /
             (
