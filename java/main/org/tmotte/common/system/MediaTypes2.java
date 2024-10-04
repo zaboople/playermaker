@@ -10,10 +10,19 @@ import java.util.List;
 import org.tmotte.common.function.Except;
 
 /**
- * This prints out
+ * Useful for printing system information about internal synthesizers, sequencers, etc.
  * Originally ripped off from a StackOverflow answer, but unrecognizable at this point.
  */
 public class MediaTypes2 {
+
+    private MediaTypes2(){}
+
+    /** Runs the system scan and prints results to command line.
+        @param args ignored
+    */
+    public static void main(String[] args) {
+        getAll().print();
+    }
 
     /**
      * Just represents a hierarchy of nodes
@@ -61,10 +70,10 @@ public class MediaTypes2 {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        getAll().print();
-    }
 
+    /** Gets the system data as a MyNode hierarchy
+        @return The hierarchy
+    */
     public static MyNode getAll() {
         MyNode root=new MyNode(null);
 

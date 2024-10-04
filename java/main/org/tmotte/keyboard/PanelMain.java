@@ -23,7 +23,7 @@ import org.tmotte.common.midi.MetaInstrument;
  * This was adapted from an utterly horrible piece of work distributed by the once-mighty
  * Sun Microsystems and has been cleaned up reasonably well.
  */
-public class PanelMain {
+class PanelMain {
     private final static String BTN_MUTE_TEXT="Mute (Ctrl-M to quick-cycle)";
     private final static String BTN_UNMUTE_TEXT="Un-mute (Ctrl-M to quick-cycle)";
     private final static String KEYBOARD_TRIGGER_MOUSE_OVER="Mouse over (not click)";

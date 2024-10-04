@@ -6,6 +6,7 @@ package org.tmotte.pm;
  * on to its sub-chords similarly.
  * <br>
  * The only actual things set in here are octave/transpose &amp; volume.
+ * @param <T> Represents the class extending this one, allowing for method chaining used by Player &amp; Chord.
  */
 public abstract class NoteAttributeHolder<T> {
 

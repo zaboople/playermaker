@@ -9,8 +9,13 @@ import javax.sound.midi.Soundbank;
 import javax.sound.midi.Instrument;
 import javax.sound.midi.MidiSystem;
 
+/** Runs the keyboard */
 public class Main {
-    public static void main(String[] args) throws Exception {
+
+	/** Provides command-line entry
+	 * @param args Use -help for options
+	 */
+    public static void main(String[] args) {
 	    System.out.println("Starting up...");
         Optional<File>
             instrumentFile=Optional.empty(),
@@ -21,7 +26,11 @@ public class Main {
             else
             if (args[i].startsWith("-s"))
                 sequenceFile=getFile(args[++i]);
-            else {
+            else
+            if (args[i].startsWith("-h")) {
+	            System.out.println("""
+	            """);
+            } else {
                 System.err.println("Unexpected: "+args[i]);
                 System.exit(1);
                 return;
@@ -38,4 +47,5 @@ public class Main {
         }
         return Optional.of(f);
     }
+    private Main(){}
 }

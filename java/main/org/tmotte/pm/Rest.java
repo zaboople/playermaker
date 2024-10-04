@@ -2,9 +2,12 @@ package org.tmotte.pm;
 
 /**
  * Rest acts as a temporary placeholder, returned by {@link Chord#r(Number)}; the intention is that you
- * want to create a chord where notes are delayed for an arpeggiated effect.
+ * want to create a Chord where notes are delayed for an arpeggiated effect.
  *
+ * @param <T> Represents the class of the parent Chord; this falls in line
+ *   with Chord's pattern of enabling lengthy method chains via same class parameterization.
  * @see Chord#r(Number)
+ * @see Rest#c(Number, int...)
  */
 public class Rest<T> {
     private final Chord<T> chord;

@@ -10,7 +10,7 @@ import java.util.function.IntSupplier;
 /**
  * Piano renders black and white keys, and when keys are pressed, plays the notes for a MIDI channel.
  */
-public class PanelPiano extends JComponent {
+class PanelPiano extends JComponent {
     private static final long serialVersionUID = 1L;
 
     // Constants:

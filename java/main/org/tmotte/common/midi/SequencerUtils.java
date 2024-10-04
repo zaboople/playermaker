@@ -1,5 +1,6 @@
 package org.tmotte.common.midi;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Optional;
 import javax.sound.midi.Instrument;
 import javax.sound.midi.MidiSystem;
@@ -33,6 +34,10 @@ public class SequencerUtils  {
 	        .setReceiver(Except.get(()->synthesizer.getReceiver()));
     }
 
+	/** This is of questionable virtue. I haven't actually tried loading instruments yet.
+		@param synth Instruments will be unloaded if replacementFile has any
+		@param replacementFile Instruments to be used instead
+	*/
     public static Instrument[] getOrReplaceInstruments(Synthesizer synth, Optional<File> replacementFile) {
 		return replacementFile
 			.map(file ->
@@ -46,5 +51,4 @@ public class SequencerUtils  {
 				synth.getDefaultSoundbank().getInstruments()
 			);
     }
-
 }

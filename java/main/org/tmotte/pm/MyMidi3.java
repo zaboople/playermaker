@@ -21,7 +21,6 @@ import org.tmotte.common.text.Log;
 
 
 /**
- * FIXME name MyMidiSequencer
  * Whereas Player is used to compose musical "tracks" (analagous but not exactly the same
  * as Midi Tracks), MyMidi is used for playback of the composition.
  */
@@ -84,10 +83,16 @@ public class MyMidi3 implements Closeable {
     private final BendGen bendGen=new BendGen(()->tickX, midiTracker::sendBend);
     private final SequencerWatcher sequencerWatcher;
 
+    /** Shortcut to MyMidi3(Optional.empty()) */
     public MyMidi3() {
         this(Optional.empty());
     }
 
+    /** Creates a new Midi sequencer and synthesizer, ready to play
+        @param replaceInstruments Attempts to replace built-in Instruments
+        with a file (usually a .sf2 file) containing alternates. Kind of
+        inflexible and not really well tested.
+    */
     public MyMidi3(Optional<File> replaceInstruments) {
         Except.run(()-> {
             synth=MidiSystem.getSynthesizer();
@@ -177,9 +182,20 @@ public class MyMidi3 implements Closeable {
     // PLAY: //
     ///////////
 
+    /** Sequences the necessary tracks and runs it through the attached synth.
+        @param players A series of Players containing data to be sequenced
+        @return this
+    */
     public MyMidi3 playAndStop(Player... players)  {
         return play(true, players);
     }
+    /** Sequences the necessary tracks and runs it through the attached synth.
+        Closes the sequencer afterwards if asked to do so.
+        @param players A series of Players containing data to be sequenced
+        @param andThenClose Whether to close the internal sequencer after
+            playing.
+        @return this
+    */
     public MyMidi3 play(boolean andThenClose, Player... players) {
         sequence(players);
         return play(andThenClose);
@@ -204,13 +220,29 @@ public class MyMidi3 implements Closeable {
         return this;
     }
 
+    /** Stops internal sequencer. */
     public void stopPlay() {
         sequencer.stop();
     }
+
+    /** Writes internal sequence to a midi file. */
+    public void write(File file) throws Exception {
+        int[] fileTypes = MidiSystem.getMidiFileTypes(sequence);
+        if (MidiSystem.write(sequence, fileTypes[0], file) == -1) {
+            throw new Exception("Write didn't work");
+        }
+    }
+
+
+    /** Closes internal sequencer. */
     public @Override void close() {
         sequencer.close();
     }
 
+    /** Resets the internal sequence and does other cleanup in preparation
+        for creating a new composition.
+        @return this
+    */
     public MyMidi3 reset() {
         Except.run(()-> {
             sequence = new Sequence(Sequence.PPQ, SEQUENCE_RESOLUTION);
@@ -223,6 +255,12 @@ public class MyMidi3 implements Closeable {
     // SEQUENCE & WRITE: //
     ///////////////////////
 
+    /** Creates a sequence from contents of the given players.
+        To actually play that sequence, call play() after this.
+        @param players An array of Player objects containing data
+            to be sequenced.
+        @return this
+    */
     public MyMidi3 sequence(Player... players) {
         for (Player player: players)
             reserveChannels.reserve(player);
@@ -444,13 +482,5 @@ public class MyMidi3 implements Closeable {
         midiTracker.sendPressure(channel, channelAttrs.pressure, currTick);
         midiTracker.sendInstrument(channel, channelAttrs.instrument, currTick);
     }
-
-    public void write(File file) throws Exception {
-        int[] fileTypes = MidiSystem.getMidiFileTypes(sequence);
-        if (MidiSystem.write(sequence, fileTypes[0], file) == -1) {
-            throw new Exception("Write didn't work");
-        }
-    }
-
 
 }

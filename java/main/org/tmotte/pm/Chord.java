@@ -14,6 +14,8 @@ import org.tmotte.common.text.Log;
  * <p>
  * Note: Refer to <a href="./package-summary.html">the org.tmotte.pm package summary</a> for an explanation
  * of note durations &amp; pitches.
+ * @param <T> Represents the class of the parent obtained from Chord.up(); can be a Player, a Chord,
+ *   or nested Chord instances. This makes it easy to create lengthy method chains.
  */
 public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
 

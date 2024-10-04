@@ -27,24 +27,46 @@ package org.tmotte.common.function;
  * Note that if Except catches a RuntimeException, it rethrows that exception directly since no wrapper is needed.
  */
 public class Except {
+    private Except(){}
+
+    /** Allows a Runnable that can throw Exceptions */
     public static interface ExceptionalRunnable {
+        /** Your lambda
+            @throws Exception for any reason
+        */
         public void run() throws Exception;
     }
+    /** Allows a Supplier that can throw Exceptions
+        @param <T> Class of your lambda's return value.
+    */
     public static interface ExceptionalSupplier<T> {
+        /** Your lambda
+            @throws Exception for any reason
+            @return Whatever the lambda returns
+        */
         public T get() throws Exception;
     }
-    public static <T> T get(ExceptionalSupplier<T> s) {
+    /** Use with your own lambda to eliminate "throws" clauses.
+        @param er The lambda
+    */
+    public static void run(ExceptionalRunnable er) {
         try {
-            return s.get();
+            er.run();
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    public static void run(ExceptionalRunnable er) {
+    /** Use with your own lambda that returns a value to
+        eliminate "throws" clauses.
+        @param s The lambda
+        @param <T> Type of the lambda's return value
+        @return Whatever the lambda returns
+    */
+    public static <T> T get(ExceptionalSupplier<T> s) {
         try {
-            er.run();
+            return s.get();
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

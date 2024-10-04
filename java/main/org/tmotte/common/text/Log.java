@@ -14,9 +14,17 @@ public class Log {
     private static boolean enabled=true;
     private static Set<String> types=new HashSet<>();
 
+    private Log(){}
+
+    /** Enable logging for specific types.
+        @param addTypes Names of types of things logged.
+    */
     public static void add(String... addTypes) {
         for (String s: addTypes) types.add(s);
     }
+    /** Disable logging for specific types.
+        @param removeTypes Names of types of things logged.
+    */
     public static void remove(String... removeTypes) {
         for (String s: removeTypes) types.remove(s);
     }

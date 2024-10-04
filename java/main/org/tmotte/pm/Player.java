@@ -12,7 +12,7 @@ import javax.sound.midi.Instrument;
  * but only one Instrument at any given time. A composition can be made of many Players.
  * Chords are added to a Player using methods like {@link Player#p(Number, int...)} and
  * {@link Player#c(Number, int...)}.
- * <h4>Attributes, event-based and otherwise</h4>
+ * <h2>Attributes, event-based and otherwise</h2>
  * While it may be unexpected, many of the attributes of Player cannot be attributes
  * of a Chord because they are applied to the entire channel. Most of them can be changed
  * throughout the course of a composition, however, because these settings are treated as events,
@@ -42,7 +42,7 @@ import javax.sound.midi.Instrument;
  * you can have only one reverb setting per Player; also, if you save your composition to a
  * standard Midi sequence file, any reverb settings are lost.
  * <br>
- * <h4>Timing</h4>
+ * <h2>Timing</h2>
  * Timing values in Midi are called "ticks". PlayerMaker has its own separate internal system of "relative" ticks,
  * leaving the actual Midi ticks inaccessible. Normally you will use setBPM() in combination with
  * classical timing notation to control timing, but it is often useful to synchronize different players

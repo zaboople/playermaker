@@ -12,9 +12,9 @@ public class TestDrums implements XTest {
 	    new TestDrums().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
-	    final int bpm = 20;
+	    final int bpm = 25;
 	    Player bass=new Player(0)
-		    .instrument(midi.findInstrument("Contrabass"))
+		    .instrument(midi.findInstrument("Synth Brass 1"))
 		    .volume(80)
 		    .reverb(64)
 		    .setBeatsPerMinute(bpm)
@@ -56,7 +56,7 @@ public class TestDrums implements XTest {
 		    .p(64, E)
 		    .p(tie(16, -64), F)
 
-		    .r(4)
+		    .r(8)
 		    ;
 	    midi.playAndStop(bass, drummer2);
     }

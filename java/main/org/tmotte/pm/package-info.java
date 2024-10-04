@@ -1,14 +1,15 @@
 /**
- * Contains all of PlayerMaker's end-user classes for musical composition and playback. The following is some general-purpose
- * documentation concerning common features.
+ * This package contains all of PlayerMaker's end-user classes for musical composition and playback. The following
+ * is some general-purpose documentation concerning common features.
+ * <h2>Entry point(s)</h2>
+ * The two main classes you will start with are {@link Player}, which contains compositional data, and {@link MyMidi3},
+ * which sequences the midi data and plays it through a synthesizer.
+ * <h2>Notation for pitch &amp; duration</h2>
+ * Many methods support a note value as input, specified as an int. In these cases, 0 is C, 1 is C# (or D&#x266d;), and
+ * so forth. Thereare convenience constants for these values in the {@link Pitches} class.
  * <br>
- *
- * <h3>Notation for pitch &amp; duration</h3>
- * Many methods support a note value as input, specified as an int. In these cases, 0 is C, 1 is C# (or D&#x266d;), and so forth. There
- * are convenience constants for these values in the {@link Pitches} class.
- * <br>
- * These methods also accept a duration as input, which can be expressed as a java Number. You will typically take advantage of "autoboxing",
- * expressing the Number as a double or int:
+ * These methods also accept a duration as input, which can be expressed as a java Number. You will typically take
+ * advantage of "autoboxing", expressing the Number as a double or int:
  * <ul>
  *   <li>"8" indicates a 8th note.
  *   <li>"8." (yes, that is valid java syntax) indicates a "dotted" 8th note, which is an 8th + 16th, i.e. 1 &amp; 1/2 times the duration. Java treats
@@ -36,7 +37,7 @@
  * Note that you can use negative numbers when using ties! This allows you to subtract a certain amount, e.g. Chord.t(4, -32)
  * would reduce the quarter note duration by a 32nd note.
  *
- * <h3>Bends &amp; Vibrato:</h3>
+ * <h2>Bends &amp; Vibrato:</h2>
  * Note "bends" can be done using {@link Chord#bend(Number, Number, int)} and other variations of Chord.bend().
  * There is also {@link Chord#vibrato(Number, Number, Number, int)}, which can be used instead of {@link Player#pressure(int)}
  * for more control over vibrato.
@@ -55,7 +56,6 @@
  * This would give the first two players two extra channels, and the 3rd player all of the rest (except channel 10,
  * which can only play drums). Refer to {@link Player#Player(int)}.
  */
-
 package org.tmotte.pm;
 
 

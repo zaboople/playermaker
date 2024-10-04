@@ -103,7 +103,7 @@
              >
       <classpath>
          <pathelement path="${build.dir}"/>
-         <fileset dir="${lib.dir}" includes="*.jar"/>
+         <!--fileset dir="${lib.dir}" includes="*.jar"/-->
       </classpath>
       <fileset dir="${src.dir}/main">
         <include name="**/*.java"/>
