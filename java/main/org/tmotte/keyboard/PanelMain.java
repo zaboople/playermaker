@@ -15,7 +15,6 @@ import java.util.function.Consumer;
 import java.io.File;
 import java.io.IOException;
 
-import org.tmotte.common.swang.GridBug;
 import org.tmotte.common.function.Except;
 import org.tmotte.common.midi.MetaInstrument;
 
