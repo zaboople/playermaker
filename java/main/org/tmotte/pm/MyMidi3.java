@@ -30,17 +30,21 @@ public class MyMidi3 implements Closeable {
     // STATIC CONSTANTS & DATA STRUCTURES: //
     /////////////////////////////////////////
 
-    // The latter is inversely related to the other:
+    /** Unfortunately our drum channel is 9 and not 10 because Java is stupid. It works fine,
+        just aggravating */
+    public final static int DRUM_CHANNEL=9;
+
+    /** Largely arbitrary but makes it possible for us to use all our standard divisions from
+        whole note to 128th note: */
     public final static int SEQUENCE_RESOLUTION=Divisions.whole * 5 * 7;
 
-    // This isn't really used, but it's just to signify that the number
-    // of ticks in a second is twice the resolution, no matter what
-    // resolution you give:
+    /** This isn't really used, but it's just to signify that the number
+        of ticks in a second is twice the resolution:*/
     public final static int TICKS_PER_SECOND=SEQUENCE_RESOLUTION*2;
-    public final static int TICKS_PER_MINUTE=TICKS_PER_SECOND*60;
 
-    public final static int DRUM_CHANNEL=9;
+    private final static int TICKS_PER_MINUTE=TICKS_PER_SECOND*60;
     private final static int REVERB = 91;
+
 
     private static class ChannelAttrs {
         int mainChannel;
@@ -111,7 +115,9 @@ public class MyMidi3 implements Closeable {
 
     /** Defaults to false, so that when playing when play
         methods are called and synth starts up, MyMidi3 stops and waits for
-        playing to finish. */
+        playing to finish.
+        @param async True or false
+        @return this */
     public MyMidi3 setAsync(boolean async) {
         this.async=async;
         return this;
@@ -123,20 +129,27 @@ public class MyMidi3 implements Closeable {
         return this;
     }
 
-    /** Gets the list of all instruments that have been loaded. */
+    /** Gets the array of all instruments that have been loaded.
+        @return array of instruments */
     public Instrument[] getInstruments() {
         return this.instruments;
     }
 
-    /** Gets an instrument by looking for an exact match by name. */
+    /** Gets an instrument by looking for an exact match by name.
+        @param name Name to match
+        @return Instrument found, or throws Exception if none found */
     public Instrument getInstrument(String name) {
-        return instrumentsByName.get(name).instrument;
+        MetaInstrument i = instrumentsByName.get(name);
+        if (i==null)
+            throw new RuntimeException("Not found: "+name);
+        return i.instrument;
     }
 
     /** Finds Instruments that match names reasonably well
-       @param names A String that approximately matches what you are looking
+        @param names A String that approximately matches what you are looking
         for. It will be treated as a space-delimited series of keywords
         to match.
+        @return list of instruments found - may be empty if none found.
     */
     public List<Instrument> findInstruments(String names) {
         return findMetaInstruments(names).map(mi->mi.instrument)
@@ -146,6 +159,7 @@ public class MyMidi3 implements Closeable {
        @param name Same as for findInstruments(name).
        @throws IllegalArgumentException if none found, or more than one
        found.
+       @return an Instrument
     */
     public Instrument findInstrument(String name) {
         final List<MetaInstrument> found = findMetaInstruments(name).toList();
@@ -227,7 +241,8 @@ public class MyMidi3 implements Closeable {
         sequencer.stop();
     }
 
-    /** Writes internal sequence to a midi file. */
+    /** Writes internal sequence to a midi file.
+        @param file The file to use */
     public void write(File file) {
         final int[] fileTypes = MidiSystem.getMidiFileTypes(sequence);
         final int result = Except.get(()-> MidiSystem.write(sequence, fileTypes[0], file));

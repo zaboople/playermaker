@@ -21,6 +21,7 @@ public class Rest<T> {
     /**
      * Ties this Rest to another - actually returns itself after extending its duration.
      * @param duration A duration expressed using the same notation as Player.p(), Chord.c(), etc.
+     * @return this
      */
     public Rest<T> t(Number duration) {
         return t(Divisions.convert(duration));
@@ -44,6 +45,9 @@ public class Rest<T> {
      * <br>
      * Also refer to {@link Chord#c(Number, int...)} if you only want to create parallel chords without
      * rests.
+     * @param duration Uses standard notation described in package docs
+     * @param notes Notes to play
+     * @return Chord instance tied to the Rest's parent Chord
      */
     public Chord<Chord<T>> c(Number duration, int... notes) {
         return addChord(Divisions.convert(duration), notes);
@@ -55,13 +59,16 @@ public class Rest<T> {
     /**
      * Indicates that we should "finish", i.e. play the pitches for the remaining duration of the
      * original Chord.
-     * @return A new Chord, parallel to this Rest.
+     * @param pitches The notes to play.
+     * @return A new Chord acting as a sub-chord to Rest's parent Chord.
      */
     public Chord<Chord<T>> fin(int... pitches) {
         return addChord(chord.duration()-restFor, pitches);
     }
     /**
      * A shortcut to fin(int...).up()
+     * @param pitches The notes to play.
+     * @return This Rest's parent Chord.
      */
     public Chord<T> finup(int... pitches) {
         return addChord(chord.duration()-restFor, pitches).up();

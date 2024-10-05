@@ -9,6 +9,7 @@ package org.tmotte.pm;
  * @param <T> Represents the class extending this one, allowing for method chaining used by Player &amp; Chord.
  */
 public abstract class NoteAttributeHolder<T> {
+    protected NoteAttributeHolder() {}
 
     /**
      * Sets an absolute value for volume, directly corresponding to the midi standard volume settings.
@@ -27,9 +28,13 @@ public abstract class NoteAttributeHolder<T> {
     public T addVolume(int change) {
         return volume(getNoteAttributesForRead().volume+change);
     }
+    /** Gets the current volume setting
+    @return volume */
     public int volume() {
         return getNoteAttributesForRead().volume;
     }
+    /** Gets the current volume setting
+    @return volume */
     public int getVolume() {
         return getNoteAttributesForRead().volume;
     }
@@ -56,6 +61,10 @@ public abstract class NoteAttributeHolder<T> {
             getNoteAttributesForRead().transpose+semitones
         );
     }
+    /** Obtains the transposition value set by either octave() or modulate();
+        same underlying thing.
+        @return The value that low C has been moved up to.
+    */
     public int getTranspose() {
         return getNoteAttributesForRead().transpose;
     }

@@ -14,6 +14,12 @@ public class SequencerWatcher {
     private final ArrayBlockingQueue<Integer> eventHook=new ArrayBlockingQueue<>(1);
     private boolean async=false, closeOnEndPlay=false;
 
+    /** Creates a new watcher that auto-closes and/or signals on finish
+        based on other inputs.
+        @param sequencer A sequencer to auto-close, if you enabled that.
+            Otherwise could be left null.
+        @param synth A synthesizer to auto-close as well.
+    */
     public SequencerWatcher(Sequencer sequencer, Synthesizer synth) {
         sequencer.addMetaEventListener(
             event ->{
@@ -38,13 +44,18 @@ public class SequencerWatcher {
         return this;
     }
 
-    /** This waits for the sequencer to stop playing. */
+    /** Waits for the sequencer to stop playing. */
     public void waitForFinish() {
         if (async)
             throw new IllegalStateException("Not set to synchronous");
         Except.run(()->eventHook.take());
     }
 
+    /** Defaults to false. If true, signals that we won't use waitForFinish(), which...
+     *  Yeah I guess nobody cares and this is dumb.
+     *  @param async true or false
+     *  @return this
+     */
     public SequencerWatcher setAsync(boolean async) {
         this.async=async;
         return this;

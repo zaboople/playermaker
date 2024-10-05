@@ -24,7 +24,7 @@ public class TestBeats  {
 	    midi.setBeatsPerMinute(bpm);
 
 	    long ticksPerBeat=Math.round(
-		    ((double)MyMidi3.TICKS_PER_MINUTE) /
+		    ((double)(MyMidi3.TICKS_PER_SECOND * 60)) /
 		    ((double)bpm)
 	    );
 	    System.out.println("Resolution "+MyMidi3.SEQUENCE_RESOLUTION);

@@ -13,10 +13,9 @@ import javax.sound.midi.Synthesizer;
 import org.tmotte.common.function.Except;
 
 /**
- * This wrapper for Sequencer allows me to put in a shutdown hook and wait for
- * the sequencer to stop playing; normally it just goes off in its own thread.
+ * This abandoned wrapper for sequencer/synthesizer is superseded by MyMidi3.
  */
-public class SequencerMgr implements Closeable {
+class SequencerMgr implements Closeable {
     private final static int SEQUENCER_END_PLAY=47;
     private final ArrayBlockingQueue<Integer> endPlayHook=new ArrayBlockingQueue<>(1);
     private boolean async=false;
@@ -27,11 +26,11 @@ public class SequencerMgr implements Closeable {
     private Map<String, MetaInstrument> instrumentsByName;
     private final MidiTracker midiTracker=new MidiTracker();
 
-    public SequencerMgr() {
+    SequencerMgr() {
         this(Optional.empty(), Optional.empty(), Optional.empty());
     }
 
-    public SequencerMgr(Optional<Synthesizer> synthOpt, Optional<Sequencer> sequencerOpt, Optional<File> replaceInstrumentsWith) {
+    SequencerMgr(Optional<Synthesizer> synthOpt, Optional<Sequencer> sequencerOpt, Optional<File> replaceInstrumentsWith) {
         Except.run(()-> {
             synth=synthOpt.orElse(MidiSystem.getSynthesizer());
             synth.open();
@@ -51,7 +50,7 @@ public class SequencerMgr implements Closeable {
     }
 
 
-    public SequencerMgr play(Sequence seq) {
+    SequencerMgr play(Sequence seq) {
         Except.run(() -> {
             //System.out.println("SequencerMgr.play() starting..."+sequencer+" "+andThenStop);
             if (!sequencer.isOpen())
@@ -72,15 +71,15 @@ public class SequencerMgr implements Closeable {
         instrumentsByName=MetaInstrument.map(true, instruments);
     }
 
-    public Instrument[] getInstruments() {
+    Instrument[] getInstruments() {
         return this.instruments;
     }
 
-    public Instrument getInstrument(String name) {
+    Instrument getInstrument(String name) {
         return instrumentsByName.get(name).instrument;
     }
 
-    public Sequencer getSequencer() {
+    Sequencer getSequencer() {
         return sequencer;
     }
 
@@ -89,7 +88,7 @@ public class SequencerMgr implements Closeable {
         @param async To async or not
         @return this
      */
-    public SequencerMgr setAsync(boolean async) {
+    SequencerMgr setAsync(boolean async) {
         this.async=async;
         return this;
     }

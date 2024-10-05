@@ -39,7 +39,8 @@ public class SequencerUtils  {
 
 	/** This is of questionable virtue. I haven't actually tried loading instruments yet.
 		@param synth Instruments will be unloaded if replacementFile has any
-		@param replacementFile Instruments to be used instead
+		@param replacementFile Instruments to be used instead - optional
+		@return The instruments found either in file or built-in with MidiSystem
 	*/
     public static Instrument[] getOrReplaceInstruments(Synthesizer synth, Optional<File> replacementFile) {
 		return replacementFile

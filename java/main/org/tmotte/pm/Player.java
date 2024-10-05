@@ -98,7 +98,7 @@ public class Player extends NoteAttributeHolder<Player> {
      * Assign this player an instrument. Instruments can be obtained from MyMidi3. The instrument will only
      * be used for Chords played after the instrument method is called. You can switch instruments as often
      * as you like; only the Player's designated channel will be affected.
-     * @param The instrument to start using
+     * @param instrument The instrument to start using
      * @return this
      */
     public Player instrument(Instrument instrument) {
@@ -106,7 +106,7 @@ public class Player extends NoteAttributeHolder<Player> {
     }
     /**
      * Selects an instrument based on MyMidi3's naming convention.
-     * @param Exact name of the instrument to start using
+     * @param name Exact name of the instrument to start using
      * @return this
      */
     public Player instrument(String name) {
@@ -166,16 +166,22 @@ public class Player extends NoteAttributeHolder<Player> {
     public Player pressure(int pressure) {
         return setPressure(pressure);
     }
-    /** An alias to pressure(int) */
+    /** An alias to pressure(int)
+        @param pressure The pressure setting
+        @return this */
     public Player setPressure(int pressure) {
         return event(new Event().setPressure(pressure));
     }
 
-    /** Note: Reverb can only be set once, because it is not event-based like most other attributes. */
+    /** Note: Reverb can only be set once, because it is not event-based like most other attributes.
+        @param reverb The reverb setting
+        @return this */
     public Player reverb(int reverb) {
         return setReverb(reverb);
     }
-    /** An alias to reverb(int) */
+    /** An alias to reverb(int)
+        @param reverb The reverb setting
+        @return this */
     public Player setReverb(int reverb) {
         if (reverbSetOnce)
             throw new RuntimeException("There is no point in setting the reverb more than once.");
@@ -196,17 +202,22 @@ public class Player extends NoteAttributeHolder<Player> {
     /**
      * Sets the start time in ticks. Changing the start time <i>after</i> adding notes/chords/rests is forbidden
      * and will throw an IllegalStateException
+     * @param time Start time
+     * @return this
      */
     public Player setStart(long time) {
         return setStartTime(time);
     }
-    /** Gets the start time in relative ticks. */
+    /** Gets the start time in relative ticks.
+        @return start time */
     public long getStart() {
         return startTime;
     }
 
 
-    /** An alias for setStart(long) */
+    /** An alias for setStart(long)
+        @param time Start time
+        @return this */
     public Player setStartTime(long time) {
         for (Event e: events)
             if (e.hasChord())
@@ -214,25 +225,30 @@ public class Player extends NoteAttributeHolder<Player> {
         this.startTime=time;
         return this;
     }
-    /** An alias for getStart() */
+    /** An alias for getStart()
+        @return start time */
     public long getStartTime() {
         return startTime;
     }
 
-    /** Gets the absolute end time of the player's track in relative ticks. */
+    /** Gets the absolute end time of the player's track in relative ticks.
+        @return end */
     public long getEnd() {
         return end();
     }
-    /** An alias for getEnd(). */
+    /** An alias for getEnd().
+        @return end */
     public long getEndTime() {
         return end();
     }
-    /** An alias for getEnd(). */
+    /** An alias for getEnd().
+        @return end */
     public long end() {
         return startTime + getTimeLength();
     }
 
-    /** Gets the duration of the composition in relative ticks. */
+    /** Gets the duration of the composition in relative ticks.
+        @return duration */
     public long duration() {
         return getTimeLength();
     }

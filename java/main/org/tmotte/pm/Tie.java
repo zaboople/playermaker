@@ -18,7 +18,10 @@ package org.tmotte.pm;
 public class Tie extends Number {
     private static final long serialVersionUID = 1L;
 
-    /** A shortcut to <code>new Tie(Number...)</code> */
+    /** A shortcut to <code>new Tie(Number...)</code>
+    * @param durations Standard-notation (refer to package docs)
+    * @return A new Tie instance
+    */
     public static Tie tie(Number... durations) {
         return new Tie(durations);
     }
@@ -29,6 +32,7 @@ public class Tie extends Number {
     /**
     * Creates a tied-note duration that can be passed to any method that expects a Number as a
     * duration. The durations should follow all the usual rules about dotted, triplet etc notes.
+    * @param durations Standard-notation (refer to package docs)
     */
     public Tie(Number... durations) {
         this.durations=durations;
