@@ -2,124 +2,127 @@
 
 <project name="playermaker" basedir="." default="help">
 
-  <!--**********-->
-  <!--PROPERTIES-->
-  <!--**********-->
+    <!--**********-->
+    <!--PROPERTIES-->
+    <!--**********-->
 
-  <property name="src.dir" value="java"/>
+    <property name="src.dir" value="java"/>
 
-  <!--Property files:-->
-  <property file="build.properties"/>
+    <!--Property files:-->
+    <property file="build.properties"/>
 
-  <!--Properties: arbitrary environment prefix:-->
-  <property environment="env"/>
+    <!--Properties: arbitrary environment prefix:-->
+    <property environment="env"/>
 
-  <!--Properties: directories:-->
-  <property name="src.dir" value="java"/>
-  <property name="dist.dir" value="dist"/>
-  <property name="dist.prefix" value="${ant.project.name}"/>
-  <property name="build.dir" value="build"/>
-  <property name="javadoc.dir" value="javadoc"/>
-  <property name="lib.dir" value="lib"/>
-  <property name="test.dir" value="test"/>
+    <!--Properties: directories:-->
+    <property name="src.dir" value="java"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="dist.prefix" value="${ant.project.name}"/>
+    <property name="build.dir" value="build"/>
+    <property name="javadoc.dir" value="javadoc"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="test.dir" value="test"/>
 
 
-  <!--**************-->
-  <!--TARGETS: HELP -->
-  <!--**************-->
+    <!--**************-->
+    <!--TARGETS: HELP -->
+    <!--**************-->
 
-  <target name="help">
-    <echo>
+    <target name="help">
+        <echo>
         Targets:
             clean
             compile
             javadoc
             jar
-    </echo>
-  </target>
+        </echo>
+    </target>
 
 
-  <!--**************-->
-  <!--TARGETS: CLEAN-->
-  <!--**************-->
+    <!--**************-->
+    <!--TARGETS: CLEAN-->
+    <!--**************-->
 
-  <target name="clean" description="Clean output directories">
-    <delete dir="build"/>
-    <delete dir="javadoc"/>
-    <!--delete dir="${web.dir}/WEB-INF/classes/**"/-->
-  </target>
+    <target name="clean" description="Clean output directories">
+        <delete dir="build"/>
+        <delete dir="javadoc"/>
+        <!--delete dir="${web.dir}/WEB-INF/classes/**"/-->
+    </target>
 
-  <!--***********************-->
-  <!--TARGETS: COMPILE & JAR -->
-  <!--***********************-->
-  <target name="compile" description="Compile all" depends="compile.main,compile.test"/>
+    <!--***********************-->
+    <!--TARGETS: COMPILE & JAR -->
+    <!--***********************-->
+    <target name="compile" description="Compile all" depends="compile.main,compile.test"/>
 
-  <target name="compile.main" description="Compile main">
-    <mkdir dir="${build.dir}"/>
-    <javac
-      destdir="${build.dir}"
-      debug="true"
-      deprecation="true"
-      failonerror="true"
-      >
-      <compilerarg value="-Xlint"/>
-      <src path="${src.dir}/main"/>
-      <!--classpath><fileset dir="${lib.dir}" includes="*.jar"/></classpath-->
-    </javac>
-  </target>
-  <target name="compile.test" description="Compile tests">
-    <mkdir dir="${build.dir}"/>
-    <javac
-      destdir="${build.dir}"
-      debug="true"
-      deprecation="true"
-      failonerror="true"
-      >
-      <compilerarg value="-Xlint:unchecked"/>
-      <src path="${src.dir}/test"/>
-      <!--classpath><fileset dir="${lib.dir}" includes="*.jar"/></classpath-->
-    </javac>
-  </target>
+    <target name="compile.main" description="Compile main">
+        <mkdir dir="${build.dir}"/>
+        <javac
+            destdir="${build.dir}"
+            debug="true"
+            deprecation="true"
+            failonerror="true"
+        >
+        <compilerarg value="-Xlint"/>
+        <src path="${src.dir}/main"/>
+        <!--classpath><fileset dir="${lib.dir}" includes="*.jar"/></classpath-->
+        </javac>
+    </target>
+    <target name="compile.test" description="Compile tests">
+        <mkdir dir="${build.dir}"/>
+        <javac
+            destdir="${build.dir}"
+            debug="true"
+            deprecation="true"
+            failonerror="true"
+            >
+            <compilerarg value="-Xlint:unchecked"/>
+            <src path="${src.dir}/test"/>
+            <!--classpath><fileset dir="${lib.dir}" includes="*.jar"/></classpath-->
+        </javac>
+    </target>
 
-  <target name="jar" depends="clean,compile.main">
-    <mkdir dir="${dist.dir}"/>
-    <mkdir dir="${dist.dir}/bin"/>
-    <jar destfile="${dist.dir}/bin/${ant.project.name}-${VERSION}.jar">
-      <fileset dir="${build.dir}"/>
-    </jar>
-  </target>
+    <target name="jar" depends="clean,compile.main">
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${dist.dir}/bin"/>
+        <jar destfile="${dist.dir}/bin/${ant.project.name}-${VERSION}.jar">
+            <fileset dir="${build.dir}"/>
+        </jar>
+    </target>
 
 
-  <!--*************************************-->
-  <!--TARGETS: DISTRIBUTION/DOCUMENTATION: -->
-  <!--*************************************-->
-  <target name="javadoc" description="JavaDoc" depends="compile">
-    <mkdir dir="${javadoc.dir}"/>
-    <javadoc sourcepath="${src.dir}/main"
-             destdir="${javadoc.dir}"
-             packagenames="org.**,com.**"
-             Public="true"
-             additionalparam="-html5"
-             >
-      <classpath>
-         <pathelement path="${build.dir}"/>
-         <!--fileset dir="${lib.dir}" includes="*.jar"/-->
-      </classpath>
-      <fileset dir="${src.dir}/main">
-        <include name="**/*.java"/>
-      </fileset>
-    </javadoc>
-  </target>
+    <!--*************************************-->
+    <!--TARGETS: DISTRIBUTION/DOCUMENTATION: -->
+    <!--*************************************-->
+    <target name="javadoc" description="JavaDoc" depends="compile">
+        <mkdir dir="${javadoc.dir}"/>
+        <javadoc sourcepath="${src.dir}/main"
+                 destdir="${javadoc.dir}"
+                 packagenames="org.**,com.**"
+                 Public="true"
+                 additionalparam="-html5"
+                 >
+            <arg value="-public"/>
+            <arg value="-Xmaxwarns"/>
+            <arg value="200"/>
+            <classpath>
+                <pathelement path="${build.dir}"/>
+                <!--fileset dir="${lib.dir}" includes="*.jar"/-->
+            </classpath>
+            <fileset dir="${src.dir}/main">
+                <include name="**/*.java"/>
+            </fileset>
+        </javadoc>
+    </target>
 
-  <target name="dist.src" depends="clean">
-    <mkdir dir="${dist.dir}"/>
-    <zip destfile="${dist.dir}/${dist.prefix}.src.zip">
-      <zipfileset dir="." prefix="${dist.prefix}.src"/>
-    </zip>
-    <echo>
-      Source distribution zipped as ${dist.prefix}.src.zip.
-    </echo>
-  </target>
+    <target name="dist.src" depends="clean">
+        <mkdir dir="${dist.dir}"/>
+        <zip destfile="${dist.dir}/${dist.prefix}.src.zip">
+            <zipfileset dir="." prefix="${dist.prefix}.src"/>
+        </zip>
+        <echo>
+        Source distribution zipped as ${dist.prefix}.src.zip.
+        </echo>
+    </target>
 
 
 </project>
