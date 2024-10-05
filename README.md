@@ -1,3 +1,5 @@
+# Background
+
 This is a wrapper for the Java Midi Sequencer library. Midi operates at "lower" level than classical notes & staves music notation, so my goal was to create a programming library that implements such a notation, but as API's, because I am insane. Here I might mention The Four Kinds Of Easy Which Don't Get Along With Each Other:
 
     1 Flexible
@@ -15,5 +17,7 @@ And not even worse, but about the same level: While Midi is a widely & actively 
 
 And lastly, along those lines of worsiness, Midi strictly separates sound sample generation/modification from real-time performance, limiting nuance to somewhat more than a piano, approaching a saxophone, but arguably failing a guitar. Still, with the right instrument library (not included) you can do some amazing things.
 
-Works for me.
+# Usage
+
+Currently compiles just fine for Java OpenJDK 21 LTS, using Ant. JavaDoc documentation explains everything. For runnable examples, refer to the java/test/test/hear directory, and the test.sh script.
 

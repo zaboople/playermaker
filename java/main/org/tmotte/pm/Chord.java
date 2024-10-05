@@ -252,6 +252,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * <br>
      * Note: The denominator must be divisible by 2!
      * @return this
+     * @see Player#setBendSensitivity(int)
      */
     public Chord<T> bend(Number delay, Number duration, int denom) {
        return bend(Divisions.convert(delay), Divisions.convert(duration), denom);
@@ -290,9 +291,10 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * @param denom The "denominator" of pitch variation of the vibrato, which works the same as
      *    for bends: lower gives more variation, as determined by
         <pre>
-            variation = bend_sensitivy / denom
+            variation = bend sensitivity / denom
         </pre>.
      * @return this
+     * @see Player#setBendSensitivity(int)
      */
     public Chord<T> vibrato(Number delay, Number duration, Number freq, int denom) {
         //log("vibrato(Number, Number, Number, int)");

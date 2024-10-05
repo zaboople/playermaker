@@ -136,9 +136,10 @@ public class Player extends NoteAttributeHolder<Player> {
     }
 
     /**
-     * In Midi a bend can go a "whole step" by default, which is to say, two notes up or down.
+     * In Midi a bend can go a "whole step" by default, which is to say, two semitones up or down.
      * However, you can change the "Bend sensitivity" to increase the range from a whole step to many more
      * steps. Refer to {@link Chord#bend} for actual bend methods.
+     * @param sensitivity Positive number of semitones
      */
     public Player setBendSensitivity(int sensitivity) {
         return event(new Event().setBendSensitivity(sensitivity));
@@ -149,7 +150,7 @@ public class Player extends NoteAttributeHolder<Player> {
     }
 
     /** Sets the Midi "pressure", which usually means vibrato; larger values are more "intense", which is to
-        say more "variable". */
+        say more "variable". Alternatively, consider using {@link Chord#vibrato(Number, Number, Number, int)} */
     public Player pressure(int pressure) {
         return setPressure(pressure);
     }
