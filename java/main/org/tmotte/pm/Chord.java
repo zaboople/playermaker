@@ -283,7 +283,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     //////////////
 
     /**
-     * This gives a more fine-tuned variation than Player.setPressure().
+     * This gives a more fine-tuned vibrato/tremolo than Player.setPressure().
      *
      * @param delay Duration to wait before starting vibrato (can be 0)
      * @param duration The duration of the vibrato
