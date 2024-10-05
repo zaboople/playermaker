@@ -23,6 +23,7 @@ public class Tie extends Number {
         return new Tie(durations);
     }
 
+    /** Constant, durations passed to constructor. */
     final Number[] durations;
 
     /**

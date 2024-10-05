@@ -16,7 +16,7 @@ import javax.sound.midi.Instrument;
  * While it may be unexpected, many of the attributes of Player cannot be attributes
  * of a Chord because they are applied to the entire channel. Most of them can be changed
  * throughout the course of a composition, however, because these settings are treated as events,
- * the same as Chords. Thus a call to, say, setInstrument() will only affect the instrument for
+ * the same as Chords. Thus a call to, say, instrument() will only affect the instrument for
  * Chords added after that call is made.
  * <br>
  * These attributes include:
@@ -84,6 +84,7 @@ public class Player extends NoteAttributeHolder<Player> {
 
     /** A shortcut to use a player that uses the special drum channel. Warning: Java
         tends to insist that channel 9 is the drum channel, not 10.
+        @return a new Player instance
     */
     public static Player drummer() {
         return new Player(MyMidi3.DRUM_CHANNEL);
@@ -95,17 +96,25 @@ public class Player extends NoteAttributeHolder<Player> {
 
     /**
      * Assign this player an instrument. Instruments can be obtained from MyMidi3. The instrument will only
-     * be used for Chords played after the instrument method is called.
+     * be used for Chords played after the instrument method is called. You can switch instruments as often
+     * as you like; only the Player's designated channel will be affected.
+     * @param The instrument to start using
+     * @return this
      */
     public Player instrument(Instrument instrument) {
         return event(new Event(instrument));
     }
     /**
      * Selects an instrument based on MyMidi3's naming convention.
+     * @param Exact name of the instrument to start using
+     * @return this
      */
     public Player instrument(String name) {
         return event(new Event().setInstrument(name));
     }
+    /** Get the 0-based channel index
+        @return The channel number
+    */
     public int channel() {
         return channel;
     }
@@ -150,7 +159,10 @@ public class Player extends NoteAttributeHolder<Player> {
     }
 
     /** Sets the Midi "pressure", which usually means vibrato; larger values are more "intense", which is to
-        say more "variable". Alternatively, consider using {@link Chord#vibrato(Number, Number, Number, int)} */
+        say more "variable". Alternatively, consider using {@link Chord#vibrato(Number, Number, Number, int)}
+        @param pressure Valid value for midi pressure
+        @return this
+    */
     public Player pressure(int pressure) {
         return setPressure(pressure);
     }

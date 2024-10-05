@@ -11,7 +11,10 @@ import javax.sound.midi.Transmitter;
 import javax.sound.midi.Receiver;
 import org.tmotte.common.function.Except;
 
+/** Utilities for doing some unusually funky things with sequencers and synths */
 public class SequencerUtils  {
+	private SequencerUtils(){}
+
 	/**
 	 * The sequencer is not necessarily using the same synthesizer as you'd expect. But
 	 * more importantly, there is a BIG difference between these two:

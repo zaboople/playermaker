@@ -228,10 +228,11 @@ public class MyMidi3 implements Closeable {
     }
 
     /** Writes internal sequence to a midi file. */
-    public void write(File file) throws Exception {
-        int[] fileTypes = MidiSystem.getMidiFileTypes(sequence);
-        if (MidiSystem.write(sequence, fileTypes[0], file) == -1) {
-            throw new Exception("Write didn't work");
+    public void write(File file) {
+        final int[] fileTypes = MidiSystem.getMidiFileTypes(sequence);
+        final int result = Except.get(()-> MidiSystem.write(sequence, fileTypes[0], file));
+        if (result == -1) {
+            throw new RuntimeException("Write didn't work");
         }
     }
 

@@ -16,40 +16,77 @@ import javax.sound.midi.*;
 
 
 /**
- * A general-purpose class for sending Midi Messages to a given Track. Essentially this provides a lot of sequencing
- * methods that the Java Midi API should already have, but "forgot" to include. A lot of these were quite difficult to
- * figure out.
+ * A general-purpose wrapper for sending Midi Messages to a given Track. Essentially this provides a
+ * lot of sequencing methods that the Java Midi API should already have, but "forgot" to include.
+ * Tracks can communicate with multiple channels, so technically you could use one track for everything
+ * assuming you don't have two instruments playing the same note one the same track &amp; channel, which would
+ * cause conflict (refer to noteOn &amp; noteOff).
+ * A lot of these were quite difficult to figure out, and some - like portamento - were never tested.
  */
 public class MidiTracker  {
 
     private Track currTrack;
 
+    /** Creates a track-less MidiTracker, so that we'll blow up if you forget to set one*/
     public MidiTracker() {}
 
+    /** Creates a new MidiTracker using t as its target.
+        @param t The target track for messages.
+    */
     public MidiTracker(Track t) {
         this.currTrack=t;
     }
 
+    /** Creates a new Track using <code>sequence</code> and uses that as our target.
+        @param sequence The sequencer to create a track with, via sequence.createTrack().
+        No - you can't create Tracks directly via <code>new Track()</code>.
+        @return this
+    */
     public MidiTracker createTrack(Sequence sequence) {
         return setTrack(sequence.createTrack());
     }
 
+    /** No real need to use this - prefer createTrack() instead.
+        @param t The track to target messages to.
+        @return this
+    */
     public MidiTracker setTrack(Track t) {
         currTrack=t;
         return this;
     }
 
+    /**
+     * Send a note-on message to the channel. Plays until a corresponding
+     * note-off message is sent.
+     * @param channel The midi channel
+     * @param pitch Semitone note value, 0-based
+     * @param volume Volume in 0-127 range
+     * @param tick Point in time
+     */
     public void noteOn(int channel, int pitch, int volume, long tick) {
         // NOTE_ON=144
         Log.log("MidiTracker", "noteOn() tick {} pitch {} volume {}", tick, pitch, volume);
         event(channel, ShortMessage.NOTE_ON, pitch, volume, tick);
     }
 
+    /**
+     * Send a note-off message to the channel. Notice that multiple notes may be
+     * playing at the same time, but the one selected is the one with designated
+     * pitch (ignoring bend messages).
+     * @param channel The midi channel
+     * @param pitch Semitone note value, 0-based
+     * @param tick Point in time
+     */
     public void noteOff(int channel, int pitch, long tick) {
         event(channel, ShortMessage.NOTE_OFF, pitch, 0, tick);
     }
 
-
+    /**
+     * Send an instrument change to the channel.
+     * @param channel The midi channel
+     * @param instr Midi instrument to use
+     * @param tick Point in time to switch instruments.
+     */
     public void sendInstrument(int channel, Instrument instr, long tick) {
         Patch patch=instr.getPatch();
         int bank   =patch.getBank();
@@ -75,12 +112,26 @@ public class MidiTracker  {
         //Data Entry LSB:
         sendControlChange(channel, 38, 0, tick);
     }
+    /**
+        Send a bend
+        A bend is 14 bits - no, not 16. That won't fit in a byte, but
+        even better, you are required to split it into a 7-bits-each pair.
+        We do that for you.
+        @param channel Channel
+        @param amount A denominator to go with your bend sensitivity numerator,
+            divide to get the number (possibly fractional) of semitones to bend
+            up or down by.
+        @param tick Time to send message
+    */
     public void sendBend(int channel, int amount, long tick) {
         Log.log("MidiTracker", "Bend {} at {} ", amount, tick);
-        // A bend is 14 bits - no, not 16. That won't fit in a byte, but
-        // even better, you are required to split it into a 7-bits-each pair.
         event(channel, ShortMessage.PITCH_BEND, getLSB(amount), getMSB(amount), tick);
     }
+    /**
+        Sends a message to stop the bend started by sendBend
+        @param channel Channel
+        @param tick Time to send message
+    */
     public void sendBendEnd(int channel, long tick) {
         sendBend(channel, 8192, tick);
     }
@@ -137,6 +188,12 @@ public class MidiTracker  {
         sendControlChange(channel, 84, noteFrom,  tick);
     }
 
+    /**
+     * Try to turn off portamento
+     *
+     * @param channel Channel
+     * @param tick Time to send message
+     */
     public void sendPortamentoOff(int channel, long tick) {
         Log.log("MidiTracker", "sendPortamentoOff() tick {} ", tick);
         sendControlChange(channel, 65, 0,  tick);
@@ -169,11 +226,9 @@ public class MidiTracker  {
     }
 
     private void event(int channel, int type, int data1, int data2, long tick) {
-        Except.run(()->
-            sendMessage(
-                new ShortMessage(type, channel, data1, data2),
-                tick
-            )
+        sendMessage(
+            Except.get(()->new ShortMessage(type, channel, data1, data2)),
+            tick
         );
     }
 

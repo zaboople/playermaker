@@ -100,7 +100,7 @@ class SynthWrapper implements MetaEventListener {
 
     public void startRecord(MetaInstrument instr) {
         recording = true;
-        midiTracker.setTrack(track = sequence.createTrack());
+        midiTracker.createTrack(sequence);
         startTime = System.currentTimeMillis();
         createInstrumentEvent(instr);
     }
