@@ -61,10 +61,11 @@ public class XTester {
         for (int i=0; i<testCalls.length; i++) {
             if (i>0) midi.reset();
             XTest call=testCalls[i];
-            System.out.println("\nTesting: "+call.getClass().getName());
+            System.out.println("Testing: "+call.getClass().getName());
             call.test(midi, false);
-            System.out.println("Test done.\n");
+            System.out.println("Test done.");
         }
+        midi.close();
     }
 
 }

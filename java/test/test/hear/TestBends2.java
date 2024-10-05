@@ -43,7 +43,6 @@ public class TestBends2 implements XTest {
 			.c(2, E, G_, B).vibrato(64, 18).up()
 		    .r(4);
 	    midi.play(stop, player);
-	    System.out.println("Done");
     }
 
 }

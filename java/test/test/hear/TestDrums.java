@@ -10,10 +10,7 @@ import static org.tmotte.pm.Pitches.*;
 /** This should play 2 rolls per second. */
 public class TestDrums implements XTest {
     public static void main(String args[]) throws Exception {
-	    Log.with(
-		    ()-> new TestDrums().test(new MyMidi3(), true),
-		    "MyMidi33"
-	    );
+		new TestDrums().test(new MyMidi3(), true);
     }
     public @Override void test(MyMidi3 midi, boolean stop)  {
 	    // This has two drummers, which means they gotta share a
@@ -81,7 +78,7 @@ public class TestDrums implements XTest {
 		    .p(8, bassdrum)
 		    .r(8)
 		    ;
-	    midi.playAndStop(bass, drummer2, drummer1);
+	    midi.play(stop, bass, drummer2, drummer1);
     }
 
 }

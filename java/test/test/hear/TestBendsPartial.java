@@ -70,9 +70,7 @@ public class TestBendsPartial implements XTest {
 			.p(2, F-12, A-12, C, G)
 
 		    .r(4);
-	    midi
-		    .play(stop, player);
-	    System.out.println("Done");
+	    midi.play(stop, player);
     }
 
 }
