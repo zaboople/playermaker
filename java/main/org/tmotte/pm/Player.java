@@ -185,8 +185,7 @@ public class Player extends NoteAttributeHolder<Player> {
      * and will throw an IllegalStateException
      */
     public Player setStart(long time) {
-        this.startTime=time;
-        return this;
+        return setStartTime(time);
     }
     /** Gets the start time in relative ticks. */
     public long getStart() {
@@ -252,11 +251,9 @@ public class Player extends NoteAttributeHolder<Player> {
     public Player r(Number... durations) {return rest(Divisions.convert(durations));}
 
     private Player rest(long division) {
-        int v=volume();
-        volume(0);
-        addChord(division, 0);
-        volume(v);
-        return this;
+        return event(new Event(
+            new Chord<>(this, attributes, division, 0).setTrueRest()
+        ));
     }
 
     /////////////

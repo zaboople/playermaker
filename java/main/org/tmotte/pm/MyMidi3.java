@@ -344,7 +344,8 @@ public class MyMidi3 implements Closeable {
     }
 
     private long processChordEvent(
-            Chord<?> chord, Player player, ChannelAttrs channelAttrs, long currTick, ParentState parentState
+            Chord<?> chord, Player player, ChannelAttrs channelAttrs,
+            long currTick, ParentState parentState
         ) {
 
         ////////////////
@@ -356,6 +357,12 @@ public class MyMidi3 implements Closeable {
         final boolean hasBends=!chord.bends().isEmpty(),
                     hasChords=!chord.chords().isEmpty(),
                     hasSwells=!chord.swells().isEmpty();
+
+        // For a real rest, we do an early return, because we're not
+        // playing any sound, just skipping ahead:
+        if (chord.isTrueRest())
+            return chordEndTick+1;
+
         /*
             We only use a spare channel IF this chord has bends, AND:
                 A. For a top-level chord, we only need a spare if there are sub-chords

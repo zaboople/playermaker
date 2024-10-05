@@ -30,6 +30,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     private List<Chord<Chord<T>>> subChords=null;
     private long duration;
     private boolean bendWithParent=false;
+    private boolean isTrueRest=false;
     private String tag;
 
 
@@ -139,6 +140,14 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
         return new Rest<>(this, duration);
     }
 
+    // Only used by Player, for a "real" rest
+    Chord<T> setTrueRest() {
+        isTrueRest=true;
+        return this;
+    }
+    boolean isTrueRest() {
+        return isTrueRest;
+    }
 
     /**
      * Allows us to add a chord that plays at the same time as this one,
