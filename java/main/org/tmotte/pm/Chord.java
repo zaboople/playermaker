@@ -283,7 +283,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     //////////////
 
     /**
-     * Aside from using Player.setPressure(), this gives a more fine-tuned variation.
+     * This gives a more fine-tuned variation than Player.setPressure().
      *
      * @param delay Duration to wait before starting vibrato (can be 0)
      * @param duration The duration of the vibrato
@@ -292,7 +292,7 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      *    for bends: lower gives more variation, as determined by
         <pre>
             variation = bend sensitivity / denom
-        </pre>.
+        </pre>
      * @return this
      * @see Player#setBendSensitivity(int)
      */
