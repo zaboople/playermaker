@@ -1,5 +1,6 @@
 package org.tmotte.common.midi;
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.Synthesizer;
 import java.util.concurrent.ArrayBlockingQueue;
 import org.tmotte.common.function.Except;
 
@@ -9,16 +10,18 @@ import org.tmotte.common.function.Except;
  */
 public class SequencerWatcher {
     private final static int SEQUENCER_END_PLAY=47;
-    private final ArrayBlockingQueue<Integer> eventHook=new ArrayBlockingQueue<>(1);
 
+    private final ArrayBlockingQueue<Integer> eventHook=new ArrayBlockingQueue<>(1);
     private boolean async=false, closeOnEndPlay=false;
 
-    public SequencerWatcher(Sequencer sequencer) {
+    public SequencerWatcher(Sequencer sequencer, Synthesizer synth) {
         sequencer.addMetaEventListener(
             event ->{
                 if (event.getType() == SEQUENCER_END_PLAY){
-                    if (closeOnEndPlay)
+                    if (closeOnEndPlay) {
                         sequencer.close();
+                        synth.close();
+                    }
                     if (!async && eventHook.size()==0)
                         eventHook.add(1);
                 }
@@ -34,7 +37,6 @@ public class SequencerWatcher {
         this.closeOnEndPlay=close;
         return this;
     }
-
 
     /** This waits for the sequencer to stop playing. */
     public void waitForFinish() {

@@ -106,10 +106,12 @@ public class MyMidi3 implements Closeable {
             setBeatsPerMinute(60);
             midiChannels = synth.getChannels();
         });
-        sequencerWatcher=new SequencerWatcher(sequencer);
+        sequencerWatcher=new SequencerWatcher(sequencer, synth);
     }
 
-    /** Defaults to true */
+    /** Defaults to false, so that when playing when play
+        methods are called and synth starts up, MyMidi3 stops and waits for
+        playing to finish. */
     public MyMidi3 setAsync(boolean async) {
         this.async=async;
         return this;
@@ -214,7 +216,7 @@ public class MyMidi3 implements Closeable {
             if (!async)
                 sequencerWatcher.waitForFinish();
         } catch (Exception e) {
-            sequencer.close();
+            close();
             throw new RuntimeException(e);
         }
         return this;
@@ -234,9 +236,10 @@ public class MyMidi3 implements Closeable {
     }
 
 
-    /** Closes internal sequencer. */
+    /** Closes internal sequencer and synth. */
     public @Override void close() {
         sequencer.close();
+        synth.close();
     }
 
     /** Resets the internal sequence and does other cleanup in preparation
