@@ -11,11 +11,12 @@
  * These methods also accept a duration as input, which can be expressed as a java Number. You will typically take
  * advantage of "autoboxing", expressing the Number as a double or int:
  * <ul>
- *   <li>"8" indicates a 8th note.
- *   <li>"8." (yes, that is valid java syntax) indicates a "dotted" 8th note, which is an 8th + 16th, i.e. 1 &amp; 1/2 times the duration. Java treats
- *       an "8." the same as "8.0", so either is acceptable, but the former is recommended for clarity.
- *   <li>"8.3" indicates a "triplet" 8th note. Whereas two regular 8th notes are the same duration as a quarter note, three eighth notes in a
- *       triplet are also the same duration as a quarter note.
+ *   <li>"8" the integer 8 indicates a 8th note.
+ *   <li>"8." (yes, that is valid java syntax) indicates a "dotted" 8th note, which is an 8th + 16th, i.e. 1 &amp; 1/2 times
+ *       the duration. Java's compiler treats an "8." the same as "8.0" (a float... or double? meh) so either is acceptable, but
+ *       the former is recommended for clarity.
+ *   <li>"8.3" indicates a "triplet" 8th note. Whereas two regular 8th notes are the same duration as a quarter note, three eighth
+ *       notes in a triplet are also the same duration as a quarter note.
  * </ul>
  * Be careful about using the <code>long</code> type for durations: Internally, your <code>double</code> &amp; <code>int</code>
  * "symbolic" values are converted into <code>long</code>s that represent the exact number of ticks in PlayerMaker's timing system.
