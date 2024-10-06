@@ -14,12 +14,6 @@ final class Bend {
     static void add(List<Bend> bends, long delay, long duration, int denominator) {
         bends.add(new Bend(delay, duration, denominator));
     }
-    static void add(List<Bend> bends, int delay, int duration, int denominator) {
-        bends.add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
-    }
-    static void add(List<Bend> bends, double delay, double duration, int denominator) {
-        bends.add(new Bend(Divisions.convert(delay), Divisions.convert(duration), denominator));
-    }
 
     static void vibrato(List<Bend> bends, long delay, long duration, long frequency, int denominator) {
         if (denominator==0)

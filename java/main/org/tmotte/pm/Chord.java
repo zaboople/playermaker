@@ -236,7 +236,10 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
      * Bends a note, as can be done on instruments like the guitar.
      * @param delay A period to wait before the bend; this can be expressed as
      *        2/4/8/16/32/64 etc to indicate a period corresponding to half/quarter/eighth/etc
-     *        notes, or 8.3 for triplet and 8. for dotted notes.
+     *        notes, or 8.3 for triplet and 8. for dotted notes. Note that multiple bends and
+     *        vibratos are scheduled <i>consecutively</i>, never simultaneously, so there is
+     *        no need to add in your own delay to account for this; the next bend picks up
+     *        where the previous left off.
      * @param duration The duration over which the bend takes place, expressed in the same
      *        notation as delay; if this is shorter than the length of the given Note/Chord, the
      *        pitch remains constant for the rest of the Note/Chord's duration.
@@ -285,7 +288,9 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     /**
      * This gives a more fine-tuned vibrato/tremolo than Player.setPressure().
      *
-     * @param delay Duration to wait before starting vibrato (can be 0)
+     * @param delay Duration to wait before starting vibrato (can be 0). As with bend(), there
+     *    is no need to add extra delay to avoid overlapping bends/vibratos, since they are
+     *    always consecutive (you can't yet bend and vibrato at the same time, sorry).
      * @param duration The duration of the vibrato
      * @param freq The frequency/speed of the vibrato, expressed as a duration (larger numbers are faster).
      * @param denom The "denominator" of pitch variation of the vibrato, which works the same as

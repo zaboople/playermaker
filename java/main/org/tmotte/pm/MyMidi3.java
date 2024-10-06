@@ -19,10 +19,10 @@ import org.tmotte.common.midi.SequencerUtils;
 import org.tmotte.common.midi.SequencerWatcher;
 import org.tmotte.common.text.Log;
 
-
 /**
  * Whereas Player is used to compose musical "tracks" (analagous but not exactly the same
- * as Midi Tracks), MyMidi is used for playback of the composition.
+ * as Midi Tracks), MyMidi is used for playback of the composition. It also keeps track
+ * of available instruments.
  */
 public class MyMidi3 implements Closeable {
 
