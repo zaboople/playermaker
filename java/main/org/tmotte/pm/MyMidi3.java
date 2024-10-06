@@ -95,7 +95,9 @@ public class MyMidi3 implements Closeable {
     /** Creates a new Midi sequencer and synthesizer, ready to play
         @param replaceInstruments Attempts to replace built-in Instruments
         with a file (usually a .sf2 file) containing alternates. Kind of
-        inflexible and not really well tested.
+        inflexible and not really well tested. In the future I hope to
+        test out adding instruments and see if I can rewrite things for more
+        flexibility.
     */
     public MyMidi3(Optional<File> replaceInstruments) {
         Except.run(()-> {
