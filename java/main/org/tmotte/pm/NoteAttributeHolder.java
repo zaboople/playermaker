@@ -33,11 +33,6 @@ public abstract class NoteAttributeHolder<T> {
     public int volume() {
         return getNoteAttributesForRead().volume;
     }
-    /** Gets the current volume setting
-    @return volume */
-    public int getVolume() {
-        return getNoteAttributesForRead().volume;
-    }
 
 
     /**
@@ -68,7 +63,6 @@ public abstract class NoteAttributeHolder<T> {
     public int getTranspose() {
         return getNoteAttributesForRead().transpose;
     }
-
 
 
     protected abstract NoteAttributes getNoteAttributesForRead();
