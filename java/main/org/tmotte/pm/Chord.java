@@ -105,6 +105,9 @@ public class Chord<T> extends NoteAttributeHolder<Chord<T>> {
     public Chord<T> t(Number duration) {
         return t(Divisions.convert(duration));
     }
+    public Chord<T> t(Number... durations) {
+        return t(Divisions.convert(duration));
+    }
     private Chord<T> t(long duration) {
         this.duration+=duration;
         return this;
