@@ -167,6 +167,11 @@ public class MyMidi3 implements Closeable {
         final List<MetaInstrument> found = findMetaInstruments(name).toList();
         if (found.size()==0)
             throw new IllegalArgumentException("No instrument found for: \""+name+"\"");
+        if (found.size() > 1) {
+            Instrument mi=getInstrument(name);
+            if (mi!=null)
+                return mi;
+        }
         if (found.size() > 1)
             throw new IllegalArgumentException(
                 "More than one instrument found for \""+name+ "\": "+
